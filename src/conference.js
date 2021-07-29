@@ -29,6 +29,7 @@ class Conference extends Service {
    *  ROOM_ENTER: string,
    *  ROOM_LEAVE: string,
    *  ROOM_OPEN: string,
+   *  RTC_STREAM_AGENT_SPEAKING: string
    *  RTC_STREAM_UPDATE: string
    * }}
    */
@@ -39,6 +40,7 @@ class Conference extends Service {
       ROOM_ENTER: 'room.enter',
       ROOM_LEAVE: 'room.leave',
       ROOM_OPEN: 'room.open',
+      RTC_STREAM_AGENT_SPEAKING: 'rtc_stream.agent_speaking',
       RTC_STREAM_UPDATE: 'rtc_stream.update'
     }
   }
