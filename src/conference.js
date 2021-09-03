@@ -108,6 +108,19 @@ class Conference extends Service {
   }
 
   /**
+   * Close room
+   * @param id
+   * @returns {Promise}
+   */
+  closeRoom (id) {
+    const params = {
+      id
+    }
+
+    return this._rpc.send('room.close', params)
+  }
+
+  /**
    * Delete room
    * @param id
    * @returns {Promise}
