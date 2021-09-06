@@ -36,6 +36,18 @@ export class Dispatcher extends BasicClient {
    * @returns {Promise}
    */
   readScope (kind, audience, scope) {
-    return this._request(`${this.endpoint}/audiences/${audience}/${kind}/${scope}`)
+    return this._get(`${this.endpoint}/audiences/${audience}/${kind}/${scope}`)
+  }
+
+  /**
+   * Update dispatcher scope
+   * @param {string} kind
+   * @param {string} audience
+   * @param {string} scope
+   * @param {object} data
+   * @returns {Promise}
+   */
+  updateScope (kind, audience, scope, data) {
+    return this._put(`${this.endpoint}/audiences/${audience}/${kind}/${scope}`, data)
   }
 }

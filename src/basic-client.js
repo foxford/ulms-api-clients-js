@@ -12,10 +12,17 @@ export class BasicClient {
     }
   }
 
-  async _request (url) {
+  async _get (url) {
     const token = await this.tokenProvider.getToken()
     const headers = BasicClient._headers(token)
 
     return this.httpClient.get(url, { headers })
+  }
+
+  async _put (url, data) {
+    const token = await this.tokenProvider.getToken()
+    const headers = BasicClient._headers(token)
+
+    return this.httpClient.put(url, data, { headers })
   }
 }

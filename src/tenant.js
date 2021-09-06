@@ -25,7 +25,7 @@ export class Tenant extends BasicClient {
       qs = `?scope=${scope}`
     }
 
-    return this._request(`${this.endpoint}/users/${id}${qs}`)
+    return this._get(`${this.endpoint}/users/${id}${qs}`)
   }
 
   /**
@@ -37,7 +37,7 @@ export class Tenant extends BasicClient {
   listProfile (ids, scope) {
     const qs = `?ids=${ids.join(',')}&scope=${scope}`
 
-    return this._request(`${this.endpoint}/users${qs}`)
+    return this._get(`${this.endpoint}/users${qs}`)
   }
 
   /**
@@ -46,6 +46,6 @@ export class Tenant extends BasicClient {
    * @returns {Promise}
    */
   readScope (scope) {
-    return this._request(`${this.endpoint}/webinars/${scope}`)
+    return this._get(`${this.endpoint}/webinars/${scope}`)
   }
 }

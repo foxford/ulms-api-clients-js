@@ -22,12 +22,12 @@ export class FetchHttpClient {
       .then(FetchHttpClient._handleResponse)
   }
 
-  // patch (url, data, config) {
-  //   return fetch(url, {
-  //     method: 'PATCH',
-  //     headers: config.headers,
-  //     body: JSON.stringify(data)
-  //   })
-  //     .then((response) => response.json())
-  // }
+  put (url, data, config) {
+    return fetch(url, {
+      method: 'PUT',
+      headers: config.headers,
+      body: JSON.stringify(data)
+    })
+      .then(FetchHttpClient._handleResponse)
+  }
 }
