@@ -77,6 +77,21 @@ class Event extends Service {
   }
 
   /**
+   * List of event types that a user without room update rights cannot create (expected to be used for locked chats)
+   * @param id
+   * @param {Object} locked_types
+   * @returns {Promise}
+   */
+  updateLockTypes (id, locked_types) {
+    const params = {
+      id,
+      locked_types
+    }
+
+    return this._rpc.send('room.locked_types', params)
+  }
+
+  /**
    * Enter room
    * @param id
    * @param broadcast_subscription
