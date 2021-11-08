@@ -1,6 +1,6 @@
 export class BasicClient {
-  constructor (endpoint, httpClient, tokenProvider) {
-    this.endpoint = endpoint
+  constructor (baseUrl, httpClient, tokenProvider) {
+    this.baseUrl = baseUrl
     this.httpClient = httpClient
     this.tokenProvider = tokenProvider
   }

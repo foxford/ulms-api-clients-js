@@ -36,7 +36,7 @@ export class Dispatcher extends BasicClient {
    * @returns {Promise}
    */
   readScope (kind, audience, scope) {
-    return this._get(`${this.endpoint}/audiences/${audience}/${kind}/${scope}`)
+    return this._get(`${this.baseUrl}/audiences/${audience}/${kind}/${scope}`)
   }
 
   /**
@@ -48,6 +48,6 @@ export class Dispatcher extends BasicClient {
    * @returns {Promise}
    */
   updateScope (kind, audience, scope, data) {
-    return this._put(`${this.endpoint}/audiences/${audience}/${kind}/${scope}`, data)
+    return this._put(`${this.baseUrl}/audiences/${audience}/${kind}/${scope}`, data)
   }
 }
