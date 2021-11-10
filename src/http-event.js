@@ -21,10 +21,6 @@ const eventEndpoints = {
 }
 
 class HTTPEvent extends BasicClient {
-  constructor (httpClient, baseUrl, tokenProvider) {
-    super(baseUrl, httpClient, tokenProvider)
-  }
-
   /**
    * Read room
    * @param id
@@ -125,11 +121,11 @@ class HTTPEvent extends BasicClient {
   /**
    * Update locked types in room
    * @param room_id
-   * @param {Object} payload
+   * @param {Object} locked_types
    * @returns {Promise}
    */
-  updateLockedTypes (room_id, payload) {
-    return this._post(this._url(eventEndpoints.roomUpdateLockedTypes(room_id)), payload)
+  updateLockedTypes (room_id, locked_types) {
+    return this._post(this._url(eventEndpoints.roomUpdateLockedTypes(room_id)), { locked_types })
   }
 
   /**
@@ -217,7 +213,7 @@ class HTTPEvent extends BasicClient {
    * @returns {Promise}
    */
   listChange (id, filterParams = {}) {
-    return this._get(this._url(eventEndpoints.changesList(id, filterParams)))// return this._rpc.send('change.list', params)
+    return this._get(this._url(eventEndpoints.changesList(id, filterParams)))
   }
 
   /**
