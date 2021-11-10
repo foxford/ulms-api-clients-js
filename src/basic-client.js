@@ -46,17 +46,17 @@ export class BasicClient {
 
   setLabels (labels) {
     const {
-      app_audience: ulms_app_audience,
-      app_label: ulms_app_label,
-      app_version: ulms_app_version,
-      scope: ulms_scope
+      app_audience,
+      app_label,
+      app_version,
+      scope
     } = labels
 
     this._labels = {
-      ...(ulms_app_audience !== undefined && { ulms_app_audience }),
-      ...(ulms_app_label !== undefined && { ulms_app_label }),
-      ...(ulms_app_version !== undefined && { ulms_app_version }),
-      ...(ulms_scope !== undefined && { ulms_scope })
+      ...(app_audience !== undefined && { 'ulms-app-audience': app_audience }),
+      ...(app_label !== undefined && { 'ulms-app-label': app_label }),
+      ...(app_version !== undefined && { 'ulms-app-version': app_version }),
+      ...(scope !== undefined && { 'ulms-scope': scope })
     }
   }
 
