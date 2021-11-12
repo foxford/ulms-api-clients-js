@@ -48,4 +48,22 @@ export class Tenant extends BasicClient {
   readScope (scope) {
     return this._get(`${this.baseUrl}/webinars/${scope}`)
   }
+
+  /**
+   * List materials
+   * @param {string} scope
+   * @returns {Promise}
+   */
+  listMaterial (scope) {
+    return this._get(`${this.baseUrl}/webinars/${scope}/materials`)
+  }
+
+  /**
+   * Create url to material with `id`
+   * @param {string} id
+   * @returns {string}
+   */
+  createMaterialUrl (id) {
+    return `${this.baseUrl}/materials/${id}`
+  }
 }
