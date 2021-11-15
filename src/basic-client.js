@@ -30,10 +30,10 @@ export class BasicClient {
         }
       }
       if (urlParams) {
-        return `https://${this.baseUrl}${endpoint}?${urlParams}`
+        return `${this.baseUrl}${endpoint}?${urlParams}`
       }
     }
-    return `https://${this.baseUrl}${endpoint}`
+    return `${this.baseUrl}${endpoint}`
   }
 
   static _headers (token, labels = {}) {
