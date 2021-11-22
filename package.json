@@ -1,6 +1,6 @@
 {
   "name": "@ulms/api-clients",
-  "version": "4.10.0",
+  "version": "4.10.1",
   "description": "JavaScript API clients for ULMS platform",
   "keywords": [],
   "homepage": "https://github.com/netology-group/ulms-api-clients-js#readme",

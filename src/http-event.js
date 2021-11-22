@@ -115,7 +115,7 @@ class HTTPEvent extends BasicClient {
    * @returns {Promise}
    */
   listEvent (room_id, filterParams = {}) {
-    return this._get(this._url(eventEndpoints.eventsList(room_id, filterParams)))
+    return this._get(this._url(eventEndpoints.eventsList(room_id), filterParams))
   }
 
   /**
@@ -213,7 +213,7 @@ class HTTPEvent extends BasicClient {
    * @returns {Promise}
    */
   listChange (id, filterParams = {}) {
-    return this._get(this._url(eventEndpoints.changesList(id, filterParams)))
+    return this._get(this._url(eventEndpoints.changesList(id), filterParams))
   }
 
   /**
