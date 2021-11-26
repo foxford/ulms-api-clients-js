@@ -2,6 +2,7 @@
 import { BasicClient } from './basic-client'
 
 const eventEndpoints = {
+  banList: id => `/rooms/${id}/bans`,
   roomRead: id => `/rooms/${id}`,
   roomUpdate: id => `/rooms/${id}`,
   roomEnter: id => `/rooms/${id}/enter`,
@@ -77,6 +78,16 @@ class HTTPEvent extends BasicClient {
     }
 
     return this._patch(this._url(eventEndpoints.agentsUpdate(room_id)), params)
+  }
+
+  /**
+   * List bans in room
+   * @param room_id
+   * @param {Object} filterParams
+   * @returns {Promise}
+   */
+  listBans (room_id, filterParams = {}) {
+    return this._get(this._url(eventEndpoints.banList(room_id), filterParams))
   }
 
   /**
