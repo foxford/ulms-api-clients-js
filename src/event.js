@@ -156,6 +156,19 @@ class Event extends Service {
   }
 
   /**
+   * List bans in room
+   * @param room_id
+   * @returns {Promise}
+   */
+  listBans (room_id) {
+    const params = {
+      room_id
+    }
+
+    return this._rpc.send('ban.list', params)
+  }
+
+  /**
    * Create event
    * @param room_id
    * @param {String} type
