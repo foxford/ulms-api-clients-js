@@ -12,6 +12,8 @@ export class FetchHttpClient {
     }
 
     return response.json()
+      .catch(() => response.text())
+      .catch(() => ({ status: response.status, statusText: response.statusText }))
   }
 
   get (url, config) {

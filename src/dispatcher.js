@@ -29,6 +29,17 @@ export class Dispatcher extends BasicClient {
   }
 
   /**
+   * Commit edition by scope
+   * @param {string} audience
+   * @param {string} scope
+   * @param {string} editionId
+   * @returns {Promise}
+   */
+  commitEdition (audience, scope, editionId) {
+    return this._post(`${this.baseUrl}/audiences/${audience}/classes/${scope}/editions/${editionId}`)
+  }
+
+  /**
    * Read dispatcher scope
    * @param {string} kind
    * @param {string} audience
