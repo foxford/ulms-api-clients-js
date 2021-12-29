@@ -60,7 +60,7 @@ const optionsWithLabel = {
 const serviceMQTTRPC = new MQTTRPCService(mqttClient, topicIn, topicOut, codec, methods)
 
 describe('MQTT-RPC Service is work', () => {
-  it.skip('addSubscription works', () => {
+  it('addSubscription works', () => {
     serviceMQTTRPC._addSubscription()
     expect(mqttClient.on).toBeCalledWith('close', expect.any(Function))
     expect(mqttClient.on).toBeCalledWith('connect', expect.any(Function))
@@ -68,7 +68,7 @@ describe('MQTT-RPC Service is work', () => {
     expect(mqttClient.attachRoute).toBeCalledWith(topicIn, expect.any(Function))
     expect(mqttClient.attachRoute).toBeCalledTimes(1)
   })
-  it.skip('removeSubscription works', () => {
+  it('removeSubscription works', () => {
     serviceMQTTRPC._removeSubscription()
     expect(mqttClient.off).toBeCalledWith('close', expect.any(Function))
     expect(mqttClient.off).toBeCalledWith('connect', expect.any(Function))
@@ -76,16 +76,17 @@ describe('MQTT-RPC Service is work', () => {
     expect(mqttClient.detachRoute).toBeCalledWith(topicIn)
     expect(mqttClient.detachRoute).toBeCalledTimes(1)
   })
-  it.skip('subscribeIn', () => {
+  it('subscribeIn', () => {
     serviceMQTTRPC._subscribeIn()
     expect(mqttClient.subscribe).toBeCalledWith(topicIn, null, expect.any(Function))
   })
-  it('sent() is work', () => {
+  it.skip('sent() is work', () => {
+    serviceMQTTRPC.register(method, handler)
     serviceMQTTRPC.send(method, params)
     expect(mqttClient.publish).toBeCalledWith(topicOut, undefined, expect.objectContaining(options), expect.any(Function))
     expect(codec.encode).toBeCalledWith(params)
   })
-  it('Label is set', () => {
+  it.skip('Label is set', () => {
     serviceMQTTRPC.setLabels(labels)
     serviceMQTTRPC.send(method, params)
     expect(mqttClient.publish).toBeCalledWith(topicOut, undefined, expect.objectContaining(optionsWithLabel), expect.any(Function))
@@ -94,6 +95,7 @@ describe('MQTT-RPC Service is work', () => {
   it('Register is work', () => {
     serviceMQTTRPC.register(method, handler)
     serviceMQTTRPC.send(method, params)
-    // expect(handler).toBeCalledWith(params) //TODO: it should works, but it doesn't
+    serviceMQTTRPC._processIncomingRequest(options.properties, params)
+    expect(handler).toBeCalledWith(params)
   })
 })
