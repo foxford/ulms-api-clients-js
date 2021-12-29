@@ -1,16 +1,16 @@
-import { BasicClient } from './basic-client'
+import BasicClient from './basic-client'
 
-export class Dispatcher extends BasicClient {
+class Dispatcher extends BasicClient {
   /**
    * Scope kind enum
    * @returns {{CHAT: string, MINIGROUP: string, P2P: string, WEBINAR: string}}
    */
-  static get kind () {
+  static get kind() {
     return {
       CHAT: 'chats',
       MINIGROUP: 'minigroups',
       P2P: 'p2p',
-      WEBINAR: 'webinars'
+      WEBINAR: 'webinars',
     }
   }
 
@@ -18,13 +18,13 @@ export class Dispatcher extends BasicClient {
    * Scope status enum
    * @returns {{REAL_TIME: string, CLOSED: string, FINISHED: string, ADJUSTED: string, TRANSCODED: string}}
    */
-  static get scopeStatus () {
+  static get scopeStatus() {
     return {
       REAL_TIME: 'real-time',
       CLOSED: 'closed',
       FINISHED: 'finished',
       ADJUSTED: 'adjusted',
-      TRANSCODED: 'transcoded'
+      TRANSCODED: 'transcoded',
     }
   }
 
@@ -35,8 +35,10 @@ export class Dispatcher extends BasicClient {
    * @param {string} editionId
    * @returns {Promise}
    */
-  commitEdition (audience, scope, editionId) {
-    return this._post(`${this.baseUrl}/audiences/${audience}/classes/${scope}/editions/${editionId}`)
+  commitEdition(audience, scope, editionId) {
+    return this.post(
+      `${this.baseUrl}/audiences/${audience}/classes/${scope}/editions/${editionId}`
+    )
   }
 
   /**
@@ -46,8 +48,8 @@ export class Dispatcher extends BasicClient {
    * @param {string} scope
    * @returns {Promise}
    */
-  readScope (kind, audience, scope) {
-    return this._get(`${this.baseUrl}/audiences/${audience}/${kind}/${scope}`)
+  readScope(kind, audience, scope) {
+    return this.get(`${this.baseUrl}/audiences/${audience}/${kind}/${scope}`)
   }
 
   /**
@@ -58,7 +60,12 @@ export class Dispatcher extends BasicClient {
    * @param {object} data
    * @returns {Promise}
    */
-  updateScope (kind, audience, scope, data) {
-    return this._put(`${this.baseUrl}/audiences/${audience}/${kind}/${scope}`, data)
+  updateScope(kind, audience, scope, data) {
+    return this.put(
+      `${this.baseUrl}/audiences/${audience}/${kind}/${scope}`,
+      data
+    )
   }
 }
+
+export default Dispatcher

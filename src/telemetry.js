@@ -1,23 +1,22 @@
-/* eslint-disable camelcase */
-import { Codec } from './codec.js'
+import Codec from './codec'
 
 class Telemetry {
-  constructor (mqttClient, agentId, appName) {
-    this._agentId = agentId
-    this._appName = appName
-    this._labels = {}
-    this._publishQoS = 1
-    this._topicOut = `agents/${this._agentId}/api/v1/out/${this._appName}`
-    this._mqtt = mqttClient
+  constructor(mqttClient, agentId, appName) {
+    this.agentId = agentId
+    this.appName = appName
+    this.labels = {}
+    this.publishQoS = 1
+    this.topicOut = `agents/${this.agentId}/api/v1/out/${this.appName}`
+    this.mqtt = mqttClient
 
-    this._codec = new Codec(
+    this.codec = new Codec(
       (data) => JSON.stringify(data),
-      _ => _
+      (_) => _
     )
   }
 
-  send (params) {
-    if (!this._mqtt.connected) {
+  send(parameters) {
+    if (!this.mqtt.connected) {
       return
     }
 
@@ -26,36 +25,34 @@ class Telemetry {
         label: 'metric.create',
         local_timestamp: Date.now().toString(),
         type: 'event',
-        ...this._labels
-      }
+        ...this.labels,
+      },
     }
 
-    this._mqtt.publish(this._topicOut, this._codec.encode(params), { properties, qos: this._publishQoS })
+    this.mqtt.publish(this.topicOut, this.codec.encode(parameters), {
+      properties,
+      qos: this.publishQoS,
+    })
   }
 
-  setLabels (labels) {
-    const {
-      app_audience,
-      app_label,
-      app_version,
-      scope
-    } = labels
+  setLabels(labels) {
+    const { app_audience, app_label, app_version, scope } = labels // eslint-disable-line camelcase
 
-    this._labels = {
-      ...(app_audience !== undefined && { app_audience }),
-      ...(app_label !== undefined && { app_label }),
-      ...(app_version !== undefined && { app_version }),
-      ...(scope !== undefined && { scope })
+    this.labels = {
+      ...(app_audience !== undefined && { app_audience }), // eslint-disable-line camelcase
+      ...(app_label !== undefined && { app_label }), // eslint-disable-line camelcase
+      ...(app_version !== undefined && { app_version }), // eslint-disable-line camelcase
+      ...(scope !== undefined && { scope }),
     }
   }
 
-  clearLabels () {
-    this._labels = {}
+  clearLabels() {
+    this.labels = {}
   }
 
-  destroy () {
+  destroy() {
     this.clearLabels()
   }
 }
 
-export { Telemetry }
+export default Telemetry

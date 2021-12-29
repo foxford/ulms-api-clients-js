@@ -1,4 +1,4 @@
-import { Codec } from '../src/codec'
+import Codec from '../src/codec'
 
 const encoder = (data) => JSON.stringify(data)
 const decoder = (data) => {
@@ -6,7 +6,7 @@ const decoder = (data) => {
 
   try {
     payload = JSON.parse(data.toString())
-  } catch (error) {
+  } catch {
     payload = {}
   }
 
@@ -18,11 +18,9 @@ const payload = {
   data: {
     a: 'a',
     b: 'b',
-    c: 'c'
+    c: 'c',
   },
-  another: [
-    'a', 'b', 'c'
-  ]
+  another: ['a', 'b', 'c'],
 }
 
 describe('Codec works correctly', () => {

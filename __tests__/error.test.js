@@ -1,6 +1,8 @@
-// import { describe, it, expect} from 'jest'
-
-import { MQTTClientError, MQTTRPCServiceError, TimeoutError } from '../src/error'
+import {
+  MQTTClientError,
+  MQTTRPCServiceError,
+  TimeoutError,
+} from '../src/error'
 
 const clientError = new MQTTClientError('Message')
 const serviceError = new MQTTRPCServiceError('Message')
@@ -14,7 +16,9 @@ describe('Custom errors have right titles', () => {
     expect(clientError.message).toEqual('Message')
   })
   it('MQTTClientError message is valid (from error)', () => {
-    expect(MQTTClientError.fromError(new Error('Message')).message).toEqual('Message')
+    expect(MQTTClientError.fromError(new Error('Message')).message).toEqual(
+      'Message'
+    )
   })
   it('MQTTRPCServiceError name is valid', () => {
     expect(serviceError.name).toEqual('MQTTRPCServiceError')

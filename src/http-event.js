@@ -1,24 +1,23 @@
-/* eslint-disable camelcase */
-import { BasicClient } from './basic-client'
+import BasicClient from './basic-client'
 
 const eventEndpoints = {
-  banList: id => `/rooms/${id}/bans`,
-  roomRead: id => `/rooms/${id}`,
-  roomUpdate: id => `/rooms/${id}`,
-  roomEnter: id => `/rooms/${id}/enter`,
-  roomState: id => `/rooms/${id}/state`,
-  roomUpdateLockedTypes: id => `/rooms/${id}/locked_types`,
-  eventsList: id => `/rooms/${id}/events`,
-  eventsCreate: id => `/rooms/${id}/events`,
-  agentsList: id => `/rooms/${id}/agents`,
-  agentsUpdate: id => `/rooms/${id}/agents`,
-  editionsList: id => `/rooms/${id}/editions`,
-  editionsCreate: id => `/rooms/${id}/editions`,
-  editionsDelete: id => `/editions/${id}`,
-  editionsCommit: id => `/editions/${id}/commit`,
-  changesList: id => `/editions/${id}/changes`,
-  changesCreate: id => `/editions/${id}/changes`,
-  changesDelete: id => `/changes/${id}`
+  agentsList: (id) => `/rooms/${id}/agents`,
+  agentsUpdate: (id) => `/rooms/${id}/agents`,
+  banList: (id) => `/rooms/${id}/bans`,
+  changesCreate: (id) => `/editions/${id}/changes`,
+  changesDelete: (id) => `/changes/${id}`,
+  changesList: (id) => `/editions/${id}/changes`,
+  editionsCommit: (id) => `/editions/${id}/commit`,
+  editionsCreate: (id) => `/rooms/${id}/editions`,
+  editionsDelete: (id) => `/editions/${id}`,
+  editionsList: (id) => `/rooms/${id}/editions`,
+  eventsCreate: (id) => `/rooms/${id}/events`,
+  eventsList: (id) => `/rooms/${id}/events`,
+  roomEnter: (id) => `/rooms/${id}/enter`,
+  roomRead: (id) => `/rooms/${id}`,
+  roomState: (id) => `/rooms/${id}/state`,
+  roomUpdate: (id) => `/rooms/${id}`,
+  roomUpdateLockedTypes: (id) => `/rooms/${id}/locked_types`,
 }
 
 class HTTPEvent extends BasicClient {
@@ -27,160 +26,162 @@ class HTTPEvent extends BasicClient {
    * @param id
    * @returns {Promise}
    */
-  readRoom (id) {
-    return this._get(this._url(eventEndpoints.roomRead(id)))
+  readRoom(id) {
+    return this.get(this.url(eventEndpoints.roomRead(id)))
   }
 
   /**
    * Update room
    * @param id
-   * @param {Object} updateParams
+   * @param {Object} updateParameters
    * @returns {Promise}
    */
-  updateRoom (id, updateParams) {
-    return this._patch(this._url(eventEndpoints.roomUpdate(id)), updateParams)
+  updateRoom(id, updateParameters) {
+    return this.patch(this.url(eventEndpoints.roomUpdate(id)), updateParameters)
   }
 
   /**
    * Enter room
    * @param id
-   * @param {String} agent_label
-   * @param {Boolean} broadcast_subscription
+   * @param {String} agentLabel
+   * @param {Boolean} broadcastSubscription
    * @returns {Promise}
    */
-  enterRoom (id, agent_label, broadcast_subscription = true) {
-    return this._post(this._url(eventEndpoints.roomEnter(id)), { agent_label, broadcast_subscription })
+  enterRoom(id, agentLabel, broadcastSubscription = true) {
+    return this.post(this.url(eventEndpoints.roomEnter(id)), {
+      agent_label: agentLabel,
+      broadcast_subscription: broadcastSubscription,
+    })
   }
 
   /**
    * List agents in room
-   * @param room_id
-   * @param {Object} filterParams
+   * @param roomId
+   * @param {Object} filterParameters
    * @returns {Promise}
    */
-  listAgent (room_id, filterParams = {}) {
-    return this._get(this._url(eventEndpoints.agentsList(room_id), filterParams))
+  listAgent(roomId, filterParameters = {}) {
+    return this.get(
+      this.url(eventEndpoints.agentsList(roomId), filterParameters)
+    )
   }
 
   /**
    * Update agent in room (currently only ban or un-ban)
-   * @param room_id
-   * @param account_id
+   * @param roomId
+   * @param accountId
    * @param {Boolean} value
    * @param {String} reason
    * @returns {Promise}
    */
-  updateAgent (room_id, account_id, value, reason) {
-    const params = {
-      account_id,
+  updateAgent(roomId, accountId, value, reason) {
+    const parameters = {
+      account_id: accountId,
       reason,
-      value
+      value,
     }
 
-    return this._patch(this._url(eventEndpoints.agentsUpdate(room_id)), params)
+    return this.patch(this.url(eventEndpoints.agentsUpdate(roomId)), parameters)
   }
 
   /**
    * List bans in room
-   * @param room_id
-   * @param {Object} filterParams
+   * @param roomId
+   * @param {Object} filterParameters
    * @returns {Promise}
    */
-  listBans (room_id, filterParams = {}) {
-    return this._get(this._url(eventEndpoints.banList(room_id), filterParams))
+  listBans(roomId, filterParameters = {}) {
+    return this.get(this.url(eventEndpoints.banList(roomId), filterParameters))
   }
 
   /**
    * Create event
-   * @param room_id
+   * @param roomId
    * @param {String} type
    * @param {Object|String|Number} data
-   * @param {Object} eventParams
+   * @param {Object} eventParameters
    * @returns {Promise}
    */
-  createEvent (room_id, type, data, eventParams = {}) {
-    const {
-      attribute,
-      is_claim,
-      is_persistent,
-      label,
-      set
-    } = eventParams
-    const params = {
+  createEvent(roomId, type, data, eventParameters = {}) {
+    const { attribute, is_claim, is_persistent, label, set } = eventParameters // eslint-disable-line camelcase
+    const parameters = {
       attribute,
       data,
-      is_claim,
-      is_persistent,
+      is_claim, // eslint-disable-line camelcase
+      is_persistent, // eslint-disable-line camelcase
       label,
       set,
-      type
+      type,
     }
 
-    return this._post(this._url(eventEndpoints.eventsCreate(room_id)), params)
+    return this.post(this.url(eventEndpoints.eventsCreate(roomId)), parameters)
   }
 
   /**
    * List events
-   * @param room_id
-   * @param {Object} filterParams
+   * @param roomId
+   * @param {Object} filterParameters
    * @returns {Promise}
    */
-  listEvent (room_id, filterParams = {}) {
-    return this._get(this._url(eventEndpoints.eventsList(room_id), filterParams))
+  listEvent(roomId, filterParameters = {}) {
+    return this.get(
+      this.url(eventEndpoints.eventsList(roomId), filterParameters)
+    )
   }
 
   /**
    * Update locked types in room
-   * @param room_id
-   * @param {Object} locked_types
+   * @param roomId
+   * @param {Object} lockedTypes
    * @returns {Promise}
    */
-  updateLockedTypes (room_id, locked_types) {
-    return this._post(this._url(eventEndpoints.roomUpdateLockedTypes(room_id)), { locked_types })
+  updateLockedTypes(roomId, lockedTypes) {
+    return this.post(this.url(eventEndpoints.roomUpdateLockedTypes(roomId)), {
+      locked_types: lockedTypes,
+    })
   }
 
   /**
    * Read state
-   * @param room_id
+   * @param roomId
    * @param {String[]} sets
-   * @param {Object} filterParams
+   * @param {Object} filterParameters
    * @returns {Promise}
    */
-  readState (room_id, sets, filterParams = {}) {
-    const {
+  readState(roomId, sets, filterParameters = {}) {
+    // eslint-disable-next-line camelcase
+    const { attribute, limit, occurred_at, original_occurred_at } =
+      filterParameters
+    const parameters = {
       attribute,
       limit,
-      occurred_at,
-      original_occurred_at
-    } = filterParams
-    const params = {
-      attribute,
-      limit,
-      occurred_at,
-      original_occurred_at,
-      sets
+      occurred_at, // eslint-disable-line camelcase
+      original_occurred_at, // eslint-disable-line camelcase
+      sets,
     }
 
-    return this._get(this._url(eventEndpoints.roomState(room_id), params))
+    return this.get(this.url(eventEndpoints.roomState(roomId), parameters))
   }
 
   /**
    * Create edition
-   * @param room_id
+   * @param roomId
    * @returns {Promise}
    */
-  createEdition (room_id) {
-    return this._post(this._url(eventEndpoints.editionsCreate(room_id)))
+  createEdition(roomId) {
+    return this.post(this.url(eventEndpoints.editionsCreate(roomId)))
   }
 
   /**
    * List editions
-   * @param room_id
-   * @param {Object} filterParams
+   * @param roomId
+   * @param {Object} filterParameters
    * @returns {Promise}
    */
-  listEdition (room_id, filterParams = {}) {
-    return this._get(this._url(eventEndpoints.editionsList(room_id), filterParams))
+  listEdition(roomId, filterParameters = {}) {
+    return this.get(
+      this.url(eventEndpoints.editionsList(roomId), filterParameters)
+    )
   }
 
   /**
@@ -188,8 +189,8 @@ class HTTPEvent extends BasicClient {
    * @param id
    * @returns {Promise}
    */
-  deleteEdition (id) {
-    return this._delete(this._url(eventEndpoints.editionsDelete(id)))
+  deleteEdition(id) {
+    return this.delete(this.url(eventEndpoints.editionsDelete(id)))
   }
 
   /**
@@ -197,34 +198,37 @@ class HTTPEvent extends BasicClient {
    * @param id
    * @returns {Promise}
    */
-  commitEdition (id) {
-    return this._post(this._url(eventEndpoints.editionsCommit(id)))
+  commitEdition(id) {
+    return this.post(this.url(eventEndpoints.editionsCommit(id)))
   }
 
   /**
    * Create change
-   * @param edition_id
+   * @param editionId
    * @param type
    * @param event
    * @returns {Promise}
    */
-  createChange (edition_id, type, event) {
-    const params = {
+  createChange(editionId, type, event) {
+    const parameters = {
       event,
-      type
+      type,
     }
 
-    return this._post(this._url(eventEndpoints.changesCreate(edition_id)), params)
+    return this.post(
+      this.url(eventEndpoints.changesCreate(editionId)),
+      parameters
+    )
   }
 
   /**
    * List changes
    * @param id
-   * @param {Object} filterParams
+   * @param {Object} filterParameters
    * @returns {Promise}
    */
-  listChange (id, filterParams = {}) {
-    return this._get(this._url(eventEndpoints.changesList(id), filterParams))
+  listChange(id, filterParameters = {}) {
+    return this.get(this.url(eventEndpoints.changesList(id), filterParameters))
   }
 
   /**
@@ -232,9 +236,9 @@ class HTTPEvent extends BasicClient {
    * @param id
    * @returns {Promise}
    */
-  deleteChange (id) {
-    return this._delete(this._url(eventEndpoints.changesDelete(id)))
+  deleteChange(id) {
+    return this.delete(this.url(eventEndpoints.changesDelete(id)))
   }
 }
 
-export { HTTPEvent }
+export default HTTPEvent

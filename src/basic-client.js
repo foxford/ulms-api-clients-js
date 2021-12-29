@@ -1,101 +1,113 @@
-/* eslint-disable camelcase */
-export class BasicClient {
-  constructor (baseUrl, httpClient, tokenProvider) {
+const parseParameter = (key, value) => {
+  if (Array.isArray(value)) {
+    // eslint-disable-next-line unicorn/no-array-reduce
+    return value.reduce(
+      (accumulator, item) =>
+        accumulator ? `${accumulator}&${key}[]=${item}` : `${key}[]=${item}`,
+      ''
+    )
+  }
+
+  if (typeof value === 'object') {
+    // eslint-disable-next-line unicorn/no-array-reduce
+    return Object.keys(value).reduce(
+      (accumulator, attribute) =>
+        accumulator
+          ? `${accumulator}&${key}[${attribute}]=${value[attribute]}`
+          : `${key}[${attribute}]=${value[attribute]}`,
+      ''
+    )
+  }
+
+  return `${key}=${value}`
+}
+
+class BasicClient {
+  constructor(baseUrl, httpClient, tokenProvider) {
     this.baseUrl = baseUrl
     this.httpClient = httpClient
     this.tokenProvider = tokenProvider
-    this._labels = {}
+    this.labels = {}
   }
 
-  _url (endpoint, params) {
-    const parseParameter = (key, value) => {
-      if (Array.isArray(value)) {
-        return value.reduce((acc, val) => {
-          return acc ? `${acc}&${key}[]=${val}` : `${key}[]=${val}`
-        }, '')
-      }
-      if (typeof value === 'object') {
-        return Object.keys(value).reduce((acc, attribute) => {
-          return acc ? `${acc}&${key}[${attribute}]=${value[attribute]}` : `${key}[${attribute}]=${value[attribute]}`
-        }, '')
-      }
-      return `${key}=${value}`
-    }
+  url(endpoint, parameters) {
+    if (parameters) {
+      let urlParameters = ''
 
-    if (params) {
-      let urlParams = ''
-      for (const [key, value] of Object.entries(params)) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const [key, value] of Object.entries(parameters)) {
         if (value !== undefined) {
-          urlParams += urlParams ? `&${parseParameter(key, value)}` : parseParameter(key, value)
+          urlParameters += urlParameters
+            ? `&${parseParameter(key, value)}`
+            : parseParameter(key, value)
         }
       }
-      if (urlParams) {
-        return `${this.baseUrl}${endpoint}?${urlParams}`
+
+      if (urlParameters) {
+        return `${this.baseUrl}${endpoint}?${urlParameters}`
       }
     }
+
     return `${this.baseUrl}${endpoint}`
   }
 
-  static _headers (token, labels = {}) {
+  static headers(token, labels = {}) {
     return {
       authorization: `Bearer ${token}`,
       'content-type': 'application/json',
-      ...labels
+      ...labels,
     }
   }
 
-  setLabels (labels) {
-    const {
-      app_audience,
-      app_label,
-      app_version,
-      scope
-    } = labels
+  setLabels(labels) {
+    const { app_audience, app_label, app_version, scope } = labels // eslint-disable-line camelcase
 
-    this._labels = {
-      ...(app_audience !== undefined && { 'ulms-app-audience': app_audience }),
-      ...(app_label !== undefined && { 'ulms-app-label': app_label }),
-      ...(app_version !== undefined && { 'ulms-app-version': app_version }),
-      ...(scope !== undefined && { 'ulms-scope': scope })
+    this.labels = {
+      ...(app_audience !== undefined && { 'ulms-app-audience': app_audience }), // eslint-disable-line camelcase
+      ...(app_label !== undefined && { 'ulms-app-label': app_label }), // eslint-disable-line camelcase
+      ...(app_version !== undefined && { 'ulms-app-version': app_version }), // eslint-disable-line camelcase
+      ...(scope !== undefined && { 'ulms-scope': scope }),
     }
   }
 
-  clearLabels () {
-    this._labels = {}
+  clearLabels() {
+    this.labels = {}
   }
 
-  async _get (url) {
+  async get(url) {
     const token = await this.tokenProvider.getToken()
-    const headers = BasicClient._headers(token, this._labels)
+    const headers = BasicClient.headers(token, this.labels)
 
     return this.httpClient.get(url, { headers })
   }
 
-  async _put (url, data) {
+  async put(url, data) {
     const token = await this.tokenProvider.getToken()
-    const headers = BasicClient._headers(token, this._labels)
+    const headers = BasicClient.headers(token, this.labels)
 
     return this.httpClient.put(url, data, { headers })
   }
 
-  async _post (url, data) {
+  async post(url, data) {
     const token = await this.tokenProvider.getToken()
-    const headers = BasicClient._headers(token, this._labels)
+    const headers = BasicClient.headers(token, this.labels)
 
     return this.httpClient.post(url, data, { headers })
   }
 
-  async _patch (url, data) {
+  async patch(url, data) {
     const token = await this.tokenProvider.getToken()
-    const headers = BasicClient._headers(token, this._labels)
+    const headers = BasicClient.headers(token, this.labels)
 
     return this.httpClient.patch(url, data, { headers })
   }
 
-  async _delete (url) {
+  async delete(url) {
     const token = await this.tokenProvider.getToken()
-    const headers = BasicClient._headers(token, this._labels)
+    const headers = BasicClient.headers(token, this.labels)
 
     return this.httpClient.delete(url, { headers })
   }
 }
+
+export default BasicClient
