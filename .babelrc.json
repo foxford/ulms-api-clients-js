@@ -1,5 +1,8 @@
 {
   "env":{
+    "test": {
+      "plugins": ["@babel/plugin-transform-modules-commonjs"]
+    },
     "es": {
       "presets": [
         ["@babel/preset-env", {
