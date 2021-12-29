@@ -1,17 +1,7 @@
-import { Conference } from './conference.js'
-import { Dispatcher } from './dispatcher.js'
-import { Event } from './event.js'
-import { HTTPEvent } from './http-event.js'
-import { FetchHttpClient } from './http-client.js'
-import { Telemetry } from './telemetry.js'
-import { Tenant } from './tenant.js'
-
-export {
-  Conference,
-  Dispatcher,
-  Event,
-  HTTPEvent,
-  FetchHttpClient,
-  Telemetry,
-  Tenant
-}
+export { default as Conference } from './conference'
+export { default as Dispatcher } from './dispatcher'
+export { default as Event } from './event'
+export { default as FetchHttpClient } from './http-client'
+export { default as HTTPEvent } from './http-event'
+export { default as Telemetry } from './telemetry'
+export { default as Tenant } from './tenant'

@@ -1,16 +1,16 @@
 class Codec {
-  constructor (encoder, decoder) {
-    this._encoder = encoder
-    this._decoder = decoder
+  constructor(encoder, decoder) {
+    this.encoder = encoder
+    this.decoder = decoder
   }
 
-  encode (data) {
-    return this._encoder(data)
+  encode(data) {
+    return this.encoder(data)
   }
 
-  decode (data) {
-    return this._decoder(data)
+  decode(data) {
+    return this.decoder(data)
   }
 }
 
-export { Codec }
+export default Codec

@@ -1,5 +1,4 @@
-/* eslint-disable camelcase */
-import { Service } from './service.js'
+import Service from './service'
 
 /**
  * Agent reader configuration
@@ -33,7 +32,7 @@ class Conference extends Service {
    *  RTC_STREAM_UPDATE: string
    * }}
    */
-  static get events () {
+  static get events() {
     return {
       AGENT_WRITER_CONFIG_UPDATE: 'agent_writer_config.update',
       ROOM_CLOSE: 'room.close',
@@ -41,7 +40,7 @@ class Conference extends Service {
       ROOM_LEAVE: 'room.leave',
       ROOM_OPEN: 'room.open',
       RTC_STREAM_AGENT_SPEAKING: 'rtc_stream.agent_speaking',
-      RTC_STREAM_UPDATE: 'rtc_stream.update'
+      RTC_STREAM_UPDATE: 'rtc_stream.update',
     }
   }
 
@@ -49,10 +48,10 @@ class Conference extends Service {
    * Conference intents enum
    * @returns {{INTENT_READ: string, INTENT_WRITE: string}}
    */
-  static get intents () {
+  static get intents() {
     return {
       INTENT_READ: 'read',
-      INTENT_WRITE: 'write'
+      INTENT_WRITE: 'write',
     }
   }
 
@@ -65,16 +64,16 @@ class Conference extends Service {
    * @param {Object} tags
    * @returns {Promise}
    */
-  createRoom (audience, time, backend, reserve, tags) {
-    const params = {
+  createRoom(audience, time, backend, reserve, tags) {
+    const parameters = {
       audience,
       backend,
       reserve,
       tags,
-      time
+      time,
     }
 
-    return this._rpc.send('room.create', params)
+    return this.rpc.send('room.create', parameters)
   }
 
   /**
@@ -82,12 +81,10 @@ class Conference extends Service {
    * @param id
    * @returns {Promise}
    */
-  readRoom (id) {
-    const params = {
-      id
-    }
+  readRoom(id) {
+    const parameters = { id }
 
-    return this._rpc.send('room.read', params)
+    return this.rpc.send('room.read', parameters)
   }
 
   /**
@@ -97,14 +94,14 @@ class Conference extends Service {
    * @param {[Number, Number]} time
    * @returns {Promise}
    */
-  updateRoom (id, audience, time) {
-    const params = {
+  updateRoom(id, audience, time) {
+    const parameters = {
       audience,
       id,
-      time
+      time,
     }
 
-    return this._rpc.send('room.update', params)
+    return this.rpc.send('room.update', parameters)
   }
 
   /**
@@ -112,12 +109,10 @@ class Conference extends Service {
    * @param id
    * @returns {Promise}
    */
-  closeRoom (id) {
-    const params = {
-      id
-    }
+  closeRoom(id) {
+    const parameters = { id }
 
-    return this._rpc.send('room.close', params)
+    return this.rpc.send('room.close', parameters)
   }
 
   /**
@@ -125,12 +120,10 @@ class Conference extends Service {
    * @param id
    * @returns {Promise}
    */
-  deleteRoom (id) {
-    const params = {
-      id
-    }
+  deleteRoom(id) {
+    const parameters = { id }
 
-    return this._rpc.send('room.delete', params)
+    return this.rpc.send('room.delete', parameters)
   }
 
   /**
@@ -138,12 +131,10 @@ class Conference extends Service {
    * @param id
    * @returns {Promise}
    */
-  enterRoom (id) {
-    const params = {
-      id
-    }
+  enterRoom(id) {
+    const parameters = { id }
 
-    return this._rpc.send('room.enter', params)
+    return this.rpc.send('room.enter', parameters)
   }
 
   /**
@@ -151,42 +142,38 @@ class Conference extends Service {
    * @param id
    * @returns {Promise}
    */
-  leaveRoom (id) {
-    const params = {
-      id
-    }
+  leaveRoom(id) {
+    const parameters = { id }
 
-    return this._rpc.send('room.leave', params)
+    return this.rpc.send('room.leave', parameters)
   }
 
   /**
    * List agent
-   * @param room_id
-   * @param {Object} filterParams
+   * @param roomId
+   * @param {Object} filterParameters
    * @returns {Promise}
    */
-  listAgent (room_id, filterParams = {}) {
-    const { limit, offset } = filterParams
-    const params = {
+  listAgent(roomId, filterParameters = {}) {
+    const { limit, offset } = filterParameters
+    const parameters = {
       limit,
       offset,
-      room_id
+      room_id: roomId,
     }
 
-    return this._rpc.send('agent.list', params)
+    return this.rpc.send('agent.list', parameters)
   }
 
   /**
    * Create RTC
-   * @param room_id
+   * @param roomId
    * @returns {Promise}
    */
-  createRtc (room_id) {
-    const params = {
-      room_id
-    }
+  createRtc(roomId) {
+    const parameters = { room_id: roomId }
 
-    return this._rpc.send('rtc.create', params)
+    return this.rpc.send('rtc.create', parameters)
   }
 
   /**
@@ -194,179 +181,162 @@ class Conference extends Service {
    * @param id
    * @returns {Promise}
    */
-  readRtc (id) {
-    const params = {
-      id
-    }
+  readRtc(id) {
+    const parameters = { id }
 
-    return this._rpc.send('rtc.read', params)
+    return this.rpc.send('rtc.read', parameters)
   }
 
   /**
    * List RTC
-   * @param room_id
-   * @param {Object} filterParams
+   * @param roomId
+   * @param {Object} filterParameters
    * @returns {Promise}
    */
-  listRtc (room_id, filterParams = {}) {
-    const { limit, offset } = filterParams
-    const params = {
+  listRtc(roomId, filterParameters = {}) {
+    const { limit, offset } = filterParameters
+    const parameters = {
       limit,
       offset,
-      room_id
+      room_id: roomId,
     }
 
-    return this._rpc.send('rtc.list', params)
+    return this.rpc.send('rtc.list', parameters)
   }
 
   /**
    * Connect to RTC
    * @param {String} id
-   * @param {Object} optionParams
-   * @param {string} optionParams.intent - Intent to connect to RTC ('read' or 'write')
+   * @param {Object} optionParameters
+   * @param {string} optionParameters.intent - Intent to connect to RTC ('read' or 'write')
    * @returns {Promise}
    */
-  connectRtc (id, optionParams = {}) {
-    const { intent = Conference.intents.INTENT_READ } = optionParams
-    const params = {
+  connectRtc(id, optionParameters = {}) {
+    const { intent = Conference.intents.INTENT_READ } = optionParameters
+    const parameters = {
       id,
-      intent
+      intent,
     }
 
-    return this._rpc.send('rtc.connect', params)
+    return this.rpc.send('rtc.connect', parameters)
   }
 
   /**
    * List RTC stream
-   * @param room_id
-   * @param {Object} filterParams
+   * @param roomId
+   * @param {Object} filterParameters
    * @returns {Promise}
    */
-  listRtcStream (room_id, filterParams = {}) {
-    const {
+  listRtcStream(roomId, filterParameters = {}) {
+    const { limit, offset, rtc_id, time } = filterParameters // eslint-disable-line camelcase
+    const parameters = {
       limit,
       offset,
-      rtc_id,
-      time
-    } = filterParams
-    const params = {
-      limit,
-      offset,
-      room_id,
-      rtc_id,
-      time
+      room_id: roomId,
+      rtc_id, // eslint-disable-line camelcase
+      time,
     }
 
-    return this._rpc.send('rtc_stream.list', params)
+    return this.rpc.send('rtc_stream.list', parameters)
   }
 
   /**
    * Create RTC signal
-   * @param {String} handle_id
+   * @param {String} handleId
    * @param {Object|Object[]} jsep
    * @param {String} label
    * @returns {Promise}
    */
-  createRtcSignal (handle_id, jsep, label) {
-    const params = {
+  createRtcSignal(handleId, jsep, label) {
+    const parameters = {
       jsep,
-      handle_id,
-      label
+      handle_id: handleId,
+      label,
     }
 
-    return this._rpc.send('rtc_signal.create', params)
+    return this.rpc.send('rtc_signal.create', parameters)
   }
 
   /**
    * Send broadcast message
    * @deprecated
-   * @param room_id
+   * @param roomId
    * @param {Object} data
    * @param {String} label
    * @returns {Promise}
    */
-  sendBroadcastMessage (room_id, data, label) {
-    const params = {
+  sendBroadcastMessage(roomId, data, label) {
+    const parameters = {
       data,
       label,
-      room_id
+      room_id: roomId,
     }
 
-    return this._rpc.send('message.broadcast', params)
+    return this.rpc.send('message.broadcast', parameters)
   }
 
   /**
    * Send unicast message
-   * @param room_id
-   * @param agent_id
+   * @param roomId
+   * @param agentId
    * @param {Object} data
    * @returns {Promise}
    */
-  sendUnicastMessage (room_id, agent_id, data) {
-    const params = {
-      agent_id,
+  sendUnicastMessage(roomId, agentId, data) {
+    const parameters = {
+      agent_id: agentId,
       data,
-      room_id
+      room_id: roomId,
     }
 
-    return this._rpc.send('message.unicast', params)
+    return this.rpc.send('message.unicast', parameters)
   }
 
   /**
    * Read AgentReaderConfig
-   * @param room_id
+   * @param roomId
    * @returns {Promise}
    */
-  readAgentReaderConfig (room_id) {
-    const params = {
-      room_id
-    }
+  readAgentReaderConfig(roomId) {
+    const parameters = { room_id: roomId }
 
-    return this._rpc.send('agent_reader_config.read', params)
+    return this.rpc.send('agent_reader_config.read', parameters)
   }
 
   /**
    * Read AgentWriterConfig
-   * @param room_id
+   * @param roomId
    * @returns {Promise}
    */
-  readAgentWriterConfig (room_id) {
-    const params = {
-      room_id
-    }
+  readAgentWriterConfig(roomId) {
+    const parameters = { room_id: roomId }
 
-    return this._rpc.send('agent_writer_config.read', params)
+    return this.rpc.send('agent_writer_config.read', parameters)
   }
 
   /**
    * Update AgentReaderConfig
-   * @param room_id
+   * @param roomId
    * @param {AgentReaderConfig[]} configs
    * @returns {Promise}
    */
-  updateAgentReaderConfig (room_id, configs) {
-    const params = {
-      configs,
-      room_id
-    }
+  updateAgentReaderConfig(roomId, configs) {
+    const parameters = { configs, room_id: roomId }
 
-    return this._rpc.send('agent_reader_config.update', params)
+    return this.rpc.send('agent_reader_config.update', parameters)
   }
 
   /**
    * Update AgentWriterConfig
-   * @param room_id
+   * @param roomId
    * @param {AgentWriterConfig[]} configs
    * @returns {Promise}
    */
-  updateAgentWriterConfig (room_id, configs) {
-    const params = {
-      configs,
-      room_id
-    }
+  updateAgentWriterConfig(roomId, configs) {
+    const parameters = { configs, room_id: roomId }
 
-    return this._rpc.send('agent_writer_config.update', params)
+    return this.rpc.send('agent_writer_config.update', parameters)
   }
 }
 
-export { Conference }
+export default Conference

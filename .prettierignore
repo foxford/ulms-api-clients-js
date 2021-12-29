@@ -1,0 +1,11 @@
+/es/
+/lib/
+
+# Node modules directory
+/node_modules/
+
+# Tests output
+/coverage/
+
+# Optional eslint cache
+.eslintcache

@@ -1,16 +1,15 @@
-/* eslint-disable camelcase */
-import { Service } from './service.js'
+import Service from './service'
 
 class Event extends Service {
   /**
    * Change type enum
    * @returns {{ADDITION: string, MODIFICATION: string, REMOVAL: string}}
    */
-  static get changeTypes () {
+  static get changeTypes() {
     return {
       ADDITION: 'addition',
       MODIFICATION: 'modification',
-      REMOVAL: 'removal'
+      REMOVAL: 'removal',
     }
   }
 
@@ -18,14 +17,14 @@ class Event extends Service {
    * Events enum
    * @returns {{AGENT_UPDATE: string, EVENT_CREATE: string, ROOM_CLOSE: string, ROOM_ENTER: string, ROOM_LEAVE: string}}
    */
-  static get events () {
+  static get events() {
     return {
       AGENT_UPDATE: 'agent.update',
       EVENT_BROADCAST: 'event.broadcast',
       EVENT_CREATE: 'event.create',
       ROOM_CLOSE: 'room.close',
       ROOM_ENTER: 'room.enter',
-      ROOM_LEAVE: 'room.leave'
+      ROOM_LEAVE: 'room.leave',
     }
   }
 
@@ -36,14 +35,14 @@ class Event extends Service {
    * @param {Object} tags
    * @returns {Promise}
    */
-  createRoom (audience, time, tags) {
-    const params = {
+  createRoom(audience, time, tags) {
+    const parameters = {
       audience,
       tags,
-      time
+      time,
     }
 
-    return this._rpc.send('room.create', params)
+    return this.rpc.send('room.create', parameters)
   }
 
   /**
@@ -51,59 +50,47 @@ class Event extends Service {
    * @param id
    * @returns {Promise}
    */
-  readRoom (id) {
-    const params = {
-      id
-    }
+  readRoom(id) {
+    const parameters = { id }
 
-    return this._rpc.send('room.read', params)
+    return this.rpc.send('room.read', parameters)
   }
 
   /**
    * Update room
    * @param id
-   * @param {Object} updateParams
+   * @param {Object} updateParameters
    * @returns {Promise}
    */
-  updateRoom (id, updateParams) {
-    const { tags, time } = updateParams
-    const params = {
-      id,
-      tags,
-      time
-    }
+  updateRoom(id, updateParameters) {
+    const { tags, time } = updateParameters
+    const parameters = { id, tags, time }
 
-    return this._rpc.send('room.update', params)
+    return this.rpc.send('room.update', parameters)
   }
 
   /**
    * List of event types that a user without room update rights cannot create (expected to be used for locked chats)
    * @param id
-   * @param {Object} locked_types
+   * @param {Object} lockedTypes
    * @returns {Promise}
    */
-  updateLockTypes (id, locked_types) {
-    const params = {
-      id,
-      locked_types
-    }
+  updateLockTypes(id, lockedTypes) {
+    const parameters = { id, locked_types: lockedTypes }
 
-    return this._rpc.send('room.locked_types', params)
+    return this.rpc.send('room.locked_types', parameters)
   }
 
   /**
    * Enter room
    * @param id
-   * @param broadcast_subscription
+   * @param broadcastSubscription
    * @returns {Promise}
    */
-  enterRoom (id, broadcast_subscription = true) {
-    const params = {
-      id,
-      broadcast_subscription
-    }
+  enterRoom(id, broadcastSubscription = true) {
+    const parameters = { id, broadcast_subscription: broadcastSubscription }
 
-    return this._rpc.send('room.enter', params)
+    return this.rpc.send('room.enter', parameters)
   }
 
   /**
@@ -111,177 +98,158 @@ class Event extends Service {
    * @param id
    * @returns {Promise}
    */
-  leaveRoom (id) {
-    const params = {
-      id
-    }
+  leaveRoom(id) {
+    const parameters = { id }
 
-    return this._rpc.send('room.leave', params)
+    return this.rpc.send('room.leave', parameters)
   }
 
   /**
    * List agents in room
-   * @param room_id
-   * @param {Object} filterParams
+   * @param roomId
+   * @param {Object} filterParameters
    * @returns {Promise}
    */
-  listAgent (room_id, filterParams = {}) {
-    const { limit, offset } = filterParams
-    const params = {
+  listAgent(roomId, filterParameters = {}) {
+    const { limit, offset } = filterParameters
+    const parameters = {
       limit,
       offset,
-      room_id
+      room_id: roomId,
     }
 
-    return this._rpc.send('agent.list', params)
+    return this.rpc.send('agent.list', parameters)
   }
 
   /**
    * Update agent in room (currently only ban or un-ban)
-   * @param room_id
-   * @param account_id
+   * @param roomId
+   * @param accountId
    * @param {Boolean} value
    * @param {String} reason
    * @returns {Promise}
    */
-  updateAgent (room_id, account_id, value, reason) {
-    const params = {
-      account_id,
-      room_id,
+  updateAgent(roomId, accountId, value, reason) {
+    const parameters = {
+      account_id: accountId,
+      room_id: roomId,
       reason,
-      value
+      value,
     }
 
-    return this._rpc.send('agent.update', params)
+    return this.rpc.send('agent.update', parameters)
   }
 
   /**
    * List bans in room
-   * @param room_id
+   * @param roomId
    * @returns {Promise}
    */
-  listBans (room_id) {
-    const params = {
-      room_id
-    }
+  listBans(roomId) {
+    const parameters = { room_id: roomId }
 
-    return this._rpc.send('ban.list', params)
+    return this.rpc.send('ban.list', parameters)
   }
 
   /**
    * Create event
-   * @param room_id
+   * @param roomId
    * @param {String} type
    * @param {Object|String|Number} data
-   * @param {Object} eventParams
+   * @param {Object} eventParameters
    * @returns {Promise}
    */
-  createEvent (room_id, type, data, eventParams = {}) {
-    const {
-      attribute,
-      is_claim,
-      is_persistent,
-      label,
-      set
-    } = eventParams
-    const params = {
+  createEvent(roomId, type, data, eventParameters = {}) {
+    const { attribute, is_claim, is_persistent, label, set } = eventParameters // eslint-disable-line camelcase
+    const parameters = {
       attribute,
       data,
-      is_claim,
-      is_persistent,
+      is_claim, // eslint-disable-line camelcase
+      is_persistent, // eslint-disable-line camelcase
       label,
-      room_id,
+      room_id: roomId,
       set,
-      type
+      type,
     }
 
-    return this._rpc.send('event.create', params)
+    return this.rpc.send('event.create', parameters)
   }
 
   /**
    * List events
-   * @param room_id
-   * @param {Object} filterParams
+   * @param roomId
+   * @param {Object} filterParameters
    * @returns {Promise}
    */
-  listEvent (room_id, filterParams = {}) {
-    const {
+  listEvent(roomId, filterParameters = {}) {
+    // eslint-disable-next-line camelcase
+    const { attribute, direction, label, last_occurred_at, limit, set, type } =
+      filterParameters
+    const parameters = {
       attribute,
       direction,
       label,
-      last_occurred_at,
+      last_occurred_at, // eslint-disable-line camelcase
       limit,
+      room_id: roomId,
       set,
-      type
-    } = filterParams
-    const params = {
-      attribute,
-      direction,
-      label,
-      last_occurred_at,
-      limit,
-      room_id,
-      set,
-      type
+      type,
     }
 
-    return this._rpc.send('event.list', params)
+    return this.rpc.send('event.list', parameters)
   }
 
   /**
    * Read state
-   * @param room_id
+   * @param roomId
    * @param {String[]} sets
-   * @param {Object} filterParams
+   * @param {Object} filterParameters
    * @returns {Promise}
    */
-  readState (room_id, sets, filterParams = {}) {
-    const {
+  readState(roomId, sets, filterParameters = {}) {
+    // eslint-disable-next-line camelcase
+    const { attribute, limit, occurred_at, original_occurred_at } =
+      filterParameters
+    const parameters = {
       attribute,
       limit,
-      occurred_at,
-      original_occurred_at
-    } = filterParams
-    const params = {
-      attribute,
-      limit,
-      occurred_at,
-      original_occurred_at,
-      room_id,
-      sets
+      occurred_at, // eslint-disable-line camelcase
+      original_occurred_at, // eslint-disable-line camelcase
+      room_id: roomId,
+      sets,
     }
 
-    return this._rpc.send('state.read', params)
+    return this.rpc.send('state.read', parameters)
   }
 
   /**
    * Create edition
-   * @param room_id
+   * @param roomId
    * @returns {Promise}
    */
-  createEdition (room_id) {
-    const params = {
-      room_id
+  createEdition(roomId) {
+    const parameters = {
+      room_id: roomId,
     }
 
-    return this._rpc.send('edition.create', params)
+    return this.rpc.send('edition.create', parameters)
   }
 
   /**
    * List editions
-   * @param room_id
-   * @param {Object} filterParams
+   * @param roomId
+   * @param {Object} filterParameters
    * @returns {Promise}
    */
-  listEdition (room_id, filterParams = {}) {
-    const { last_created_at, limit } = filterParams
-    const params = {
-      last_created_at,
+  listEdition(roomId, filterParameters = {}) {
+    const { last_created_at, limit } = filterParameters // eslint-disable-line camelcase
+    const parameters = {
+      last_created_at, // eslint-disable-line camelcase
       limit,
-      room_id
+      room_id: roomId,
     }
 
-    return this._rpc.send('edition.list', params)
+    return this.rpc.send('edition.list', parameters)
   }
 
   /**
@@ -289,12 +257,12 @@ class Event extends Service {
    * @param id
    * @returns {Promise}
    */
-  deleteEdition (id) {
-    const params = {
-      id
+  deleteEdition(id) {
+    const parameters = {
+      id,
     }
 
-    return this._rpc.send('edition.delete', params)
+    return this.rpc.send('edition.delete', parameters)
   }
 
   /**
@@ -302,46 +270,46 @@ class Event extends Service {
    * @param id
    * @returns {Promise}
    */
-  commitEdition (id) {
-    const params = {
-      id
+  commitEdition(id) {
+    const parameters = {
+      id,
     }
 
-    return this._rpc.send('edition.commit', params)
+    return this.rpc.send('edition.commit', parameters)
   }
 
   /**
    * Create change
-   * @param edition_id
+   * @param editionId
    * @param type
    * @param event
    * @returns {Promise}
    */
-  createChange (edition_id, type, event) {
-    const params = {
-      edition_id,
+  createChange(editionId, type, event) {
+    const parameters = {
+      edition_id: editionId,
       event,
-      type
+      type,
     }
 
-    return this._rpc.send('change.create', params)
+    return this.rpc.send('change.create', parameters)
   }
 
   /**
    * List changes
    * @param id
-   * @param {Object} filterParams
+   * @param {Object} filterParameters
    * @returns {Promise}
    */
-  listChange (id, filterParams = {}) {
-    const { last_created_at, limit } = filterParams
-    const params = {
+  listChange(id, filterParameters = {}) {
+    const { last_created_at, limit } = filterParameters // eslint-disable-line camelcase
+    const parameters = {
       id,
-      last_created_at,
-      limit
+      last_created_at, // eslint-disable-line camelcase
+      limit,
     }
 
-    return this._rpc.send('change.list', params)
+    return this.rpc.send('change.list', parameters)
   }
 
   /**
@@ -349,26 +317,24 @@ class Event extends Service {
    * @param id
    * @returns {Promise}
    */
-  deleteChange (id) {
-    const params = {
-      id
-    }
+  deleteChange(id) {
+    const parameters = { id }
 
-    return this._rpc.send('change.delete', params)
+    return this.rpc.send('change.delete', parameters)
   }
 
   /**
    * Send broadcast message
-   * @param room_id
+   * @param roomId
    * @param {Object} data
    * @returns {Promise}
    */
-  sendBroadcastMessage (room_id, data) {
-    const params = data
-    const topic = this._topicBroadcastFn(room_id)
+  sendBroadcastMessage(roomId, data) {
+    const parameters = data
+    const topic = this.topicBroadcastFn(roomId)
 
-    return this._rpc.broadcast(topic, 'event.broadcast', params)
+    return this.rpc.broadcast(topic, 'event.broadcast', parameters)
   }
 }
 
-export { Event }
+export default Event

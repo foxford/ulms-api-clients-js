@@ -1,102 +1,113 @@
+/* eslint-disable unicorn/prevent-abbreviations */
+// eslint-disable-next-line unicorn/prefer-node-protocol
 import EventEmitter from 'events'
 
-import { Codec } from './codec.js'
-import { MQTTRPCService } from './mqtt-rpc.js'
+import Codec from './codec'
+import MQTTRPCService from './mqtt-rpc'
 
 class Service {
-  constructor (mqttClient, agentId, appName) {
-    this._agentId = agentId
-    this._appName = appName
-    this._topicBroadcastFn = roomId => `broadcasts/${this._appName}/api/v1/rooms/${roomId}/events`
-    this._topicIn = `agents/${this._agentId}/api/v1/in/${this._appName}`
-    this._topicOut = `agents/${this._agentId}/api/v1/out/${this._appName}`
-    this._topicPatternBroadcasts = `broadcasts/${this._appName}/api/v1/rooms/+roomId/events`
-    this._topicPatternNotifications = `apps/${this._appName}/api/v1/rooms/+roomId/events`
-    this._mqtt = mqttClient
+  constructor(mqttClient, agentId, appName) {
+    this.agentId = agentId
+    this.appName = appName
+    this.topicBroadcastFn = (roomId) =>
+      `broadcasts/${this.appName}/api/v1/rooms/${roomId}/events`
+    this.topicIn = `agents/${this.agentId}/api/v1/in/${this.appName}`
+    this.topicOut = `agents/${this.agentId}/api/v1/out/${this.appName}`
+    this.topicPatternBroadcasts = `broadcasts/${this.appName}/api/v1/rooms/+roomId/events`
+    this.topicPatternNotifications = `apps/${this.appName}/api/v1/rooms/+roomId/events`
+    this.mqtt = mqttClient
 
-    this._codec = new Codec(
+    this.codec = new Codec(
       (data) => JSON.stringify(data),
       (data) => {
         let payload
 
         try {
           payload = JSON.parse(data.toString())
-        } catch (error) {
+        } catch {
           payload = {}
         }
 
         return payload
       }
     )
-    this._ee = new EventEmitter()
-    this._rpc = new MQTTRPCService(
-      this._mqtt,
-      this._topicIn,
-      this._topicOut,
-      this._codec,
+    this.ee = new EventEmitter()
+    this.rpc = new MQTTRPCService(
+      this.mqtt,
+      this.topicIn,
+      this.topicOut,
+      this.codec,
       {}
     )
 
-    this._attachRoutes()
+    this.attachRoutes()
   }
 
-  _attachRoutes () {
-    this._mqtt.attachRoute(this._topicPatternBroadcasts, this._subMessageHandler.bind(this))
-    this._mqtt.attachRoute(this._topicPatternNotifications, this._subMessageHandler.bind(this))
+  attachRoutes() {
+    this.mqtt.attachRoute(
+      this.topicPatternBroadcasts,
+      this.subMessageHandler.bind(this)
+    )
+    this.mqtt.attachRoute(
+      this.topicPatternNotifications,
+      this.subMessageHandler.bind(this)
+    )
   }
 
-  _detachRoutes () {
-    this._mqtt.detachRoute(this._topicPatternBroadcasts)
-    this._mqtt.detachRoute(this._topicPatternNotifications)
+  detachRoutes() {
+    this.mqtt.detachRoute(this.topicPatternBroadcasts)
+    this.mqtt.detachRoute(this.topicPatternNotifications)
   }
 
-  register (...args) {
-    this._rpc.register(...args)
+  register(...args) {
+    this.rpc.register(...args)
   }
 
-  unregister (...args) {
-    this._rpc.unregister(...args)
+  unregister(...args) {
+    this.rpc.unregister(...args)
   }
 
-  on (eventName, eventHandler) {
-    this._ee.addListener(eventName, eventHandler)
+  on(eventName, eventHandler) {
+    this.ee.addListener(eventName, eventHandler)
   }
 
-  off (eventName, eventHandler) {
-    this._ee.removeListener(eventName, eventHandler)
+  off(eventName, eventHandler) {
+    this.ee.removeListener(eventName, eventHandler)
   }
 
-  setLabels (labels) {
-    this._rpc.setLabels(labels)
+  setLabels(labels) {
+    this.rpc.setLabels(labels)
   }
 
-  clearLabels () {
-    this._rpc.clearLabels()
+  clearLabels() {
+    this.rpc.clearLabels()
   }
 
-  _subMessageHandler (topicParams, topic, message, packet) {
-    const payload = this._codec.decode(message)
+  subMessageHandler(topicParams, topic, message, packet) {
+    const payload = this.codec.decode(message)
     const { properties } = packet
-    const { userProperties: { label, type } } = properties
-    let event = null
+    const {
+      userProperties: { label, type },
+    } = properties
+    let event
 
     if (type === 'event' && payload !== undefined) {
       event = {
         type: label,
-        data: payload
+        data: payload,
       }
 
-      this._ee.emit(event.type, event)
+      this.ee.emit(event.type, event)
     } else {
       // do nothing
     }
   }
 
-  destroy () {
-    this._detachRoutes()
-    this._ee.removeAllListeners()
-    this._rpc.destroy()
+  destroy() {
+    this.detachRoutes()
+    this.ee.removeAllListeners()
+    this.rpc.destroy()
   }
 }
 
-export { Service }
+export default Service

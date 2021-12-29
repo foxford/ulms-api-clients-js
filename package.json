@@ -1,15 +1,15 @@
 {
   "name": "@ulms/api-clients",
-  "version": "4.13.0",
+  "version": "5.0.0",
   "description": "JavaScript API clients for ULMS platform",
   "keywords": [],
-  "homepage": "https://github.com/netology-group/ulms-api-clients-js#readme",
+  "homepage": "https://github.com/foxford/ulms-api-clients-js#readme",
   "bugs": {
-    "url": "https://github.com/netology-group/ulms-api-clients-js/issues"
+    "url": "https://github.com/foxford/ulms-api-clients-js/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/netology-group/ulms-api-clients-js.git"
+    "url": "https://github.com/foxford/ulms-api-clients-js.git"
   },
   "license": "MIT",
   "author": "OLC Netology group LLC",
@@ -19,52 +19,42 @@
     "lib": "src"
   },
   "files": [
-    "dist",
     "es",
     "lib"
   ],
   "scripts": {
-    "babel": "babel src -d lib",
-    "prebuild": "rm -rf lib es dist",
-    "build": "npm run build/lib && npm run build/es && npm run build/umd && npm run build/umd/min",
-    "build/es": "cross-env BABEL_ENV=es babel src --config-file ./.babelrc.json -d es --copy-files",
-    "build/lib": "cross-env BABEL_ENV=lib npm run babel -- --config-file ./.babelrc.json",
-    "build/umd": "cross-env BABEL_ENV=rollup rollup -c -o dist/clients.js",
-    "build/umd/min": "cross-env NODE_ENV=production BABEL_ENV=rollup rollup -c -o dist/clients.min.js",
-    "lint": "eslint ./src",
+    "build": "npm run build:lib && npm run build:es",
+    "build:es": "cross-env BABEL_ENV=es babel src --config-file ./.babelrc.json -d es --copy-files",
+    "build:lib": "cross-env BABEL_ENV=lib babel src --config-file ./.babelrc.json -d lib --copy-files",
+    "prelint": "prettier --check .",
+    "lint": "eslint ./src --cache",
+    "prebuild": "rm -rf lib es",
     "prepublishOnly": "npm test && npm run build",
-    "test": "npm run lint",
-    "jest": "jest --coverage"
+    "test": "jest --coverage"
   },
   "dependencies": {
-    "events": "~3.1.0",
-    "uuid": "~7.0.1"
+    "events": "3.3.0",
+    "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@babel/cli": "~7.11.6",
-    "@babel/core": "~7.11.6",
-    "@babel/plugin-transform-modules-commonjs": "^7.12.1",
-    "@babel/preset-env": "~7.11.5",
-    "@babel/register": "~7.11.5",
-    "babel-jest": "^26.6.3",
-    "babel-loader": "~8.1.0",
-    "babel-plugin-annotate-pure-calls": "~0.4.0",
-    "cross-env": "~7.0.2",
-    "eslint": "~6.8.0",
-    "eslint-config-standard": "~14.1.0",
-    "eslint-plugin-import": "~2.20.1",
-    "eslint-plugin-node": "~11.0.0",
-    "eslint-plugin-promise": "~4.2.1",
-    "eslint-plugin-standard": "~4.0.1",
-    "jest": "^26.6.3",
-    "rollup": "~1.12.0",
-    "rollup-plugin-babel": "~4.4.0",
-    "rollup-plugin-commonjs": "~10.1.0",
-    "rollup-plugin-node-resolve": "~5.2.0",
-    "rollup-plugin-replace": "~2.2.0",
-    "rollup-plugin-terser": "~5.3.0"
-  },
-  "peerDependencies": {
-    "uuid": ">=7.0.1"
+    "@babel/cli": "7.16.0",
+    "@babel/core": "7.16.5",
+    "@babel/plugin-transform-modules-commonjs": "7.16.5",
+    "@babel/preset-env": "7.16.5",
+    "@babel/register": "7.16.5",
+    "babel-jest": "26.6.3",
+    "babel-loader": "8.2.3",
+    "babel-plugin-annotate-pure-calls": "0.4.0",
+    "cross-env": "7.0.3",
+    "eslint": "8.5.0",
+    "eslint-config-airbnb-base": "15.0.0",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-import": "2.25.3",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-promise": "6.0.0",
+    "eslint-plugin-sonarjs": "0.11.0",
+    "eslint-plugin-unicorn": "39.0.0",
+    "jest": "26.6.3",
+    "prettier": "2.5.1"
   }
 }

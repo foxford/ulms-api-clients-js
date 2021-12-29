@@ -1,14 +1,14 @@
-import { BasicClient } from './basic-client'
+import BasicClient from './basic-client'
 
-export class Tenant extends BasicClient {
+class Tenant extends BasicClient {
   /**
    * Profile role enum
    * @returns {{MODERATOR: string, USER: string}}
    */
-  static get role () {
+  static get role() {
     return {
       MODERATOR: 'moderator',
-      USER: 'user'
+      USER: 'user',
     }
   }
 
@@ -18,14 +18,14 @@ export class Tenant extends BasicClient {
    * @param {string} scope
    * @returns {Promise}
    */
-  readProfile (id, scope) {
+  readProfile(id, scope) {
     let qs = ''
 
     if (scope) {
       qs = `?scope=${scope}`
     }
 
-    return this._get(`${this.baseUrl}/users/${id}${qs}`)
+    return this.get(`${this.baseUrl}/users/${id}${qs}`)
   }
 
   /**
@@ -34,10 +34,10 @@ export class Tenant extends BasicClient {
    * @param {string} scope
    * @returns {Promise}
    */
-  listProfile (ids, scope) {
+  listProfile(ids, scope) {
     const qs = `?ids=${ids.join(',')}&scope=${scope}`
 
-    return this._get(`${this.baseUrl}/users${qs}`)
+    return this.get(`${this.baseUrl}/users${qs}`)
   }
 
   /**
@@ -45,8 +45,8 @@ export class Tenant extends BasicClient {
    * @param {string} scope
    * @returns {Promise}
    */
-  readScope (scope) {
-    return this._get(`${this.baseUrl}/webinars/${scope}`)
+  readScope(scope) {
+    return this.get(`${this.baseUrl}/webinars/${scope}`)
   }
 
   /**
@@ -54,8 +54,8 @@ export class Tenant extends BasicClient {
    * @param {string} scope
    * @returns {Promise}
    */
-  listMaterial (scope) {
-    return this._get(`${this.baseUrl}/webinars/${scope}/materials`)
+  listMaterial(scope) {
+    return this.get(`${this.baseUrl}/webinars/${scope}/materials`)
   }
 
   /**
@@ -63,7 +63,9 @@ export class Tenant extends BasicClient {
    * @param {string} id
    * @returns {string}
    */
-  createMaterialUrl (id) {
+  createMaterialUrl(id) {
     return `${this.baseUrl}/materials/${id}`
   }
 }
+
+export default Tenant

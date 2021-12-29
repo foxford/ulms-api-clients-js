@@ -1,6 +1,13 @@
 {
-  "extends": "standard",
   "env": {
     "jest": true
-  }
+  },
+  "extends": [
+    "airbnb-base",
+    "plugin:promise/recommended",
+    "plugin:sonarjs/recommended",
+    "plugin:unicorn/recommended",
+    "prettier"
+  ],
+  "plugins": ["promise", "sonarjs", "unicorn"]
 }
