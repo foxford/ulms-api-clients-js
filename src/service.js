@@ -7,8 +7,10 @@ class Service {
   constructor (mqttClient, agentId, appName) {
     this._agentId = agentId
     this._appName = appName
+    this._topicBroadcastFn = roomId => `broadcasts/${this._appName}/api/v1/rooms/${roomId}/events`
     this._topicIn = `agents/${this._agentId}/api/v1/in/${this._appName}`
     this._topicOut = `agents/${this._agentId}/api/v1/out/${this._appName}`
+    this._topicPatternBroadcasts = `broadcasts/${this._appName}/api/v1/rooms/+roomId/events`
     this._topicPatternNotifications = `apps/${this._appName}/api/v1/rooms/+roomId/events`
     this._mqtt = mqttClient
 
@@ -35,7 +37,17 @@ class Service {
       {}
     )
 
+    this._attachRoutes()
+  }
+
+  _attachRoutes () {
+    this._mqtt.attachRoute(this._topicPatternBroadcasts, this._subMessageHandler.bind(this))
     this._mqtt.attachRoute(this._topicPatternNotifications, this._subMessageHandler.bind(this))
+  }
+
+  _detachRoutes () {
+    this._mqtt.detachRoute(this._topicPatternBroadcasts)
+    this._mqtt.detachRoute(this._topicPatternNotifications)
   }
 
   register (...args) {
@@ -81,7 +93,7 @@ class Service {
   }
 
   destroy () {
-    this._mqtt.detachRoute(this._topicPatternNotifications)
+    this._detachRoutes()
     this._ee.removeAllListeners()
     this._rpc.destroy()
   }

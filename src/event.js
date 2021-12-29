@@ -21,6 +21,7 @@ class Event extends Service {
   static get events () {
     return {
       AGENT_UPDATE: 'agent.update',
+      EVENT_BROADCAST: 'event.broadcast',
       EVENT_CREATE: 'event.create',
       ROOM_CLOSE: 'room.close',
       ROOM_ENTER: 'room.enter',
@@ -76,13 +77,30 @@ class Event extends Service {
   }
 
   /**
-   * Enter room
+   * List of event types that a user without room update rights cannot create (expected to be used for locked chats)
    * @param id
+   * @param {Object} locked_types
    * @returns {Promise}
    */
-  enterRoom (id) {
+  updateLockTypes (id, locked_types) {
     const params = {
-      id
+      id,
+      locked_types
+    }
+
+    return this._rpc.send('room.locked_types', params)
+  }
+
+  /**
+   * Enter room
+   * @param id
+   * @param broadcast_subscription
+   * @returns {Promise}
+   */
+  enterRoom (id, broadcast_subscription = true) {
+    const params = {
+      id,
+      broadcast_subscription
     }
 
     return this._rpc.send('room.enter', params)
@@ -135,6 +153,19 @@ class Event extends Service {
     }
 
     return this._rpc.send('agent.update', params)
+  }
+
+  /**
+   * List bans in room
+   * @param room_id
+   * @returns {Promise}
+   */
+  listBans (room_id) {
+    const params = {
+      room_id
+    }
+
+    return this._rpc.send('ban.list', params)
   }
 
   /**
@@ -324,6 +355,19 @@ class Event extends Service {
     }
 
     return this._rpc.send('change.delete', params)
+  }
+
+  /**
+   * Send broadcast message
+   * @param room_id
+   * @param {Object} data
+   * @returns {Promise}
+   */
+  sendBroadcastMessage (room_id, data) {
+    const params = data
+    const topic = this._topicBroadcastFn(room_id)
+
+    return this._rpc.broadcast(topic, 'event.broadcast', params)
   }
 }
 

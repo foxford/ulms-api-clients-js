@@ -1,6 +1,6 @@
 import { TimeoutError } from './error'
 
-export function rejectByTimeout (promise, timeout, context) {
+export function rejectByTimeout (promise, timeout = 5000, context) {
   return Promise.race([
     promise,
     new Promise((resolve, reject) => {

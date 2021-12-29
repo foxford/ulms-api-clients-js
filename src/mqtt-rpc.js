@@ -22,6 +22,10 @@ class MQTTRPCService {
     this._subPromise = null
 
     this._addSubscription()
+
+    if (this._mqtt && this._mqtt.connected) {
+      this._subscribeIn()
+    }
   }
 
   _addSubscription () {
@@ -74,6 +78,44 @@ class MQTTRPCService {
     } else {
       // do nothing
     }
+  }
+
+  _processBroadcast (topic, label, params) {
+    if (!this._mqtt.connected) {
+      return Promise.reject(new MQTTRPCServiceError(`[${label}] Client disconnected`))
+    }
+
+    const properties = {
+      userProperties: {
+        label,
+        local_timestamp: Date.now().toString(),
+        type: 'event',
+        ...this._labels
+      }
+    }
+
+    const payload = this._codec.encode(params)
+    let resolveFn
+    let rejectFn
+    const promise = new Promise((resolve, reject) => {
+      resolveFn = resolve
+      rejectFn = reject
+    })
+
+    this._mqtt.publish(
+      topic,
+      payload,
+      { properties, qos: this._publishQoS },
+      (error) => {
+        if (error) {
+          rejectFn(MQTTClientError.fromError(error))
+        } else {
+          resolveFn()
+        }
+      }
+    )
+
+    return promise
   }
 
   _processIncomingRequest (properties, payload) {
@@ -184,6 +226,10 @@ class MQTTRPCService {
     })
 
     this._requestStorage = {}
+  }
+
+  broadcast (topic, label, params) {
+    return this._processBroadcast(topic, label, params)
   }
 
   send (method, params) {

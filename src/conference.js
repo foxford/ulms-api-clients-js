@@ -1,17 +1,46 @@
 /* eslint-disable camelcase */
 import { Service } from './service.js'
 
+/**
+ * Agent reader configuration
+ * @name AgentReaderConfig
+ * @type {object}
+ * @property {string} agent_id
+ * @property {boolean} receive_audio
+ * @property {boolean} receive_video
+ */
+
+/**
+ * Agent writer configuration
+ * @name AgentWriterConfig
+ * @type {object}
+ * @property {string} agent_id
+ * @property {boolean} send_audio
+ * @property {boolean} send_video
+ * @property {number} video_remb
+ */
+
 class Conference extends Service {
   /**
    * Conference events enum
-   * @returns {{ROOM_CLOSE: string, ROOM_ENTER: string, ROOM_LEAVE: string, ROOM_OPEN: string, RTC_STREAM_UPDATE: string}}
+   * @returns {{
+   *  AGENT_WRITER_CONFIG_UPDATE: string,
+   *  ROOM_CLOSE: string,
+   *  ROOM_ENTER: string,
+   *  ROOM_LEAVE: string,
+   *  ROOM_OPEN: string,
+   *  RTC_STREAM_AGENT_SPEAKING: string
+   *  RTC_STREAM_UPDATE: string
+   * }}
    */
   static get events () {
     return {
+      AGENT_WRITER_CONFIG_UPDATE: 'agent_writer_config.update',
       ROOM_CLOSE: 'room.close',
       ROOM_ENTER: 'room.enter',
       ROOM_LEAVE: 'room.leave',
       ROOM_OPEN: 'room.open',
+      RTC_STREAM_AGENT_SPEAKING: 'rtc_stream.agent_speaking',
       RTC_STREAM_UPDATE: 'rtc_stream.update'
     }
   }
@@ -76,6 +105,19 @@ class Conference extends Service {
     }
 
     return this._rpc.send('room.update', params)
+  }
+
+  /**
+   * Close room
+   * @param id
+   * @returns {Promise}
+   */
+  closeRoom (id) {
+    const params = {
+      id
+    }
+
+    return this._rpc.send('room.close', params)
   }
 
   /**
@@ -181,19 +223,15 @@ class Conference extends Service {
    * Connect to RTC
    * @param {String} id
    * @param {Object} optionParams
-   * @param {string} [intent=read] optionParams.intent - Intent to connect to RTC ('read' or 'write')
-   * @param {string} [label] optionParams.label - An arbitrary label to mark the stream. Required only with intent = 'write'.
+   * @param {string} optionParams.intent - Intent to connect to RTC ('read' or 'write')
    * @returns {Promise}
    */
   connectRtc (id, optionParams = {}) {
+    const { intent = Conference.intents.INTENT_READ } = optionParams
     const params = {
-      id
+      id,
+      intent
     }
-
-    const { intent = Conference.intents.INTENT_READ, label } = optionParams
-
-    if (intent) params.intent = intent
-    if (label) params.label = label
 
     return this._rpc.send('rtc.connect', params)
   }
@@ -223,52 +261,25 @@ class Conference extends Service {
   }
 
   /**
-   * Create signal
-   * @param {String} room_id
-   * @param {Object} jsep
+   * Create RTC signal
+   * @param {String} handle_id
+   * @param {Object|Object[]} jsep
+   * @param {String} label
    * @returns {Promise}
    */
-  createSignal (room_id, jsep) {
+  createRtcSignal (handle_id, jsep, label) {
     const params = {
       jsep,
-      room_id
+      handle_id,
+      label
     }
 
-    return this._rpc.send('signal.create', params)
-  }
-
-  /**
-   * Create 'trickle' signal
-   * @param {String} room_id
-   * @param {Object} jsep
-   * @returns {Promise}
-   */
-  createTrickleSignal (room_id, jsep) {
-    const params = {
-      jsep,
-      room_id
-    }
-
-    return this._rpc.send('signal.trickle', params)
-  }
-
-  /**
-   * Update signal
-   * @param {String} room_id
-   * @param {Object} jsep
-   * @returns {Promise}
-   */
-  updateSignal (room_id, jsep) {
-    const params = {
-      jsep,
-      room_id
-    }
-
-    return this._rpc.send('signal.update', params)
+    return this._rpc.send('rtc_signal.create', params)
   }
 
   /**
    * Send broadcast message
+   * @deprecated
    * @param room_id
    * @param {Object} data
    * @param {String} label
@@ -299,6 +310,62 @@ class Conference extends Service {
     }
 
     return this._rpc.send('message.unicast', params)
+  }
+
+  /**
+   * Read AgentReaderConfig
+   * @param room_id
+   * @returns {Promise}
+   */
+  readAgentReaderConfig (room_id) {
+    const params = {
+      room_id
+    }
+
+    return this._rpc.send('agent_reader_config.read', params)
+  }
+
+  /**
+   * Read AgentWriterConfig
+   * @param room_id
+   * @returns {Promise}
+   */
+  readAgentWriterConfig (room_id) {
+    const params = {
+      room_id
+    }
+
+    return this._rpc.send('agent_writer_config.read', params)
+  }
+
+  /**
+   * Update AgentReaderConfig
+   * @param room_id
+   * @param {AgentReaderConfig[]} configs
+   * @returns {Promise}
+   */
+  updateAgentReaderConfig (room_id, configs) {
+    const params = {
+      configs,
+      room_id
+    }
+
+    return this._rpc.send('agent_reader_config.update', params)
+  }
+
+  /**
+   * Update AgentWriterConfig
+   * @param room_id
+   * @param {AgentWriterConfig[]} configs
+   * @returns {Promise}
+   */
+  updateAgentWriterConfig (room_id, configs) {
+    const params = {
+      configs,
+      room_id
+    }
+
+    return this._rpc.send('agent_writer_config.update', params)
   }
 }
 
