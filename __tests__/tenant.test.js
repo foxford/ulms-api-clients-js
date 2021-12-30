@@ -1,4 +1,4 @@
-import {Tenant} from "../src";
+import { Tenant } from '../src'
 
 const baseUrl = 'https://test.url'
 const httpClient = {
@@ -34,31 +34,42 @@ describe('Tenant client should work', () => {
   it('readProfile should work with scope', async () => {
     await tenant.readProfile(id, scope)
 
-    expect(httpClient.get).toBeCalledWith(`${baseUrl}/users/${id}?scope=${scope}`, {headers})
+    expect(httpClient.get).toBeCalledWith(
+      `${baseUrl}/users/${id}?scope=${scope}`,
+      { headers }
+    )
   })
 
   it('readProfile should work without scope', async () => {
     await tenant.readProfile(id)
 
-    expect(httpClient.get).toBeCalledWith(`${baseUrl}/users/${id}`, {headers})
+    expect(httpClient.get).toBeCalledWith(`${baseUrl}/users/${id}`, { headers })
   })
 
   it('listProfile should work', async () => {
     await tenant.listProfile(ids, scope)
 
-    expect(httpClient.get).toBeCalledWith(`${baseUrl}/users?ids=${ids}&scope=${scope}`, {headers})
+    expect(httpClient.get).toBeCalledWith(
+      `${baseUrl}/users?ids=${ids}&scope=${scope}`,
+      { headers }
+    )
   })
 
   it('readScope should work', async () => {
     await tenant.readScope(scope)
 
-    expect(httpClient.get).toBeCalledWith(`${baseUrl}/webinars/${scope}`, {headers})
+    expect(httpClient.get).toBeCalledWith(`${baseUrl}/webinars/${scope}`, {
+      headers,
+    })
   })
 
   it('listMaterial should work', async () => {
     await tenant.listMaterial(scope)
 
-    expect(httpClient.get).toBeCalledWith(`${baseUrl}/webinars/${scope}/materials`, {headers})
+    expect(httpClient.get).toBeCalledWith(
+      `${baseUrl}/webinars/${scope}/materials`,
+      { headers }
+    )
   })
 
   it('createMaterialUrl should work', async () => {

@@ -1,4 +1,4 @@
-import {Dispatcher} from "../src";
+import { Dispatcher } from '../src'
 
 const baseUrl = 'https://test.url'
 const httpClient = {
@@ -46,30 +46,30 @@ describe('Dispatcher should work', () => {
     const editionId = 'editionId'
     await dispatcher.commitEdition(audience, scope, editionId)
 
-    expect(httpClient.post)
-      .toBeCalledWith(
-        `${baseUrl}/audiences/${audience}/classes/${scope}/editions/${editionId}`,
-        undefined,
-        {headers})
+    expect(httpClient.post).toBeCalledWith(
+      `${baseUrl}/audiences/${audience}/classes/${scope}/editions/${editionId}`,
+      undefined,
+      { headers }
+    )
   })
 
   it('readScope should work', async () => {
-    await dispatcher.readScope(kind,audience, scope)
+    await dispatcher.readScope(kind, audience, scope)
 
-    expect(httpClient.get)
-      .toBeCalledWith(
-        `${baseUrl}/audiences/${audience}/${kind}/${scope}`,
-        {headers})
+    expect(httpClient.get).toBeCalledWith(
+      `${baseUrl}/audiences/${audience}/${kind}/${scope}`,
+      { headers }
+    )
   })
 
   it('updateScope should work', async () => {
-    const data = {payload: 'payload'}
+    const data = { payload: 'payload' }
     await dispatcher.updateScope(kind, audience, scope, data)
 
-    expect(httpClient.put)
-      .toBeCalledWith(
-        `${baseUrl}/audiences/${audience}/${kind}/${scope}`,
-        data,
-        {headers})
+    expect(httpClient.put).toBeCalledWith(
+      `${baseUrl}/audiences/${audience}/${kind}/${scope}`,
+      data,
+      { headers }
+    )
   })
 })
