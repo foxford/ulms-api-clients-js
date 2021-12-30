@@ -30,7 +30,7 @@
     "lint": "eslint ./src --cache",
     "prebuild": "rm -rf lib es",
     "prepublishOnly": "npm test && npm run build",
-    "test": "jest --coverage"
+    "test": "jest --coverage --silent --ci"
   },
   "dependencies": {
     "events": "3.3.0",
