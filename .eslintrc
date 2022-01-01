@@ -9,8 +9,5 @@
     "plugin:unicorn/recommended",
     "prettier"
   ],
-  "plugins": ["promise", "sonarjs", "unicorn", "prettier"],
-  "rules": {
-    "prettier/prettier": "error"
-  }
+  "plugins": ["promise", "sonarjs", "unicorn"]
 }
