@@ -1,24 +1,11 @@
-import { enterRoom, rejectByTimeout } from '../src/common'
+import { enterRoom } from '../src/common'
 
-describe('RejectByTimout should work', () => {
-  it('RejectByTimout should throw right message', async () => {
-    const promise = new Promise((resolve) => {
-      setTimeout(() => resolve(), 100)
-    })
-    const context = 'hello'
-    await expect(rejectByTimeout(promise, 0, context)).rejects.toThrow(
-      `[${context}] Service or another peer not responding more than 0 ms`
-    )
-  })
+jest.spyOn(global, 'setTimeout')
 
-  it('RejectByTimeout resolve promise', async () => {
-    const promise = new Promise((resolve) => {
-      resolve('OK')
-    })
-    const context = 'hello'
-    await expect(rejectByTimeout(promise, 100, context)).resolves.toBe('OK')
+const flushPromises = () =>
+  new Promise((resolve) => {
+    process.nextTick(resolve)
   })
-})
 
 const roomId = '123'
 const agentId = '321'
@@ -92,5 +79,22 @@ describe('enterRoom should work', () => {
     expect(client.on).toBeCalledWith(ROOM_ENTER, expect.any(Function))
     expect(client.off).toBeCalledTimes(2)
     expect(client.off).toBeCalledWith(ROOM_ENTER, expect.any(Function))
+  })
+
+  it('enterRoom is ok with default resolve timer', async () => {
+    jest.useFakeTimers()
+    const enterRoomPromise = enterRoom(client, roomId, agentId)
+    jest.advanceTimersByTime(5100)
+    await flushPromises()
+    await expect(enterRoomPromise).rejects.toThrow(
+      '[room.enter] Service or another peer not responding more than 5000 ms'
+    )
+    expect(client.on).toBeCalledTimes(1)
+    expect(client.on).toBeCalledWith(ROOM_ENTER, expect.any(Function))
+    expect(client.off).toBeCalledTimes(1)
+    expect(client.off).toBeCalledWith(ROOM_ENTER, expect.any(Function))
+
+    jest.clearAllTimers()
+    jest.useRealTimers()
   })
 })
