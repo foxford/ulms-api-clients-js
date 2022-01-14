@@ -100,7 +100,7 @@ class HTTPEvent extends BasicClient {
    * @param {String} type
    * @param {Object|String|Number} data
    * @param {Object} eventParameters event parameters: attribute, is_claim, is_persistent, label, set, removed
-   * for more information see: https://github.com/foxford/event/blob/ULMS-1702-removed-events-filter/docs/src/api/event/create.md
+   * for more information see: https://github.com/foxford/event/blob/master/docs/src/api/event/create.md
    *
    * @returns {Promise}
    */
