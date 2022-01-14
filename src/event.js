@@ -106,7 +106,7 @@ class Event extends Service {
 
   /**
    * List agents in room
-   * @param roomId
+   * @param {uuid} roomId
    * @param {Object} filterParameters
    * @returns {Promise}
    */
@@ -123,7 +123,7 @@ class Event extends Service {
 
   /**
    * Update agent in room (currently only ban or un-ban)
-   * @param roomId
+   * @param {uuid} roomId
    * @param accountId
    * @param {Boolean} value
    * @param {String} reason
@@ -142,7 +142,7 @@ class Event extends Service {
 
   /**
    * List bans in room
-   * @param roomId
+   * @param {uuid} roomId
    * @returns {Promise}
    */
   listBans(roomId) {
@@ -153,22 +153,19 @@ class Event extends Service {
 
   /**
    * Create event
-   * @param roomId
+   * @param {uuid} roomId
    * @param {String} type
    * @param {Object|String|Number} data
-   * @param {Object} eventParameters
+   * @param {Object} eventParameters event parameters: attribute, is_claim, is_persistent, label, set, removed
+   * for more information see: https://github.com/foxford/event/blob/master/docs/src/api/event/create.md
+   *
    * @returns {Promise}
    */
   createEvent(roomId, type, data, eventParameters = {}) {
-    const { attribute, is_claim, is_persistent, label, set } = eventParameters // eslint-disable-line camelcase
     const parameters = {
-      attribute,
+      ...eventParameters,
       data,
-      is_claim, // eslint-disable-line camelcase
-      is_persistent, // eslint-disable-line camelcase
-      label,
       room_id: roomId,
-      set,
       type,
     }
 
@@ -177,23 +174,14 @@ class Event extends Service {
 
   /**
    * List events
-   * @param roomId
-   * @param {Object} filterParameters
+   * @param {uuid} roomId
+   * @param {Object} filterParameters Parameters to filter: attribute, direction, label, last_occurred_at, limit, set, type
    * @returns {Promise}
    */
   listEvent(roomId, filterParameters = {}) {
-    // eslint-disable-next-line camelcase
-    const { attribute, direction, label, last_occurred_at, limit, set, type } =
-      filterParameters
     const parameters = {
-      attribute,
-      direction,
-      label,
-      last_occurred_at, // eslint-disable-line camelcase
-      limit,
+      ...filterParameters,
       room_id: roomId,
-      set,
-      type,
     }
 
     return this.rpc.send('event.list', parameters)
@@ -201,7 +189,7 @@ class Event extends Service {
 
   /**
    * Read state
-   * @param roomId
+   * @param {uuid} roomId
    * @param {String[]} sets
    * @param {Object} filterParameters
    * @returns {Promise}
@@ -224,7 +212,7 @@ class Event extends Service {
 
   /**
    * Create edition
-   * @param roomId
+   * @param {uuid} roomId
    * @returns {Promise}
    */
   createEdition(roomId) {
@@ -237,7 +225,7 @@ class Event extends Service {
 
   /**
    * List editions
-   * @param roomId
+   * @param {uuid} roomId
    * @param {Object} filterParameters
    * @returns {Promise}
    */
@@ -325,7 +313,7 @@ class Event extends Service {
 
   /**
    * Send broadcast message
-   * @param roomId
+   * @param {uuid} roomId
    * @param {Object} data
    * @returns {Promise}
    */

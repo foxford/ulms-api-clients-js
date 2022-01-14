@@ -56,7 +56,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * List agents in room
-   * @param roomId
+   * @param {uuid} roomId
    * @param {Object} filterParameters
    * @returns {Promise}
    */
@@ -68,7 +68,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Update agent in room (currently only ban or un-ban)
-   * @param roomId
+   * @param {uuid} roomId
    * @param accountId
    * @param {Boolean} value
    * @param {String} reason
@@ -86,7 +86,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * List bans in room
-   * @param roomId
+   * @param {uuid} roomId
    * @param {Object} filterParameters
    * @returns {Promise}
    */
@@ -96,21 +96,18 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Create event
-   * @param roomId
+   * @param {uuid} roomId
    * @param {String} type
    * @param {Object|String|Number} data
-   * @param {Object} eventParameters
+   * @param {Object} eventParameters event parameters: attribute, is_claim, is_persistent, label, set, removed
+   * for more information see: https://github.com/foxford/event/blob/master/docs/src/api/event/create.md
+   *
    * @returns {Promise}
    */
   createEvent(roomId, type, data, eventParameters = {}) {
-    const { attribute, is_claim, is_persistent, label, set } = eventParameters // eslint-disable-line camelcase
     const parameters = {
-      attribute,
+      ...eventParameters,
       data,
-      is_claim, // eslint-disable-line camelcase
-      is_persistent, // eslint-disable-line camelcase
-      label,
-      set,
       type,
     }
 
@@ -119,7 +116,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * List events
-   * @param roomId
+   * @param {uuid} roomId
    * @param {Object} filterParameters
    * @returns {Promise}
    */
@@ -131,7 +128,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Update locked types in room
-   * @param roomId
+   * @param {uuid} roomId
    * @param {Object} lockedTypes
    * @returns {Promise}
    */
@@ -143,7 +140,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Read state
-   * @param roomId
+   * @param {uuid} roomId
    * @param {String[]} sets
    * @param {Object} filterParameters
    * @returns {Promise}
@@ -165,7 +162,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Create edition
-   * @param roomId
+   * @param {uuid} roomId
    * @returns {Promise}
    */
   createEdition(roomId) {
@@ -174,7 +171,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * List editions
-   * @param roomId
+   * @param {uuid} roomId
    * @param {Object} filterParameters
    * @returns {Promise}
    */
