@@ -66,6 +66,19 @@ class Dispatcher extends BasicClient {
       data
     )
   }
+
+  /**
+   * Update position timestamp
+   * @param {string} kind
+   * @param {string} classId
+   * @param {number} position
+   * @returns {Promise}
+   */
+  updatePosition(kind, classId, position) {
+    return this.post(`${this.baseUrl}/${kind}/${classId}/timestamps`, {
+      position,
+    })
+  }
 }
 
 export default Dispatcher
