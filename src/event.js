@@ -15,7 +15,7 @@ class Event extends Service {
 
   /**
    * Events enum
-   * @returns {{AGENT_UPDATE: string, EVENT_CREATE: string, ROOM_CLOSE: string, ROOM_ENTER: string, ROOM_LEAVE: string}}
+   * @returns {{AGENT_UPDATE: string, EVENT_CREATE: string, ROOM_CLOSE: string, ROOM_ENTER: string, ROOM_LEAVE: string, ROOM_UPDATE: string}}
    */
   static get events() {
     return {
@@ -25,6 +25,7 @@ class Event extends Service {
       ROOM_CLOSE: 'room.close',
       ROOM_ENTER: 'room.enter',
       ROOM_LEAVE: 'room.leave',
+      ROOM_UPDATE: 'room.update',
     }
   }
 
