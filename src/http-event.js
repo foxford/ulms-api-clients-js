@@ -196,7 +196,7 @@ class HTTPEvent extends BasicClient {
    * @returns {Promise}
    */
   commitEdition(id) {
-    return this.post(this.url(eventEndpoints.editionsCommit(id)))
+    return this.post(this.url(eventEndpoints.editionsCommit(id)), {})
   }
 
   /**
