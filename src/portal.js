@@ -6,7 +6,7 @@ class Portal extends BasicClient {
    * @returns {Promise}
    */
   getOptions() {
-    return this.get(this.baseUrl)
+    return this.get(this.baseUrl, { mode: 'cors', credentials: 'include' })
   }
 }
 

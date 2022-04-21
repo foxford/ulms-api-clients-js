@@ -27,39 +27,39 @@ class FetchHttpClient {
 
   get(url, config) {
     return fetch(url, {
+      ...config,
       method: 'GET',
-      headers: config.headers,
     }).then(FetchHttpClient.handleResponse)
   }
 
   put(url, data, config) {
     return fetch(url, {
+      ...config,
       method: 'PUT',
-      headers: config.headers,
       body: JSON.stringify(data),
     }).then(FetchHttpClient.handleResponse)
   }
 
   post(url, data, config) {
     return fetch(url, {
+      ...config,
       method: 'POST',
-      headers: config.headers,
       body: JSON.stringify(data),
     }).then(FetchHttpClient.handleResponse)
   }
 
   patch(url, data, config) {
     return fetch(url, {
+      ...config,
       method: 'PATCH',
-      headers: config.headers,
       body: JSON.stringify(data),
     }).then(FetchHttpClient.handleResponse)
   }
 
   delete(url, config) {
     return fetch(url, {
+      ...config,
       method: 'DELETE',
-      headers: config.headers,
     }).then(FetchHttpClient.handleResponse)
   }
 }
