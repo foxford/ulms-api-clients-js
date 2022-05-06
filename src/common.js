@@ -49,3 +49,14 @@ export function enterRoom(client, roomId, agentId, timeout = 5000) {
     throw error
   })
 }
+
+export function makeDeferred() {
+  const deferred = {}
+
+  deferred.promise = new Promise((resolve, reject) => {
+    deferred.resolve = resolve
+    deferred.reject = reject
+  })
+
+  return deferred
+}

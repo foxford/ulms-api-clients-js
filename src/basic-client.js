@@ -76,40 +76,55 @@ class BasicClient {
 
   async get(url, options = {}) {
     const token = await this.tokenProvider.getToken()
-    const headers = {...options.headers, ...BasicClient.headers(token, this.labels)}
-    const requestOptions = {...options, headers}
+    const headers = {
+      ...options.headers,
+      ...BasicClient.headers(token, this.labels),
+    }
+    const requestOptions = { ...options, headers }
 
     return this.httpClient.get(url, requestOptions)
   }
 
   async put(url, data, options = {}) {
     const token = await this.tokenProvider.getToken()
-    const headers = {...options.headers, ...BasicClient.headers(token, this.labels)}
-    const requestOptions = {...options, headers}
+    const headers = {
+      ...options.headers,
+      ...BasicClient.headers(token, this.labels),
+    }
+    const requestOptions = { ...options, headers }
 
     return this.httpClient.put(url, data, requestOptions)
   }
 
   async post(url, data, options = {}) {
     const token = await this.tokenProvider.getToken()
-    const headers = {...options.headers, ...BasicClient.headers(token, this.labels)}
-    const requestOptions = {...options, headers}
+    const headers = {
+      ...options.headers,
+      ...BasicClient.headers(token, this.labels),
+    }
+    const requestOptions = { ...options, headers }
 
     return this.httpClient.post(url, data, requestOptions)
   }
 
   async patch(url, data, options = {}) {
     const token = await this.tokenProvider.getToken()
-    const headers = {...options.headers, ...BasicClient.headers(token, this.labels)}
-    const requestOptions = {...options, headers}
+    const headers = {
+      ...options.headers,
+      ...BasicClient.headers(token, this.labels),
+    }
+    const requestOptions = { ...options, headers }
 
     return this.httpClient.patch(url, data, requestOptions)
   }
 
   async delete(url, options = {}) {
     const token = await this.tokenProvider.getToken()
-    const headers = {...options.headers, ...BasicClient.headers(token, this.labels)}
-    const requestOptions = {...options, headers}
+    const headers = {
+      ...options.headers,
+      ...BasicClient.headers(token, this.labels),
+    }
+    const requestOptions = { ...options, headers }
 
     return this.httpClient.delete(url, requestOptions)
   }

@@ -9,5 +9,8 @@
     "plugin:unicorn/recommended",
     "prettier"
   ],
+  "globals": {
+    "WebSocket": true
+  },
   "plugins": ["promise", "sonarjs", "unicorn"]
 }
