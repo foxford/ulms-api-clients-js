@@ -125,15 +125,11 @@ class HTTPEvent extends BasicClient {
    *
    * @returns {Promise}
    */
-  removeEvent(roomId, type, data, eventParameters = {}) {
-    const parameters = {
+  createRemovalEvent(roomId, type, data, eventParameters = {}) {
+    return this.createEvent(roomId, type, data, {
       ...eventParameters,
-      data,
-      type,
       removed: true
-    }
-
-    return this.post(this.url(eventEndpoints.eventsRemove(roomId)), parameters)
+    })
   }
 
   /**
