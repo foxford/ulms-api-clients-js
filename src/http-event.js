@@ -12,6 +12,7 @@ const eventEndpoints = {
   editionsDelete: (id) => `/editions/${id}`,
   editionsList: (id) => `/rooms/${id}/editions`,
   eventsCreate: (id) => `/rooms/${id}/events`,
+  eventsRemove: (id) => `/rooms/${id}/events`,
   eventsList: (id) => `/rooms/${id}/events`,
   roomEnter: (id) => `/rooms/${id}/enter`,
   roomRead: (id) => `/rooms/${id}`,
@@ -112,6 +113,23 @@ class HTTPEvent extends BasicClient {
     }
 
     return this.post(this.url(eventEndpoints.eventsCreate(roomId)), parameters)
+  }
+
+  /**
+   * Sets the flag "removed" for the event
+   * @param {uuid} roomId
+   * @param {String} type
+   * @param {Object|String|Number} data
+   * @param {Object} eventParameters event parameters: attribute, is_claim, is_persistent, label, set, removed
+   * for more information see: https://github.com/foxford/event/blob/master/docs/src/api/event/create.md
+   *
+   * @returns {Promise}
+   */
+  createRemovalEvent(roomId, type, data, eventParameters = {}) {
+    return this.createEvent(roomId, type, data, {
+      ...eventParameters,
+      removed: true
+    })
   }
 
   /**
