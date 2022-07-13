@@ -53,6 +53,29 @@ class Dispatcher extends BasicClient {
   }
 
   /**
+   * Read class property
+   * @param {string} kind
+   * @param {string} classId
+   * @param {string} propertyId
+   * @returns {Promise}
+   */
+  readClassProperty(kind, classId, propertyId) {
+    return this.get(`${this.baseUrl}/${kind}/${classId}/properties/${propertyId}`)
+  }
+
+  /**
+   * Update class property
+   * @param {string} kind
+   * @param {string} classId
+   * @param {string} propertyId
+   * @param {object} data
+   * @returns {Promise}
+   */
+  updateClassProperty(kind, classId, propertyId, data) {
+    return this.put(`${this.baseUrl}/${kind}/${classId}/properties/${propertyId}`, data)
+  }
+
+  /**
    * Update dispatcher scope
    * @param {string} kind
    * @param {string} audience
