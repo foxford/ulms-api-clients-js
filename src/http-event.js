@@ -128,7 +128,7 @@ class HTTPEvent extends BasicClient {
   createRemovalEvent(roomId, type, data, eventParameters = {}) {
     return this.createEvent(roomId, type, data, {
       ...eventParameters,
-      removed: true
+      removed: true,
     })
   }
 

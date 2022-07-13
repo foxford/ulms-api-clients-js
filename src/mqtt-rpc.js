@@ -146,7 +146,7 @@ class MQTTRPCService {
       }
 
       this.mqtt.publish(responseTopic, this.codec.encode(result), {
-        publishProperties,
+        properties: publishProperties,
         qos: this.publishQoS,
       })
     }
