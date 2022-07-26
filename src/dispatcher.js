@@ -60,7 +60,9 @@ class Dispatcher extends BasicClient {
    * @returns {Promise}
    */
   readClassProperty(kind, classId, propertyId) {
-    return this.get(`${this.baseUrl}/${kind}/${classId}/properties/${propertyId}`)
+    return this.get(
+      `${this.baseUrl}/${kind}/${classId}/properties/${propertyId}`
+    )
   }
 
   /**
@@ -72,7 +74,10 @@ class Dispatcher extends BasicClient {
    * @returns {Promise}
    */
   updateClassProperty(kind, classId, propertyId, data) {
-    return this.put(`${this.baseUrl}/${kind}/${classId}/properties/${propertyId}`, data)
+    return this.put(
+      `${this.baseUrl}/${kind}/${classId}/properties/${propertyId}`,
+      data
+    )
   }
 
   /**
