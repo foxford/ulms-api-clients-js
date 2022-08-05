@@ -29,6 +29,26 @@ class Dispatcher extends BasicClient {
   }
 
   /**
+   * Class properties enum
+   * @returns {{IS_ADULT: string}}
+   */
+  static get classKeys() {
+    return {
+      IS_ADULT: 'is_adult',
+    }
+  }
+
+  /**
+   * Account properties enum
+   * @returns {{ONBOARDING: string}}
+   */
+  static get accountKeys() {
+    return {
+      ONBOARDING: 'onboarding',
+    }
+  }
+
+  /**
    * Commit edition by scope
    * @param {string} audience
    * @param {string} scope
@@ -46,10 +66,13 @@ class Dispatcher extends BasicClient {
    * @param {string} kind
    * @param {string} audience
    * @param {string} scope
+   * @param {object} options
    * @returns {Promise}
    */
-  readScope(kind, audience, scope) {
-    return this.get(`${this.baseUrl}/audiences/${audience}/${kind}/${scope}`)
+  readScope(kind, audience, scope, options) {
+    return this.get(
+      this.url(`/audiences/${audience}/${kind}/${scope}`, options)
+    )
   }
 
   /**
@@ -78,6 +101,25 @@ class Dispatcher extends BasicClient {
       `${this.baseUrl}/${kind}/${classId}/properties/${propertyId}`,
       data
     )
+  }
+
+  /**
+   * Read account property
+   * @param {string} propertyId
+   * @returns {Promise}
+   */
+  readAccountProperty(propertyId) {
+    return this.get(`${this.baseUrl}/account/properties/${propertyId}`)
+  }
+
+  /**
+   * Update account property
+   * @param {string} propertyId
+   * @param {object} data
+   * @returns {Promise}
+   */
+  updateAccountProperty(propertyId, data) {
+    return this.put(`${this.baseUrl}/account/properties/${propertyId}`, data)
   }
 
   /**
