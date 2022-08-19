@@ -25,6 +25,7 @@ const parseParameter = (key, value) => {
 class BasicClient {
   constructor(baseUrl, httpClient, tokenProvider) {
     this.baseUrl = baseUrl
+    this.customHeaders = {}
     this.httpClient = httpClient
     this.tokenProvider = tokenProvider
     this.labels = {}
@@ -51,12 +52,17 @@ class BasicClient {
     return `${this.baseUrl}${endpoint}`
   }
 
-  static headers(token, labels = {}) {
+  static headers(token, labels = {}, headers = {}) {
     return {
+      ...headers,
       authorization: `Bearer ${token}`,
       'content-type': 'application/json',
       ...labels,
     }
+  }
+
+  setHeaders(headers) {
+    this.customHeaders = headers
   }
 
   setLabels(labels) {
@@ -78,7 +84,7 @@ class BasicClient {
     const token = await this.tokenProvider.getToken()
     const headers = {
       ...options.headers,
-      ...BasicClient.headers(token, this.labels),
+      ...BasicClient.headers(token, this.labels, this.customHeaders),
     }
     const requestOptions = { ...options, headers }
 
@@ -89,7 +95,7 @@ class BasicClient {
     const token = await this.tokenProvider.getToken()
     const headers = {
       ...options.headers,
-      ...BasicClient.headers(token, this.labels),
+      ...BasicClient.headers(token, this.labels, this.customHeaders),
     }
     const requestOptions = { ...options, headers }
 
@@ -100,7 +106,7 @@ class BasicClient {
     const token = await this.tokenProvider.getToken()
     const headers = {
       ...options.headers,
-      ...BasicClient.headers(token, this.labels),
+      ...BasicClient.headers(token, this.labels, this.customHeaders),
     }
     const requestOptions = { ...options, headers }
 
@@ -111,7 +117,7 @@ class BasicClient {
     const token = await this.tokenProvider.getToken()
     const headers = {
       ...options.headers,
-      ...BasicClient.headers(token, this.labels),
+      ...BasicClient.headers(token, this.labels, this.customHeaders),
     }
     const requestOptions = { ...options, headers }
 
@@ -122,7 +128,7 @@ class BasicClient {
     const token = await this.tokenProvider.getToken()
     const headers = {
       ...options.headers,
-      ...BasicClient.headers(token, this.labels),
+      ...BasicClient.headers(token, this.labels, this.customHeaders),
     }
     const requestOptions = { ...options, headers }
 

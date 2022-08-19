@@ -109,13 +109,10 @@ class HTTPConference extends BasicClient {
   /**
    * Enter room
    * @param roomId
-   * @param agentLabel
    * @returns {Promise}
    */
-  enterRoom(roomId, agentLabel) {
-    const payload = { agent_label: agentLabel }
-
-    return this.post(this.url(`/rooms/${roomId}/enter`), payload)
+  enterRoom(roomId) {
+    return this.post(this.url(`/rooms/${roomId}/enter`))
   }
 
   /**
@@ -159,15 +156,13 @@ class HTTPConference extends BasicClient {
   /**
    * Connect to RTC
    * @param {String} rtcId
-   * @param {String} agentLabel
    * @param {Object} optionParameters
    * @param {String} optionParameters.intent - Intent to connect to RTC ('read' or 'write')
    * @returns {Promise}
    */
-  connectRtc(rtcId, agentLabel, optionParameters = {}) {
+  connectRtc(rtcId, optionParameters = {}) {
     const { intent = HTTPConference.intents.INTENT_READ } = optionParameters
     const payload = {
-      agent_label: agentLabel,
       intent,
     }
 
@@ -189,12 +184,10 @@ class HTTPConference extends BasicClient {
    * @param {String} handleId
    * @param {Object|Object[]} jsep
    * @param {String} label
-   * @param {String} agentLabel
    * @returns {Promise}
    */
-  createRtcSignal(handleId, jsep, label, agentLabel) {
+  createRtcSignal(handleId, jsep, label) {
     const payload = {
-      agent_label: agentLabel,
       jsep,
       handle_id: handleId,
       label,
