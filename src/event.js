@@ -174,6 +174,28 @@ class Event extends Service {
   }
 
   /**
+   * Sets the flag "removed" for the event
+   * @param {uuid} roomId
+   * @param {String} type
+   * @param {Object|String|Number} data
+   * @param {Object} eventParameters event parameters: attribute, is_claim, is_persistent, label, set, removed
+   * for more information see: https://github.com/foxford/event/blob/master/docs/src/api/event/create.md
+   *
+   * @returns {Promise}
+   */
+  createRemovalEvent(roomId, type, data, eventParameters = {}) {
+    const parameters = {
+      ...eventParameters,
+      data,
+      room_id: roomId,
+      type,
+      removed: true,
+    }
+
+    return this.rpc.send('event.create', parameters)
+  }
+
+  /**
    * List events
    * @param {uuid} roomId
    * @param {Object} filterParameters Parameters to filter: attribute, direction, label, last_occurred_at, limit, set, type
