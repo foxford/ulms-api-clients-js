@@ -197,6 +197,44 @@ class HTTPConference extends BasicClient {
   }
 
   /**
+   * Create signal
+   * @param {String} rtcId
+   * @param {Object|Object[]} jsep
+   * @param {String} intent
+   * @param {String} label
+   * @returns {Promise}
+   */
+  createSignal(
+    rtcId,
+    jsep,
+    intent = HTTPConference.intents.INTENT_READ, // eslint-disable-line default-param-last
+    label
+  ) {
+    const payload = {
+      intent,
+      jsep,
+      label,
+    }
+
+    return this.post(this.url(`/rtcs/${rtcId}/signal`), payload)
+  }
+
+  /**
+   * Create trickle signal
+   * @param {String} handleId
+   * @param {Object|Object[]} candidates
+   * @returns {Promise}
+   */
+  createTrickleSignal(handleId, candidates) {
+    const payload = {
+      candidates,
+      handle_id: handleId,
+    }
+
+    return this.post(this.url('/streams/trickle'), payload)
+  }
+
+  /**
    * Read AgentReaderConfig
    * @param roomId
    * @returns {Promise}
