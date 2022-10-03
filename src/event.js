@@ -21,7 +21,7 @@ class Event extends Service {
     return {
       AGENT_UPDATE: 'agent.update',
       EVENT_BROADCAST: 'event.broadcast',
-      EVENT_CREATE: 'event.create',
+      EVENT_CREATE: 'event.create', // eslint-disable-line sonarjs/no-duplicate-string
       ROOM_CLOSE: 'room.close',
       ROOM_ENTER: 'room.enter',
       ROOM_LEAVE: 'room.leave',

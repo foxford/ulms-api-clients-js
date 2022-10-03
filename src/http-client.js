@@ -1,4 +1,3 @@
-/* global fetch */
 /* eslint-disable class-methods-use-this */
 
 class FetchHttpClient {
