@@ -24,6 +24,7 @@ class Conference extends Service {
    * Conference events enum
    * @returns {{
    *  AGENT_WRITER_CONFIG_UPDATE: string,
+   *  GROUP_UPDATE: string,
    *  ROOM_CLOSE: string,
    *  ROOM_ENTER: string,
    *  ROOM_LEAVE: string,
@@ -35,6 +36,7 @@ class Conference extends Service {
   static get events() {
     return {
       AGENT_WRITER_CONFIG_UPDATE: 'agent_writer_config.update',
+      GROUP_UPDATE: 'group.update',
       ROOM_CLOSE: 'room.close',
       ROOM_ENTER: 'room.enter',
       ROOM_LEAVE: 'room.leave',

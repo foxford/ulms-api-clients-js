@@ -28,6 +28,14 @@ import BasicClient from './basic-client'
  */
 
 /**
+ * Group configuration
+ * @name GroupConfig
+ * @type {object}
+ * @property {number} number
+ * @property {string[]} agents
+ */
+
+/**
  * Extended parameters to filter listing requests of rtc streams
  * @name RtcStreamFilterParameters
  * @type {object}
@@ -36,11 +44,19 @@ import BasicClient from './basic-client'
  * @property {[number | null, number | null]} time
  */
 
+/**
+ * Filter parameters for groups read requests
+ * @name GroupsFilterParameters
+ * @type {object}
+ * @property {number} within_group
+ */
+
 class HTTPConference extends BasicClient {
   /**
    * Conference events enum
    * @returns {{
    *  AGENT_WRITER_CONFIG_UPDATE: string,
+   *  GROUP_UPDATE: string,
    *  ROOM_CLOSE: string,
    *  ROOM_ENTER: string,
    *  ROOM_LEAVE: string,
@@ -52,6 +68,7 @@ class HTTPConference extends BasicClient {
   static get events() {
     return {
       AGENT_WRITER_CONFIG_UPDATE: 'agent_writer_config.update',
+      GROUP_UPDATE: 'group.update',
       ROOM_CLOSE: 'room.close',
       ROOM_ENTER: 'room.enter',
       ROOM_LEAVE: 'room.leave',
@@ -253,6 +270,16 @@ class HTTPConference extends BasicClient {
   }
 
   /**
+   * Read Groups
+   * @param roomId
+   * @param {GroupsFilterParameters|Object} filterParameters
+   * @returns {Promise}
+   */
+  readGroups(roomId, filterParameters) {
+    return this.get(this.url(`/rooms/${roomId}/groups`, filterParameters))
+  }
+
+  /**
    * Update AgentReaderConfig
    * @param roomId
    * @param {AgentReaderConfig[]} configs
@@ -274,6 +301,16 @@ class HTTPConference extends BasicClient {
     const payload = { configs }
 
     return this.post(this.url(`/rooms/${roomId}/configs/writer`), payload)
+  }
+
+  /**
+   * Update Groups
+   * @param roomId
+   * @param {GroupConfig[]} payload
+   * @returns {Promise}
+   */
+  updateGroups(roomId, payload) {
+    return this.post(this.url(`/rooms/${roomId}/groups`), payload)
   }
 }
 
