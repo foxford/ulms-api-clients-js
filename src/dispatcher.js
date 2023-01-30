@@ -30,11 +30,12 @@ class Dispatcher extends BasicClient {
 
   /**
    * Class properties enum
-   * @returns {{IS_ADULT: string}}
+   * @returns {{IS_ADULT: string, HAS_USER_ACCESS_TO_BOARD: string}}
    */
   static get classKeys() {
     return {
       IS_ADULT: 'is_adult',
+      HAS_USER_ACCESS_TO_BOARD: 'has_user_access_to_board',
     }
   }
 
