@@ -43,6 +43,7 @@ class PresenceWS extends EventEmitter {
     this.ws = new WebSocket(url)
 
     this.ws.addEventListener('close', (closeEvent) => {
+      // eslint-disable-next-line no-console
       console.log('[PresenceWS] closed', closeEvent)
 
       if (this.connected) {
@@ -64,18 +65,21 @@ class PresenceWS extends EventEmitter {
     })
 
     this.ws.addEventListener('error', (errorEvent) => {
+      // eslint-disable-next-line no-console
       console.log('[PresenceWS] error', errorEvent)
 
       this.lastTransportError = errorEvent
     })
 
     this.ws.addEventListener('open', () => {
+      // eslint-disable-next-line no-console
       console.log('[PresenceWS] opened')
 
       this.ws.send(JSON.stringify(connectRequestPayload))
     })
 
     this.ws.addEventListener('message', (messageEvent) => {
+      // eslint-disable-next-line no-console
       console.log('[PresenceWS] message', JSON.parse(messageEvent.data))
 
       // Notification example
