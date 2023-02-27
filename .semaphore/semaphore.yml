@@ -13,7 +13,8 @@ blocks:
         - name: prepare
           commands:
             - checkout
-            - nvm use $(cat .nvmrc) # semaphore does not use node version from .nvmrc for some reason
+            - nvm install $(cat .nvmrc)
+            - nvm use
             - cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH,node-modules-master
             - npm ci
             - cache store node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json) node_modules
@@ -23,14 +24,16 @@ blocks:
         - name: lint
           commands:
             - checkout
-            - nvm use $(cat .nvmrc) # semaphore does not use node version from .nvmrc for some reason
+            - nvm install $(cat .nvmrc)
+            - nvm use
             - cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json)
             - npm ci
             - npm run lint
         - name: test
           commands:
             - checkout
-            - nvm use $(cat .nvmrc) # semaphore does not use node version from .nvmrc for some reason
+            - nvm install $(cat .nvmrc)
+            - nvm use
             - cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json)
             - npm ci
             - npm test

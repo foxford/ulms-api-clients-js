@@ -57,3 +57,26 @@ export class PresenceError extends Error {
     return new PresenceError(errorType)
   }
 }
+
+export class TokenProviderError extends Error {
+  constructor(...args) {
+    super(...args)
+
+    this.name = 'TokenProviderError'
+  }
+
+  static get types() {
+    return {
+      UNAUTHENTICATED: 'UNAUTHENTICATED',
+      NETWORK_ERROR: 'NETWORK_ERROR',
+      UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+    }
+  }
+
+  static fromType(type) {
+    const errorType =
+      TokenProviderError.types[type] || TokenProviderError.types.UNKNOWN_ERROR
+
+    return new TokenProviderError(errorType)
+  }
+}
