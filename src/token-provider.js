@@ -95,7 +95,7 @@ class TokenProvider {
 
   updateTokenData(updates) {
     const { expires_in } = updates
-    const expires_ts = Date.now() + expires_in * 1e3 - 3e3
+    const expires_ts = Date.now() + expires_in * 1e3 - 10e3
 
     this.tokenData = {
       ...this.tokenData,
