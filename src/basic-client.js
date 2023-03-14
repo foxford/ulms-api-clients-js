@@ -29,6 +29,7 @@ class BasicClient {
     this.httpClient = httpClient
     this.tokenProvider = tokenProvider
     this.labels = {}
+    this.trackEvent = undefined
   }
 
   url(endpoint, parameters) {
@@ -76,6 +77,10 @@ class BasicClient {
     }
   }
 
+  setTrackEventFunction(trackEvent) {
+    this.trackEvent = trackEvent
+  }
+
   clearLabels() {
     this.labels = {}
   }
@@ -109,6 +114,34 @@ class BasicClient {
       ...BasicClient.headers(token, this.labels, this.customHeaders),
     }
     const requestOptions = { ...options, headers }
+
+    // [debug section] start
+    if (this.trackEvent) {
+      const { exp } = JSON.parse(atob(token.split('.')[1]))
+      const requestStart = Date.now()
+      const expiresAtLocal = this.tokenProvider.tokenData
+        ? this.tokenProvider.tokenData.expires_ts
+        : undefined
+      const result = this.httpClient.post(url, data, requestOptions)
+
+      result.catch((error) => {
+        const responseEnd = Date.now()
+
+        const eventPayload = {
+          exp: exp * 1000,
+          expiresAtLocal,
+          requestStart,
+          responseEnd,
+        }
+
+        if (error && error.type === 'invalid_authentication') {
+          this.trackEvent(eventPayload)
+        }
+      })
+
+      return result
+    }
+    // [debug section] end
 
     return this.httpClient.post(url, data, requestOptions)
   }

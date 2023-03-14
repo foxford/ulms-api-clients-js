@@ -147,8 +147,16 @@ class Dispatcher extends BasicClient {
    * @returns {Promise}
    */
   updatePosition(kind, classId, position) {
-    return this.post(`${this.baseUrl}/${kind}/${classId}/timestamps`, {
-      position,
+    const controller = new AbortController()
+    const { signal } = controller
+    const timeoutId = setTimeout(() => controller.abort(), 10 * 1000)
+
+    return this.post(
+      `${this.baseUrl}/${kind}/${classId}/timestamps`,
+      { position },
+      { signal }
+    ).finally(() => {
+      clearTimeout(timeoutId)
     })
   }
 }
