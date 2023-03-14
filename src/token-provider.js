@@ -9,6 +9,7 @@ class TokenProvider {
     this.httpClient = httpClient
     this.tokenData = undefined
     this.tokenP = undefined
+    this.tokenRequestStart = undefined
   }
 
   setContext(context) {
@@ -27,6 +28,7 @@ class TokenProvider {
 
     if (isTokenDataEmpty || isAccessTokenExpired) {
       this.tokenP = makeDeferred()
+      this.tokenRequestStart = Date.now()
 
       this.fetchTokenData()
         .then((response) => {
@@ -44,10 +46,20 @@ class TokenProvider {
   }
 
   fetchTokenData() {
+    const controller = new AbortController()
+    const { signal } = controller
+    const timeoutId = setTimeout(() => controller.abort(), 10 * 1000)
     const qs = this.context ? `?context=${this.context}` : ''
     const url = `${this.baseUrl}/api/user/ulms_token${qs}`
 
-    return this.httpClient.post(url, undefined, { credentials: 'include' })
+    return this.httpClient
+      .post(url, undefined, {
+        credentials: 'include',
+        signal,
+      })
+      .finally(() => {
+        clearTimeout(timeoutId)
+      })
   }
 
   rejectAndReset(error) {
@@ -85,17 +97,19 @@ class TokenProvider {
     this.tokenP.reject(transformedError)
 
     this.tokenP = undefined
+    this.tokenRequestStart = undefined
   }
 
   resolveAndReset() {
     this.tokenP.resolve(this.tokenData.access_token)
 
     this.tokenP = undefined
+    this.tokenRequestStart = undefined
   }
 
   updateTokenData(updates) {
     const { expires_in } = updates
-    const expires_ts = Date.now() + expires_in * 1e3 - 10e3
+    const expires_ts = this.tokenRequestStart + expires_in * 1e3 - 20e3
 
     this.tokenData = {
       ...this.tokenData,
