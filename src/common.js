@@ -50,6 +50,57 @@ export function enterRoom(client, roomId, agentId, timeout = 5000) {
   })
 }
 
+const sleep = async (ms) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+
+export async function enterServiceRoom(
+  client,
+  httpClient,
+  roomId,
+  id,
+  label,
+  delay,
+  trackEvent,
+  serviceName
+) {
+  const EVENT_NAME = 'room.enter'
+  let enterRoomSuccess = false
+  let response
+
+  const handler = (event) => {
+    if (event.data.agent_id === id) {
+      enterRoomSuccess = true
+
+      client.off(EVENT_NAME, handler)
+    }
+  }
+
+  client.on(EVENT_NAME, handler)
+
+  try {
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      // eslint-disable-next-line no-await-in-loop
+      response = await httpClient.enterRoom(roomId, label)
+
+      if (enterRoomSuccess) break
+
+      // eslint-disable-next-line no-await-in-loop
+      await sleep(delay)
+
+      trackEvent('Debug', `${serviceName}.Subscription.Retry`)
+    }
+  } catch (error) {
+    client.off(EVENT_NAME, handler)
+
+    throw error
+  }
+
+  return response
+}
+
 export function makeDeferred() {
   const deferred = {}
 

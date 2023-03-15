@@ -74,6 +74,8 @@ class TokenProvider {
      *   error instanceof TypeError && error.message.startsWith('Failed to fetch')
      *     - отсутствует соединение с сетью
      *     - ошибка CORS (внезапно ответ 200, но ошибка по заголовкам)
+     *
+     * - клиентский таймаут
      * */
     let transformedError
 
@@ -83,6 +85,10 @@ class TokenProvider {
     ) {
       transformedError = TokenProviderError.fromType(
         TokenProviderError.types.NETWORK_ERROR
+      )
+    } else if (error instanceof DOMException && error.name === 'AbortError') {
+      transformedError = TokenProviderError.fromType(
+        TokenProviderError.types.CLIENT_TIMEOUT
       )
     } else if (error.error) {
       transformedError = TokenProviderError.fromType(

@@ -67,6 +67,7 @@ export class TokenProviderError extends Error {
 
   static get types() {
     return {
+      CLIENT_TIMEOUT: 'CLIENT_TIMEOUT',
       UNAUTHENTICATED: 'UNAUTHENTICATED',
       NETWORK_ERROR: 'NETWORK_ERROR',
       UNKNOWN_ERROR: 'UNKNOWN_ERROR',
