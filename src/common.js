@@ -66,6 +66,7 @@ export async function enterServiceRoom(
   serviceName
 ) {
   const EVENT_NAME = 'room.enter'
+  const isTransportConnected = () => client.mqtt.connected
   let enterRoomSuccess = false
   let response
 
@@ -82,8 +83,16 @@ export async function enterServiceRoom(
   try {
     // eslint-disable-next-line no-constant-condition
     while (true) {
+      if (!isTransportConnected()) {
+        throw new Error('MQTT client disconnected')
+      }
+
       // eslint-disable-next-line no-await-in-loop
       response = await httpClient.enterRoom(roomId, label)
+
+      if (!isTransportConnected()) {
+        throw new Error('MQTT client disconnected')
+      }
 
       if (enterRoomSuccess) break
 
