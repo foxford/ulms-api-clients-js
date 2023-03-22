@@ -59,10 +59,12 @@ export class PresenceError extends Error {
 }
 
 export class TokenProviderError extends Error {
-  constructor(...args) {
-    super(...args)
+  constructor(type, message, cause) {
+    super(message)
 
+    this.cause = cause
     this.name = 'TokenProviderError'
+    this.type = type
   }
 
   static get types() {
@@ -72,12 +74,5 @@ export class TokenProviderError extends Error {
       NETWORK_ERROR: 'NETWORK_ERROR',
       UNKNOWN_ERROR: 'UNKNOWN_ERROR',
     }
-  }
-
-  static fromType(type) {
-    const errorType =
-      TokenProviderError.types[type] || TokenProviderError.types.UNKNOWN_ERROR
-
-    return new TokenProviderError(errorType)
   }
 }
