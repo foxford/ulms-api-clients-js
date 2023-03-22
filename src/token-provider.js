@@ -6,6 +6,7 @@ class TokenProvider {
   constructor(baseUrl, httpClient) {
     this.baseUrl = baseUrl
     this.context = undefined
+    this.errorHandler = undefined
     this.httpClient = httpClient
     this.tokenData = undefined
     this.tokenP = undefined
@@ -14,6 +15,10 @@ class TokenProvider {
 
   setContext(context) {
     this.context = context
+  }
+
+  setErrorHandler(errorHandler) {
+    this.errorHandler = errorHandler
   }
 
   getToken() {
@@ -83,21 +88,33 @@ class TokenProvider {
       error instanceof TypeError &&
       error.message.startsWith('Failed to fetch')
     ) {
-      transformedError = TokenProviderError.fromType(
-        TokenProviderError.types.NETWORK_ERROR
+      transformedError = new TokenProviderError(
+        TokenProviderError.types.NETWORK_ERROR,
+        error.message,
+        error
       )
     } else if (error instanceof DOMException && error.name === 'AbortError') {
-      transformedError = TokenProviderError.fromType(
-        TokenProviderError.types.CLIENT_TIMEOUT
+      transformedError = new TokenProviderError(
+        TokenProviderError.types.CLIENT_TIMEOUT,
+        'Request was aborted (client timeout)',
+        error
       )
     } else if (error.error) {
-      transformedError = TokenProviderError.fromType(
-        TokenProviderError.types.UNAUTHENTICATED
+      transformedError = new TokenProviderError(
+        TokenProviderError.types.UNAUTHENTICATED,
+        error.error,
+        error
       )
     } else {
-      transformedError = TokenProviderError.fromType(
-        TokenProviderError.types.UNKNOWN_ERROR
+      transformedError = new TokenProviderError(
+        TokenProviderError.types.UNKNOWN_ERROR,
+        error.message,
+        error
       )
+    }
+
+    if (this.errorHandler) {
+      this.errorHandler(transformedError)
     }
 
     this.tokenP.reject(transformedError)
