@@ -1,3 +1,4 @@
+/* global window */
 /* eslint-disable camelcase, promise/always-return */
 import { makeDeferred } from './common'
 import { TokenProviderError } from './error'
@@ -60,6 +61,9 @@ class TokenProvider {
     return this.httpClient
       .post(url, undefined, {
         credentials: 'include',
+        headers: {
+          'X-Referer': `${window.location.origin}${window.location.pathname}`,
+        },
         signal,
       })
       .finally(() => {
