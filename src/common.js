@@ -50,7 +50,7 @@ export function enterRoom(client, roomId, agentId, timeout = 5000) {
   })
 }
 
-const sleep = async (ms) =>
+export const sleep = async (ms) =>
   new Promise((resolve) => {
     setTimeout(resolve, ms)
   })
@@ -119,4 +119,22 @@ export function makeDeferred() {
   })
 
   return deferred
+}
+
+export const timeout = async (delay) => {
+  let resolveFunction
+  const promise = new Promise((resolve) => {
+    resolveFunction = resolve
+  })
+  const ts0 = Date.now()
+  const id = setInterval(() => {
+    const ts = Date.now()
+
+    if (ts - ts0 >= delay) {
+      clearInterval(id)
+      resolveFunction()
+    }
+  }, 60 * 1e3) // 60 seconds
+
+  return promise
 }
