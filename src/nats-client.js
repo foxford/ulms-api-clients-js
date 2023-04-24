@@ -17,6 +17,7 @@ class NATSClient {
     this.endpoint = endpoint
     this.handlers = {}
     this.natsConnection = undefined
+    this.responders = {}
     this.topic = ''
     this.trackError = undefined
   }
@@ -35,7 +36,7 @@ class NATSClient {
    */
   // eslint-disable-next-line sonarjs/cognitive-complexity
   async connect(options) {
-    const { classId, name, token } = options
+    const { accountLabel, classId, name, token } = options
     const { pingInterval, timeout } = this.defaultOptions
     let done
     let reconnectCount = 0
@@ -106,6 +107,31 @@ class NATSClient {
         },
       })
 
+      if (accountLabel) {
+        this.natsConnection.subscribe(
+          `agent.${accountLabel}.request.${classId}`,
+          {
+            callback: (error, sourceMessage) => {
+              if (error) {
+                console.log('[NATS] Error receiving message:', error) // eslint-disable-line no-console
+
+                if (this.trackError) this.trackError(error)
+
+                return
+              }
+
+              const message = jsonCodec.decode(sourceMessage.data)
+
+              if (sourceMessage.reply && this.responders[message.type]) {
+                const response = this.responders[message.type](message.data)
+
+                sourceMessage.respond(jsonCodec.encode(response))
+              }
+            },
+          }
+        )
+      }
+
       done = this.natsConnection
         .closed()
         .then((error) => {
@@ -147,6 +173,33 @@ class NATSClient {
 
       console.log('[NATS] Error closing connection:', error) // eslint-disable-line no-console
     }
+  }
+
+  /**
+   * Register responder to exact type of messages
+   * @param {string} type - Message type
+   * @param {function} responder
+   */
+  registerResponder(type, responder) {
+    this.responders[type] = responder
+  }
+
+  /**
+   * Send request
+   * @param {string} sender - Account ID of sender
+   * @param {string} receiver - Account ID of receiver
+   * @param {string} classId - Class id
+   * @param {string} type - Request type
+   * @param {object} data - Request payload
+   */
+  request(sender, receiver, classId, type, data) {
+    if (!this.natsConnection) return Promise.reject()
+
+    return this.natsConnection.request(
+      `agent.${receiver}.request.${classId}`,
+      jsonCodec.encode({ type, data }),
+      { noMux: true, reply: `agent.${sender}.response.${classId}` }
+    )
   }
 
   /**
