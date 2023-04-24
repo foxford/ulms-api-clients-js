@@ -46,7 +46,7 @@ class NatsManager {
     return response
   }
 
-  async start(audience, classId, name) {
+  async start(audience, classId, name, accountLabel) {
     this.forcedStop = false
 
     // eslint-disable-next-line no-constant-condition
@@ -58,6 +58,7 @@ class NatsManager {
 
       // setup new connection to NATS
       const closed = this.client.connect({
+        accountLabel,
         classId,
         name,
         token,
