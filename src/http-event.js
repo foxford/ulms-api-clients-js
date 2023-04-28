@@ -1,6 +1,6 @@
 import BasicClient from './basic-client'
 
-const eventEndpoints = {
+export const eventEndpoints = {
   agentsList: (id) => `/rooms/${id}/agents`,
   agentsUpdate: (id) => `/rooms/${id}/agents`,
   banList: (id) => `/rooms/${id}/bans`,
