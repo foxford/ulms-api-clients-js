@@ -38,6 +38,9 @@ class NATSClient {
   async connect(options) {
     const { accountLabel, classId, name, token } = options
     const { pingInterval, timeout } = this.defaultOptions
+    const inboxPrefix = accountLabel
+      ? `agent.${accountLabel}.response.${classId}`
+      : undefined
     let done
     let reconnectCount = 0
 
@@ -57,6 +60,7 @@ class NATSClient {
       this.natsConnection = await connect({
         ...this.defaultOptions,
         authenticator: jwtAuthenticator(token),
+        inboxPrefix,
         name,
         noEcho: true,
         pingInterval,
@@ -186,19 +190,17 @@ class NATSClient {
 
   /**
    * Send request
-   * @param {string} sender - Account ID of sender
    * @param {string} receiver - Account ID of receiver
    * @param {string} classId - Class id
    * @param {string} type - Request type
    * @param {object} data - Request payload
    */
-  request(sender, receiver, classId, type, data) {
+  request(receiver, classId, type, data) {
     if (!this.natsConnection) return Promise.reject()
 
     return this.natsConnection.request(
       `agent.${receiver}.request.${classId}`,
-      jsonCodec.encode({ type, data }),
-      { noMux: true, reply: `agent.${sender}.response.${classId}` }
+      jsonCodec.encode({ type, data })
     )
   }
 
