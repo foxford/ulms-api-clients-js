@@ -83,6 +83,18 @@ class Event extends Service {
   }
 
   /**
+   * Use to update whiteboard access in a room
+   * @param {uuid} id
+   * @param {{ [account_id]: Boolean }} whiteboardAccess
+   * @returns {Promise}
+   */
+  updateWhiteboardAccess(id, whiteboardAccess) {
+    const parameters = { id, whiteboard_access: whiteboardAccess }
+
+    return this.rpc.send('room.whiteboard_access', parameters)
+  }
+
+  /**
    * Enter room
    * @param id
    * @param broadcastSubscription
