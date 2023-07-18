@@ -19,6 +19,7 @@ const eventEndpoints = {
   roomState: (id) => `/rooms/${id}/state`,
   roomUpdate: (id) => `/rooms/${id}`,
   roomUpdateLockedTypes: (id) => `/rooms/${id}/locked_types`,
+  roomUpdateWhiteboardAccess: (id) => `/rooms/${id}/whiteboard_access`,
 }
 
 class HTTPEvent extends BasicClient {
@@ -154,6 +155,21 @@ class HTTPEvent extends BasicClient {
     return this.post(this.url(eventEndpoints.roomUpdateLockedTypes(roomId)), {
       locked_types: lockedTypes,
     })
+  }
+
+  /**
+   * Use to update whiteboard access in a room
+   * @param {uuid} roomId
+   * @param {{ [account_id]: Boolean }} payload
+   * @returns {Promise}
+   */
+  updateWhiteboardAccess(roomId, payload) {
+    return this.post(
+      this.url(eventEndpoints.roomUpdateWhiteboardAccess(roomId)),
+      {
+        whiteboard_access: payload,
+      }
+    )
   }
 
   /**
