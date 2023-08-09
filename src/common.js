@@ -110,13 +110,29 @@ export async function enterServiceRoom(
   return response
 }
 
+export const deferredStatusEnum = {
+  PENDING: 'pending',
+  REJECTED: 'rejected',
+  RESOLVED: 'resolved',
+}
+
 export function makeDeferred() {
   const deferred = {}
 
   deferred.promise = new Promise((resolve, reject) => {
+    deferred.state = deferredStatusEnum.PENDING
     deferred.resolve = resolve
     deferred.reject = reject
   })
+
+  deferred.promise
+    // eslint-disable-next-line promise/always-return
+    .then(() => {
+      deferred.state = deferredStatusEnum.RESOLVED
+    })
+    .catch(() => {
+      deferred.state = deferredStatusEnum.REJECTED
+    })
 
   return deferred
 }

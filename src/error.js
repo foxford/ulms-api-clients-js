@@ -34,18 +34,26 @@ export class PresenceError extends Error {
     this.name = 'PresenceError'
   }
 
+  static get kinds() {
+    return {
+      RECOVERABLE_SESSION_ERROR: 'recoverable_session_error', // only TERMINATED
+      UNRECOVERABLE_SESSION_ERROR: 'unrecoverable_session_error', // all other
+    }
+  }
+
   static get types() {
     return {
       ACCESS_DENIED: 'ACCESS_DENIED',
-      AGENT_AUTH_TIMED_OUT: 'AGENT_AUTH_TIMED_OUT',
-      AGENT_REPLACED: 'AGENT_REPLACED',
+      AUTH_TIMED_OUT: 'AUTH_TIMED_OUT',
       CONNECTION_FAILED: 'CONNECTION_FAILED',
-      DATABASE_QUERY_FAILED: 'DATABASE_QUERY_FAILED',
+      INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
       NOT_CONNECTED: 'NOT_CONNECTED',
+      PONG_TIMED_OUT: 'PONG_TIMED_OUT',
+      REPLACED: 'REPLACED',
       SERIALIZATION_FAILED: 'SERIALIZATION_FAILED',
+      TERMINATED: 'TERMINATED',
       UNAUTHENTICATED: 'UNAUTHENTICATED',
       UNKNOWN_ERROR: 'UNKNOWN_ERROR',
-      UNSUPPORTED_REQUEST: 'UNSUPPORTED_REQUEST',
       WS_ERROR: 'WS_ERROR',
     }
   }
@@ -55,6 +63,28 @@ export class PresenceError extends Error {
       PresenceError.types[type] || PresenceError.types.UNKNOWN_ERROR
 
     return new PresenceError(errorType)
+  }
+
+  static isRecoverableSessionError(error) {
+    const { type } = error
+
+    return type === PresenceError.kinds.RECOVERABLE_SESSION_ERROR
+  }
+
+  static isReplacedError(error) {
+    if (!(error instanceof PresenceError)) return false
+
+    const { message } = error
+
+    return message === PresenceError.types.REPLACED
+  }
+
+  static isTerminatedError(error) {
+    if (!(error instanceof PresenceError)) return false
+
+    const { message } = error
+
+    return message === PresenceError.types.TERMINATED
   }
 }
 
