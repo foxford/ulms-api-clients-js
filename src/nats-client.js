@@ -194,13 +194,17 @@ class NATSClient {
    * @param {string} classId - Class id
    * @param {string} type - Request type
    * @param {object} data - Request payload
+   * @param {object} requestOptions - Request options
    */
-  request(receiver, classId, type, data) {
+  request(receiver, classId, type, data, requestOptions = {}) {
     if (!this.natsConnection) return Promise.reject()
+
+    const { timeout = 5000 } = requestOptions
 
     return this.natsConnection.request(
       `agent.${receiver}.request.${classId}`,
-      jsonCodec.encode({ type, data })
+      jsonCodec.encode({ type, data }),
+      { timeout }
     )
   }
 
