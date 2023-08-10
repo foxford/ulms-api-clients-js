@@ -52,6 +52,25 @@ class Dispatcher extends BasicClient {
   }
 
   /**
+   * Bans media stream and collaboration for user
+   * @param {{ accountId: string, ban: boolean, classId: string }}
+   * @returns {Promise}
+   */
+  banUser({ accountId, ban, classId }) {
+    return this.get(
+      `${this.baseUrl}/account/${accountId}/ban` // get last ban operation id for user
+      // eslint-disable-next-line camelcase
+    ).then(({ last_seen_op_id }) =>
+      this.post(`${this.baseUrl}/account/${accountId}/ban`, {
+        ban,
+        class_id: classId,
+        // eslint-disable-next-line camelcase
+        last_seen_op_id,
+      })
+    )
+  }
+
+  /**
    * Commit edition by scope
    * @param {string} audience
    * @param {string} scope
