@@ -1,4 +1,5 @@
 /* eslint-disable unicorn/no-abusive-eslint-disable, unicorn/numeric-separators-style */
+/* global window */
 import { connect, jwtAuthenticator, JSONCodec } from 'nats.ws/lib/src/mod'
 
 const jsonCodec = JSONCodec()
@@ -20,6 +21,7 @@ class NATSClient {
     this.responders = {}
     this.topic = ''
     this.trackError = undefined
+    this.trackEvent = undefined
   }
 
   isClosed() {
@@ -200,12 +202,54 @@ class NATSClient {
     if (!this.natsConnection) return Promise.reject()
 
     const { timeout = 5000 } = requestOptions
-
-    return this.natsConnection.request(
+    const t0 = window.performance.now()
+    const requestPromise = this.natsConnection.request(
       `agent.${receiver}.request.${classId}`,
       jsonCodec.encode({ type, data }),
       { timeout }
     )
+
+    if (this.trackEvent) {
+      try {
+        // eslint-disable-next-line promise/catch-or-return
+        requestPromise
+          // eslint-disable-next-line promise/always-return
+          .then((response) => {
+            const { method, type: dataType } = data
+            const t1 = window.performance.now()
+            const meta = {
+              classId,
+              error: null, // eslint-disable-line unicorn/no-null
+              method,
+              response: jsonCodec.decode(response.data),
+              responseTime: Math.floor(t1 - t0),
+              type: dataType,
+            }
+
+            this.trackEvent('Debug', 'NATS.request', 'v1', 'success', meta)
+          })
+          .catch((error) => {
+            const { method, type: dataType } = data
+            const t1 = window.performance.now()
+            const meta = {
+              classId,
+              error: error ? `${error.name}: ${error.message}` : '',
+              method,
+              response: null, // eslint-disable-line unicorn/no-null
+              responseTime: Math.floor(t1 - t0),
+              type: dataType,
+            }
+
+            this.trackEvent('Debug', 'NATS.request', 'v1', 'error', meta)
+          })
+      } catch (error) {
+        if (this.trackError) {
+          this.trackError(error)
+        }
+      }
+    }
+
+    return requestPromise
   }
 
   /**
@@ -214,6 +258,14 @@ class NATSClient {
    */
   setErrorTracker(trackError) {
     this.trackError = trackError
+  }
+
+  /**
+   * Set event tracker
+   * @param {function} trackEvent
+   */
+  setEventTracker(trackEvent) {
+    this.trackEvent = trackEvent
   }
 
   /**
