@@ -1,8 +1,12 @@
 import BasicClient from './basic-client'
 
+/**
+ * @deprecated
+ */
 class NatsGatekeeper extends BasicClient {
   /**
    * Fetch token data
+   * @deprecated
    * @param {string} audience
    * @param {string} classroomId
    * @returns {Promise}
