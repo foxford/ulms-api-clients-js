@@ -36,6 +36,7 @@ class Dispatcher extends BasicClient {
     return {
       IS_ADULT: 'is_adult',
       HAS_USER_ACCESS_TO_BOARD: 'has_user_access_to_board',
+      EMOTIONS: 'emotions',
     }
   }
 
