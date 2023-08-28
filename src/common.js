@@ -1,3 +1,4 @@
+import Backoff from './backoff'
 import { TimeoutError } from './error'
 
 // eslint-disable-next-line default-param-last
@@ -61,10 +62,11 @@ export async function enterServiceRoom(
   roomId,
   id,
   label,
-  delay,
+  minDelay,
   trackEvent,
   serviceName
 ) {
+  const backoff = new Backoff(minDelay)
   const EVENT_NAME = 'room.enter'
   const isTransportConnected = () => client.mqtt.connected
   let enterRoomSuccess = false
@@ -97,15 +99,23 @@ export async function enterServiceRoom(
       if (enterRoomSuccess) break
 
       // eslint-disable-next-line no-await-in-loop
-      await sleep(delay)
+      await sleep(backoff.value)
+
+      backoff.next()
+
+      if (enterRoomSuccess) break
 
       trackEvent('Debug', `${serviceName}.Subscription.Retry`)
     }
   } catch (error) {
     client.off(EVENT_NAME, handler)
 
+    backoff.reset()
+
     throw error
   }
+
+  backoff.reset()
 
   return response
 }
