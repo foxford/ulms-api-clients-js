@@ -58,7 +58,7 @@ class Dispatcher extends BasicClient {
    */
   banUser({ accountId, ban, classId }) {
     return this.get(
-      `${this.baseUrl}/account/${accountId}/ban` // get last ban operation id for user
+      `${this.baseUrl}/account/${accountId}/ban/${classId}` // get last ban operation id for user
       // eslint-disable-next-line camelcase
     ).then(({ last_seen_op_id }) =>
       this.post(`${this.baseUrl}/account/${accountId}/ban`, {
