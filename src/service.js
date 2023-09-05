@@ -3,17 +3,11 @@
 import EventEmitter from 'events'
 
 import Codec from './codec'
-import MQTTRPCService from './mqtt-rpc'
 
 class Service {
   constructor(mqttClient, agentId, appName) {
     this.agentId = agentId
     this.appName = appName
-    this.topicBroadcastFn = (roomId) =>
-      `broadcasts/${this.appName}/api/v1/rooms/${roomId}/events`
-    this.topicIn = `agents/${this.agentId}/api/v1/in/${this.appName}`
-    this.topicOut = `agents/${this.agentId}/api/v1/out/${this.appName}`
-    this.topicPatternBroadcasts = `broadcasts/${this.appName}/api/v1/rooms/+roomId/events`
     this.topicPatternNotifications = `apps/${this.appName}/api/v1/rooms/+roomId/events`
     this.mqtt = mqttClient
 
@@ -32,22 +26,11 @@ class Service {
       }
     )
     this.ee = new EventEmitter()
-    this.rpc = new MQTTRPCService(
-      this.mqtt,
-      this.topicIn,
-      this.topicOut,
-      this.codec,
-      {}
-    )
 
     this.attachRoutes()
   }
 
   attachRoutes() {
-    this.mqtt.attachRoute(
-      this.topicPatternBroadcasts,
-      this.subMessageHandler.bind(this)
-    )
     this.mqtt.attachRoute(
       this.topicPatternNotifications,
       this.subMessageHandler.bind(this)
@@ -55,16 +38,7 @@ class Service {
   }
 
   detachRoutes() {
-    this.mqtt.detachRoute(this.topicPatternBroadcasts)
     this.mqtt.detachRoute(this.topicPatternNotifications)
-  }
-
-  register(...args) {
-    this.rpc.register(...args)
-  }
-
-  unregister(...args) {
-    this.rpc.unregister(...args)
   }
 
   on(eventName, eventHandler) {
@@ -73,14 +47,6 @@ class Service {
 
   off(eventName, eventHandler) {
     this.ee.removeListener(eventName, eventHandler)
-  }
-
-  setLabels(labels) {
-    this.rpc.setLabels(labels)
-  }
-
-  clearLabels() {
-    this.rpc.clearLabels()
   }
 
   subMessageHandler(topicParams, topic, message, packet) {
@@ -106,7 +72,6 @@ class Service {
   destroy() {
     this.detachRoutes()
     this.ee.removeAllListeners()
-    this.rpc.destroy()
   }
 }
 
