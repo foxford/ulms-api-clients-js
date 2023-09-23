@@ -1,7 +1,9 @@
-const MIN_DELAY = 2 * 1000 // 2s
-const MAX_DELAY = 5 * 60 * 1000 // 5m
 const FACTOR = 2
+const MAX_DELAY = 5 * 60 * 1000 // 5m
 const RANDOM_ADDITIVE_MAX = 1000 // 1s
+
+// get milliseconds as value
+const MILLISECONDS_IN_SECOND = 1000
 
 function getRandomIntInclusive(min, max) {
   const minValue = Math.ceil(min)
@@ -12,12 +14,9 @@ function getRandomIntInclusive(min, max) {
 }
 
 class Backoff {
-  constructor(min = MIN_DELAY, max = MAX_DELAY, factor = FACTOR) {
+  constructor() {
     this.counter = 0
     this.delay = 0
-    this.factor = factor
-    this.max = max
-    this.min = min
 
     this.next()
   }
@@ -27,16 +26,23 @@ class Backoff {
   }
 
   next() {
-    const randomAdditive = getRandomIntInclusive(0, RANDOM_ADDITIVE_MAX)
+    if (this.delay < MAX_DELAY) {
+      const randomAdditive = getRandomIntInclusive(0, RANDOM_ADDITIVE_MAX)
 
-    // first delay always equals to randomAdditive
-    this.delay = Math.min(
-      this.min * this.factor ** this.counter - this.min + randomAdditive,
-      this.max
-    )
+      // first delay always equals to randomAdditive
+      this.delay =
+        this.counter === 0
+          ? randomAdditive
+          : Math.min(
+              MILLISECONDS_IN_SECOND * FACTOR ** this.counter + randomAdditive,
+              MAX_DELAY
+            )
+    }
+
     this.counter += 1
   }
 
+  // eslint-disable-next-line sonarjs/no-identical-functions
   reset() {
     this.counter = 0
     this.delay = 0

@@ -62,11 +62,11 @@ export async function enterServiceRoom(
   roomId,
   id,
   label,
-  minDelay,
+  minDelay, // unused parameter
   trackEvent,
   serviceName
 ) {
-  const backoff = new Backoff(minDelay)
+  const backoff = new Backoff()
   const EVENT_NAME = 'room.enter'
   const isTransportConnected = () => client.mqtt.connected
   let enterRoomSuccess = false
