@@ -59,6 +59,8 @@ class NATSClient {
         console.warn('[NATS] `timeout` value not set') // eslint-disable-line no-console
       }
 
+      const t0 = window.performance.now()
+
       this.natsConnection = await connect({
         ...this.defaultOptions,
         authenticator: jwtAuthenticator(token),
@@ -70,6 +72,12 @@ class NATSClient {
         servers: this.endpoint,
         timeout,
       })
+
+      const t1 = window.performance.now()
+
+      if (this.trackEvent) {
+        this.trackEvent('Debug', 'NATS.ConnectTime', 'v1', (t1 - t0).toFixed(0))
+      }
 
       console.log('[NATS] connection: success') // eslint-disable-line no-console
 
@@ -147,10 +155,26 @@ class NATSClient {
 
             if (this.trackError) this.trackError(error)
           }
+
+          const t2 = window.performance.now()
+
+          // eslint-disable-next-line promise/always-return
+          if (this.trackEvent) {
+            this.trackEvent(
+              'Debug',
+              'NATS.Disconnect',
+              'v1',
+              (t2 - t1).toFixed(0),
+              { reason: error || null } // eslint-disable-line unicorn/no-null
+            )
+          }
         })
         .catch((error) => console.log('[NATS] Catch closing error:', error)) // eslint-disable-line no-console
     } catch (error) {
       if (this.trackError) this.trackError(error)
+      if (this.trackEvent) {
+        this.trackEvent('Debug', 'NATS.Error', 'v1', undefined, { error })
+      }
 
       console.log('[NATS] Error connecting to server:', error) // eslint-disable-line no-console
     }

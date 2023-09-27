@@ -1,4 +1,5 @@
 /* eslint-disable camelcase, no-await-in-loop, no-restricted-syntax, sonarjs/cognitive-complexity, unicorn/no-array-reduce */
+/* global window */
 import Debug from 'debug'
 
 import Backoff from '../backoff'
@@ -55,7 +56,7 @@ const messageHandler = ({ dispatch }, message) => {
 
 async function startPresenceFlow(
   { dispatch },
-  { presenceWs },
+  { presenceWs, trackEvent },
   classroomId,
   agentLabel = 'http'
 ) {
@@ -66,10 +67,18 @@ async function startPresenceFlow(
       payload: { status: presenceStatusEnum.PENDING },
     })
 
+    const t0 = window.performance.now()
+
     await presenceWs.connect({
       agentLabel,
       classroomId,
     })
+
+    const t1 = window.performance.now()
+
+    if (trackEvent) {
+      trackEvent('Debug', 'Presence.ConnectTime', 'v1', (t1 - t0).toFixed(0))
+    }
 
     debug('[flow] connected')
     dispatch({
@@ -78,6 +87,13 @@ async function startPresenceFlow(
     })
 
     const reason = await presenceWs.disconnected()
+    const t2 = window.performance.now()
+
+    if (trackEvent) {
+      trackEvent('Debug', 'Presence.Disconnect', 'v1', (t2 - t1).toFixed(0), {
+        reason,
+      })
+    }
 
     debug('[flow] disconnected, reason:', reason)
     dispatch({
@@ -85,6 +101,20 @@ async function startPresenceFlow(
       payload: { status: presenceStatusEnum.DISCONNECTED, error: reason },
     })
   } catch (error) {
+    if (trackEvent) {
+      const customError =
+        error &&
+        error.type === 'error' &&
+        error.target &&
+        error.target instanceof WebSocket
+          ? 'WebSocket error event'
+          : error
+
+      trackEvent('Debug', 'Presence.Error', 'v1', undefined, {
+        error: customError,
+      })
+    }
+
     debug('[flow] catch', error)
     dispatch({
       type: PRESENCE_UPDATE,
@@ -255,7 +285,7 @@ async function getPresenceAgentList(
 }
 
 const createPresenceMiddleware =
-  ({ presence, presenceWs }) =>
+  ({ presence, presenceWs, trackEvent }) =>
   ({ getState, dispatch }) => {
     const boundedMessageHandler = messageHandler.bind(undefined, {
       dispatch,
@@ -267,7 +297,7 @@ const createPresenceMiddleware =
         dispatch,
         getState,
       },
-      { presence, presenceWs }
+      { presence, presenceWs, trackEvent }
     )
     const boundedGetPresenceAgentList = getPresenceAgentList.bind(
       undefined,
