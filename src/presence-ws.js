@@ -111,6 +111,8 @@ class PresenceWS extends EventEmitter {
         // connected transport
         debug('[flow] transport connected')
 
+        this.processEvent('connect')
+
         if (previousTransport) {
           previousTransport.close()
 
