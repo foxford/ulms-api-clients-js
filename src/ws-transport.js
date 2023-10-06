@@ -1,11 +1,10 @@
-/* global window */
 import Debug from 'debug'
 
 import { makeDeferred } from './common'
 
 const debug = Debug('ws-transport')
 
-const generateRandomId = () => window.crypto.randomUUID().split('-')[0]
+const generateRandomId = () => Math.random().toString(36).slice(2, 8)
 
 const PING_MESSAGE = '>'
 const PONG_MESSAGE = '<'
