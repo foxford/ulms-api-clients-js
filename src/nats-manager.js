@@ -3,11 +3,12 @@ import Backoff from './backoff'
 import { sleep, timeout } from './common'
 
 class NatsManager {
-  constructor(client, gatekeeper, nsm) {
+  constructor(client, gatekeeper, nsm, vsm) {
     this.client = client
     this.gatekeeper = gatekeeper
     this.gatekeeperBackoff = new Backoff()
-    this.nsm = nsm
+    this.nsm = nsm // NetworkStatusMonitor instance
+    this.vsm = vsm // VisibilityStateMonitor instance
 
     this.forcedStop = false
   }
@@ -76,8 +77,13 @@ class NatsManager {
         break
       }
 
-      // waiting 2 seconds between reconnections
-      await sleep(2e3)
+      // eslint-disable-next-line unicorn/prefer-ternary
+      if (this.vsm && this.vsm.isHidden()) {
+        await this.vsm.waitVisible()
+      } else {
+        // waiting 2 seconds between reconnections
+        await sleep(2e3)
+      }
     }
   }
 
