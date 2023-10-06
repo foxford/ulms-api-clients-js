@@ -7,6 +7,25 @@ const debug = Debug('ws-transport')
 
 const generateRandomId = () => window.crypto.randomUUID().split('-')[0]
 
+const PING_MESSAGE = '>'
+const PONG_MESSAGE = '<'
+const PING_TIMED_OUT_ERROR_PAYLOAD = {
+  payload: {
+    status: 0,
+    title: 'Ping timed out',
+    type: 'ping_timed_out',
+  },
+  type: 'recoverable_session_error',
+}
+const WS_CLOSED_ERROR_PAYLOAD = {
+  payload: {
+    status: 0,
+    title: 'Connection closed',
+    type: 'ws_error',
+  },
+  type: 'unrecoverable_session_error',
+}
+
 class WsTransport {
   constructor() {
     this.connected = false
@@ -16,19 +35,24 @@ class WsTransport {
     this.id = generateRandomId()
     this.lastError = undefined
     this.messageHandler = undefined
+    this.pingInterval = undefined // in ms
+    this.pingTimerId = undefined
     this.socket = undefined
   }
 
   async connect(url) {
     this.socket = new WebSocket(url)
 
+    debug(`[${this.id}] socket created`)
+
     this.socket.addEventListener('close', (closeEvent) => {
       debug(`[${this.id}] close event`, closeEvent)
 
       if (this.forcedDisconnect) return
 
-      const { code, wasClean } = closeEvent
-      const closeMeta = { code, wasClean }
+      // not used at this time
+      // const { code, wasClean } = closeEvent
+      // const closeMeta = { code, wasClean }
 
       // connected | forcedDisconnect | reason                                    |
       // -------------------------------------------------------------------------|
@@ -37,7 +61,7 @@ class WsTransport {
       // true      | false            | disconnect with or without error (server or browser)
       // true      | true             | manual disconnect (no error)
 
-      const maybeError = this.lastError || closeMeta
+      const maybeError = this.lastError || WS_CLOSED_ERROR_PAYLOAD
 
       if (this.connected) {
         this.disconnectedPromise.resolve(maybeError)
@@ -54,7 +78,7 @@ class WsTransport {
 
       if (this.forcedDisconnect) return
 
-      this.lastError = errorEvent
+      this.lastError = WS_CLOSED_ERROR_PAYLOAD
     })
 
     this.socket.addEventListener('open', () => {
@@ -70,6 +94,26 @@ class WsTransport {
     this.socket.addEventListener('message', (messageEvent) => {
       debug(`[${this.id}] message event`, messageEvent.data)
 
+      if (messageEvent.data === PING_MESSAGE) {
+        this.socket.send(PONG_MESSAGE)
+
+        if (this.pingInterval) {
+          if (this.pingTimerId) {
+            clearTimeout(this.pingTimerId)
+          }
+
+          this.pingTimerId = setTimeout(() => {
+            if (this.pingTimerId) {
+              clearTimeout(this.pingTimerId)
+            }
+
+            this.close(PING_TIMED_OUT_ERROR_PAYLOAD)
+          }, this.pingInterval)
+        }
+
+        return
+      }
+
       if (this.forcedDisconnect || !this.messageHandler) return
 
       const data = JSON.parse(messageEvent.data)
@@ -84,8 +128,12 @@ class WsTransport {
     return this.disconnectedPromise.promise
   }
 
-  close() {
+  close(reason) {
     if (!this.socket) return
+
+    if (this.pingTimerId) {
+      clearTimeout(this.pingTimerId)
+    }
 
     this.forcedDisconnect = true
 
@@ -94,10 +142,10 @@ class WsTransport {
     if (this.connected) {
       this.connected = false
 
-      this.disconnectedPromise.resolve()
+      this.disconnectedPromise.resolve(reason)
     } else {
-      this.connectedPromise.reject()
-      this.disconnectedPromise.reject()
+      this.connectedPromise.reject(reason)
+      this.disconnectedPromise.reject(reason)
     }
   }
 
@@ -109,6 +157,10 @@ class WsTransport {
 
   setMessageHandler(handler) {
     this.messageHandler = handler
+  }
+
+  setPingInterval(value) {
+    this.pingInterval = value
   }
 }
 
