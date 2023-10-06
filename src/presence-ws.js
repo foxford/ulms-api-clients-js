@@ -8,8 +8,13 @@ import WsTransport from './ws-transport'
 
 const debug = Debug('presence-ws')
 
-// todo: add error kind to error ((un-)recoverable)
-// todo: add client timeout for connection start (connect timeout - from start to open event, auth timeout - from request to response)
+const CONNECT_REQUEST_TYPE = 'connect_request'
+const CONNECT_SUCCESS_RESPONSE_TYPE = 'connect_success'
+const WS_CLIENT_CONFIG_PAYLOAD_TYPE = 'WebSocketClientConfig'
+
+// todo: add client timeout for connection start
+// todo: - connect timeout - from start to open event
+// todo: - auth timeout - from request to response
 class PresenceWS extends EventEmitter {
   constructor(url, tokenProvider) {
     super()
@@ -38,16 +43,24 @@ class PresenceWS extends EventEmitter {
         classroom_id: classroomId,
         token,
       },
-      type: 'connect_request',
+      type: CONNECT_REQUEST_TYPE,
     }
     const connected = makeDeferred()
     const transport = new WsTransport()
     const handler = (message) => {
-      const { type } = message
+      const { type, payload } = message
 
       transport.setMessageHandler()
 
-      if (type === 'connect_success') {
+      if (type === CONNECT_SUCCESS_RESPONSE_TYPE) {
+        if (payload) {
+          const { ping_timeout: pingTimeout, type: payloadType } = payload
+
+          if (payloadType === WS_CLIENT_CONFIG_PAYLOAD_TYPE && pingTimeout) {
+            transport.setPingInterval(pingTimeout)
+          }
+        }
+
         connected.resolve()
       } else {
         connected.reject(message)
@@ -64,9 +77,8 @@ class PresenceWS extends EventEmitter {
       transport.send(connectRequestPayload)
 
       // wait for event 'connect_success'
-      await Promise.race([this.signal.promise, connected.promise]) // fixme: throws
+      await Promise.race([this.signal.promise, connected.promise])
     } catch (error) {
-      // handle connect error (wrap it to PresenceError)
       debug('[createTransport] catch', error)
 
       transport.close()
@@ -136,20 +148,32 @@ class PresenceWS extends EventEmitter {
           this.recoverableErrorReceived.promise,
         ])
 
-        if (maybeDisconnectReason === undefined || maybeDisconnectReason.code) {
+        if (
+          maybeDisconnectReason === undefined ||
+          (maybeDisconnectReason &&
+            maybeDisconnectReason.payload &&
+            maybeDisconnectReason.payload.type !==
+              PresenceError.recoverableTypes.TERMINATED)
+        ) {
           debug('[flow] transport disconnected, throw')
 
           throw maybeDisconnectReason
         }
 
         // received recoverable_session_error
-        debug('[flow] received recoverable_session_error')
+        debug('[flow] received recoverable_session_error TERMINATED')
 
         previousTransport = this.transport
       }
     } catch (error) {
       debug('[flow] catch', error)
+
       // if error = undefined - normal disconnect (manual)
+      const reason = error
+        ? error.payload && error.payload.type
+          ? PresenceError.fromType(error.payload.type.toUpperCase())
+          : error
+        : undefined
 
       this.signal.reject()
 
@@ -166,12 +190,12 @@ class PresenceWS extends EventEmitter {
       }
 
       if (!this.connected) {
-        this.connectedPromise.reject(this.lastProtocolError || error)
+        this.connectedPromise.reject(this.lastProtocolError || reason)
       }
 
       this.connected = false
 
-      this.disconnectedPromise.resolve(this.lastProtocolError || error)
+      this.disconnectedPromise.resolve(this.lastProtocolError || reason)
     }
   }
 
@@ -216,7 +240,7 @@ class PresenceWS extends EventEmitter {
   disconnected() {
     if (!this.connected) {
       return Promise.reject(
-        PresenceError.fromType(PresenceError.types.NOT_CONNECTED)
+        PresenceError.fromType(PresenceError.unrecoverableTypes.NOT_CONNECTED)
       )
     }
 

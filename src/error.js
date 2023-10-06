@@ -36,31 +36,40 @@ export class PresenceError extends Error {
 
   static get kinds() {
     return {
-      RECOVERABLE_SESSION_ERROR: 'recoverable_session_error', // only TERMINATED
-      UNRECOVERABLE_SESSION_ERROR: 'unrecoverable_session_error', // all other
+      RECOVERABLE_SESSION_ERROR: 'recoverable_session_error',
+      UNRECOVERABLE_SESSION_ERROR: 'unrecoverable_session_error',
     }
   }
 
-  static get types() {
+  static get recoverableTypes() {
+    return {
+      PING_TIMED_OUT: 'PING_TIMED_OUT', // client-side error
+      SLOW_SUBSCRIBER: 'SLOW_SUBSCRIBER',
+      TERMINATED: 'TERMINATED',
+    }
+  }
+
+  static get unrecoverableTypes() {
     return {
       ACCESS_DENIED: 'ACCESS_DENIED',
       AUTH_TIMED_OUT: 'AUTH_TIMED_OUT',
-      CONNECTION_FAILED: 'CONNECTION_FAILED',
       INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
-      NOT_CONNECTED: 'NOT_CONNECTED',
+      NOT_CONNECTED: 'NOT_CONNECTED', // client-side error
       PONG_TIMED_OUT: 'PONG_TIMED_OUT',
       REPLACED: 'REPLACED',
       SERIALIZATION_FAILED: 'SERIALIZATION_FAILED',
-      TERMINATED: 'TERMINATED',
       UNAUTHENTICATED: 'UNAUTHENTICATED',
-      UNKNOWN_ERROR: 'UNKNOWN_ERROR',
-      WS_ERROR: 'WS_ERROR',
+      UNKNOWN_ERROR: 'UNKNOWN_ERROR', // client-side error
+      UNSUPPORTED_REQUEST: 'UNSUPPORTED_REQUEST',
+      WS_ERROR: 'WS_ERROR', // client-side error
     }
   }
 
   static fromType(type) {
     const errorType =
-      PresenceError.types[type] || PresenceError.types.UNKNOWN_ERROR
+      PresenceError.recoverableTypes[type] ||
+      PresenceError.unrecoverableTypes[type] ||
+      PresenceError.unrecoverableTypes.UNKNOWN_ERROR
 
     return new PresenceError(errorType)
   }
@@ -76,7 +85,7 @@ export class PresenceError extends Error {
 
     const { message } = error
 
-    return message === PresenceError.types.REPLACED
+    return message === PresenceError.unrecoverableTypes.REPLACED
   }
 
   static isTerminatedError(error) {
@@ -84,7 +93,11 @@ export class PresenceError extends Error {
 
     const { message } = error
 
-    return message === PresenceError.types.TERMINATED
+    return message === PresenceError.recoverableTypes.TERMINATED
+  }
+
+  isRecoverable() {
+    return !!PresenceError.recoverableTypes[this.message]
   }
 }
 

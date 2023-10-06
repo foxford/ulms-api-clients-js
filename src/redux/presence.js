@@ -7,6 +7,7 @@ const PRESENCE_UPDATE = 'presence/update'
 const presenceStatusEnum = {
   CONNECTED: 'connected',
   DISCONNECTED: 'disconnected',
+  ENDED: 'ended',
   IDLE: 'idle',
   PENDING: 'pending',
 }

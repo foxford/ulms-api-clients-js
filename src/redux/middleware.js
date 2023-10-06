@@ -1,9 +1,10 @@
-/* eslint-disable camelcase, no-await-in-loop, no-restricted-syntax, sonarjs/cognitive-complexity, unicorn/no-array-reduce */
+/* eslint-disable camelcase, no-await-in-loop, no-restricted-syntax, sonarjs/cognitive-complexity, unicorn/no-array-reduce, unicorn/no-null */
 /* global window */
 import Debug from 'debug'
 
 import Backoff from '../backoff'
 import { sleep } from '../common'
+import { PresenceError } from '../error'
 
 import {
   AGENT_ENTERED,
@@ -60,67 +61,113 @@ async function startPresenceFlow(
   classroomId,
   agentLabel = 'http'
 ) {
-  try {
-    debug('[flow] start')
-    dispatch({
-      type: PRESENCE_UPDATE,
-      payload: { status: presenceStatusEnum.PENDING },
-    })
+  debug('[flow] start')
 
-    const t0 = window.performance.now()
+  const RETRY_LIMIT = 3
+  const backoff = new Backoff()
+  let reason
+  let retryCount = 0
 
-    await presenceWs.connect({
-      agentLabel,
-      classroomId,
-    })
+  while (retryCount < RETRY_LIMIT) {
+    if (retryCount !== 0) {
+      debug('[flow] sleep:', backoff.value)
 
-    const t1 = window.performance.now()
+      // perform backoff delay
+      await sleep(backoff.value)
 
-    if (trackEvent) {
-      trackEvent('Debug', 'Presence.ConnectTime', 'v1', (t1 - t0).toFixed(0))
+      backoff.next()
     }
 
-    debug('[flow] connected')
-    dispatch({
-      type: PRESENCE_UPDATE,
-      payload: { status: presenceStatusEnum.CONNECTED },
-    })
-
-    const reason = await presenceWs.disconnected()
-    const t2 = window.performance.now()
-
-    if (trackEvent) {
-      trackEvent('Debug', 'Presence.Disconnect', 'v1', (t2 - t1).toFixed(0), {
-        reason,
+    try {
+      dispatch({
+        type: PRESENCE_UPDATE,
+        payload: { status: presenceStatusEnum.PENDING },
       })
-    }
 
-    debug('[flow] disconnected, reason:', reason)
-    dispatch({
-      type: PRESENCE_UPDATE,
-      payload: { status: presenceStatusEnum.DISCONNECTED, error: reason },
-    })
-  } catch (error) {
-    if (trackEvent) {
-      const customError =
-        error &&
-        error.type === 'error' &&
-        error.target &&
-        error.target instanceof WebSocket
-          ? 'WebSocket error event'
-          : error
+      const t0 = window.performance.now()
 
-      trackEvent('Debug', 'Presence.Error', 'v1', undefined, {
-        error: customError,
+      await presenceWs.connect({
+        agentLabel,
+        classroomId,
       })
+
+      const t1 = window.performance.now()
+
+      if (trackEvent) {
+        trackEvent('Debug', 'Presence.ConnectTime', 'v1', (t1 - t0).toFixed(0))
+      }
+
+      // reset retryCount
+      retryCount = 0
+
+      backoff.reset()
+
+      debug('[flow] connected')
+      dispatch({
+        type: PRESENCE_UPDATE,
+        payload: { status: presenceStatusEnum.CONNECTED },
+      })
+
+      reason = await presenceWs.disconnected()
+
+      const errorPayload = reason
+        ? { message: reason.message, name: reason.name }
+        : null
+      const t2 = window.performance.now()
+
+      if (trackEvent) {
+        trackEvent('Debug', 'Presence.Disconnect', 'v1', (t2 - t1).toFixed(0), {
+          error: errorPayload,
+        })
+      }
+
+      debug('[flow] disconnected, reason:', reason)
+      dispatch({
+        type: PRESENCE_UPDATE,
+        payload: {
+          status: presenceStatusEnum.DISCONNECTED,
+          error: errorPayload,
+        },
+      })
+    } catch (error) {
+      const errorPayload = error
+        ? { message: error.message, name: error.name }
+        : null
+
+      if (trackEvent) {
+        trackEvent('Debug', 'Presence.Error', 'v1', undefined, {
+          error: errorPayload,
+        })
+      }
+
+      debug('[flow] catch', error)
+      dispatch({
+        type: PRESENCE_UPDATE,
+        payload: {
+          status: presenceStatusEnum.DISCONNECTED,
+          error: errorPayload,
+        },
+      })
+
+      reason = error
     }
 
-    debug('[flow] catch', error)
-    dispatch({
-      type: PRESENCE_UPDATE,
-      payload: { status: presenceStatusEnum.DISCONNECTED, error },
-    })
+    if (reason instanceof PresenceError && reason.isRecoverable()) {
+      retryCount += 1
+    } else {
+      break
+    }
   }
+
+  const errorPayload = reason
+    ? { message: reason.message, name: reason.name }
+    : null
+
+  debug('[flow] ended, reason:', reason)
+  dispatch({
+    type: PRESENCE_UPDATE,
+    payload: { status: presenceStatusEnum.ENDED, error: errorPayload },
+  })
 }
 
 async function getPresenceAgentList(
@@ -320,7 +367,7 @@ const createPresenceMiddleware =
 
           if (
             presenceStatus === presenceStatusEnum.IDLE ||
-            presenceStatus === presenceStatusEnum.DISCONNECTED
+            presenceStatus === presenceStatusEnum.ENDED
           ) {
             boundedStartPresenceFlow(classroomId, agentLabel)
           }
