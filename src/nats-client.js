@@ -1,6 +1,11 @@
 /* eslint-disable unicorn/no-abusive-eslint-disable, unicorn/numeric-separators-style */
 /* global window */
-import { connect, jwtAuthenticator, JSONCodec } from 'nats.ws/lib/src/mod'
+import {
+  JSONCodec,
+  NatsError,
+  connect,
+  jwtAuthenticator,
+} from 'nats.ws/lib/src/mod'
 
 const jsonCodec = JSONCodec()
 
@@ -173,7 +178,17 @@ class NATSClient {
     } catch (error) {
       if (this.trackError) this.trackError(error)
       if (this.trackEvent) {
-        this.trackEvent('Debug', 'NATS.Error', 'v1', undefined, { error })
+        let errorMeta = error
+
+        if (error instanceof NatsError) {
+          const { code, message, name: errorName } = error
+
+          errorMeta = { code, message, name: errorName }
+        }
+
+        this.trackEvent('Debug', 'NATS.Error', 'v1', undefined, {
+          error: errorMeta,
+        })
       }
 
       console.log('[NATS] Error connecting to server:', error) // eslint-disable-line no-console
