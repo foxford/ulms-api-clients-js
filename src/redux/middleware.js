@@ -57,7 +57,7 @@ const messageHandler = ({ dispatch }, message) => {
 
 async function startPresenceFlow(
   { dispatch },
-  { presenceWs, trackEvent },
+  { presenceWs, trackError, trackEvent },
   classroomId,
   agentLabel = 'http'
 ) {
@@ -134,6 +134,10 @@ async function startPresenceFlow(
         ? { message: error.message, name: error.name }
         : null
 
+      if (trackError) {
+        trackError(error)
+      }
+
       if (trackEvent) {
         trackEvent('Debug', 'Presence.Error', 'v1', undefined, {
           error: errorPayload,
@@ -172,7 +176,7 @@ async function startPresenceFlow(
 
 async function getPresenceAgentList(
   { dispatch, getState },
-  { presence },
+  { presence, trackError },
   classroomId
 ) {
   const agentBackoff = new Backoff()
@@ -219,6 +223,10 @@ async function getPresenceAgentList(
       agentBackoff.reset()
     } catch (error) {
       debug('[agent] catch', error)
+
+      if (trackError) {
+        trackError(error)
+      }
 
       const { status } = error
       const isErrorUnrecoverable = !!status
@@ -332,7 +340,7 @@ async function getPresenceAgentList(
 }
 
 const createPresenceMiddleware =
-  ({ presence, presenceWs, trackEvent }) =>
+  ({ presence, presenceWs, trackError, trackEvent }) =>
   ({ getState, dispatch }) => {
     const boundedMessageHandler = messageHandler.bind(undefined, {
       dispatch,
@@ -344,7 +352,7 @@ const createPresenceMiddleware =
         dispatch,
         getState,
       },
-      { presence, presenceWs, trackEvent }
+      { presence, presenceWs, trackError, trackEvent }
     )
     const boundedGetPresenceAgentList = getPresenceAgentList.bind(
       undefined,
@@ -352,7 +360,7 @@ const createPresenceMiddleware =
         dispatch,
         getState,
       },
-      { presence, presenceWs }
+      { presence, presenceWs, trackError, trackEvent }
     )
 
     presenceWs.on('event', boundedMessageHandler)
