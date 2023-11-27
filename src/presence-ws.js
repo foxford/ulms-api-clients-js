@@ -9,8 +9,10 @@ import WsTransport from './ws-transport'
 const debug = Debug('presence-ws')
 
 const CONNECT_REQUEST_TYPE = 'connect_request'
+const CONNECT_RESPONSE_TYPE = 'connect_completed'
 const CONNECT_SUCCESS_RESPONSE_TYPE = 'connect_success'
-const WS_CLIENT_CONFIG_PAYLOAD_TYPE = 'WebSocketClientConfig'
+const ERROR_MESSAGE_TYPE = 'error'
+const EVENT_MESSAGE_TYPE = 'event'
 
 // todo: add client timeout for connection start
 // todo: - connect timeout - from start to open event
@@ -52,12 +54,16 @@ class PresenceWS extends EventEmitter {
 
       transport.setMessageHandler()
 
-      if (type === CONNECT_SUCCESS_RESPONSE_TYPE) {
+      if (
+        type === CONNECT_RESPONSE_TYPE ||
+        type === CONNECT_SUCCESS_RESPONSE_TYPE
+      ) {
         if (payload) {
-          const { ping_timeout: pingTimeout, type: payloadType } = payload
+          const { idle_timeout: idleTimeout, ping_timeout: pingTimeout } =
+            payload
 
-          if (payloadType === WS_CLIENT_CONFIG_PAYLOAD_TYPE && pingTimeout) {
-            transport.setPingInterval(pingTimeout)
+          if (pingTimeout || idleTimeout) {
+            transport.setPingInterval(pingTimeout || idleTimeout)
           }
         }
 
@@ -148,12 +154,15 @@ class PresenceWS extends EventEmitter {
           this.recoverableErrorReceived.promise,
         ])
 
+        // todo: remove TERMINATED
         if (
           maybeDisconnectReason === undefined ||
           (maybeDisconnectReason &&
             maybeDisconnectReason.payload &&
             maybeDisconnectReason.payload.type !==
-              PresenceError.recoverableTypes.TERMINATED)
+              PresenceError.recoverableTypes.TERMINATED &&
+            maybeDisconnectReason.payload.type !==
+              PresenceError.recoverableTypes.SERVER_SHUTDOWN)
         ) {
           debug('[flow] transport disconnected, throw')
 
@@ -161,7 +170,10 @@ class PresenceWS extends EventEmitter {
         }
 
         // received recoverable_session_error
-        debug('[flow] received recoverable_session_error TERMINATED')
+        // todo: remove TERMINATED
+        debug(
+          '[flow] received recoverable_session_error TERMINATED | SERVER_SHUTDOWN'
+        )
 
         previousTransport = this.transport
       }
@@ -170,7 +182,8 @@ class PresenceWS extends EventEmitter {
 
       // if error = undefined - normal disconnect (manual)
       const reason = error
-        ? error.payload && error.payload.type
+        ? (error.payload && error.payload.type) ||
+          error.type === ERROR_MESSAGE_TYPE
           ? PresenceError.fromType(error.payload.type.toUpperCase())
           : error
         : undefined
@@ -204,19 +217,23 @@ class PresenceWS extends EventEmitter {
 
     debug('[handleMessage] message', message)
 
-    if (type !== undefined) {
-      // process service system messages (response, error)
+    if (type === EVENT_MESSAGE_TYPE) {
+      // process service notification
+      this.processEvent(EVENT_MESSAGE_TYPE, message)
+    } else if (type === ERROR_MESSAGE_TYPE || type !== undefined) {
+      const { is_transient: isTransient } = payload
+      // process service system messages (error)
       this.lastProtocolError = PresenceError.fromType(
         payload.type.toUpperCase()
       )
 
       // if (type === 'recoverable_session_error') {
-      if (PresenceError.isRecoverableSessionError(message)) {
+      if (isTransient || PresenceError.isRecoverableSessionError(message)) {
         this.recoverableErrorReceived.resolve(this.lastProtocolError)
       }
     } else {
       // process service notification
-      this.processEvent('event', message)
+      this.processEvent(EVENT_MESSAGE_TYPE, message)
     }
   }
 

@@ -53,12 +53,19 @@ const agentInitialState = {
 const agentOperationReducer = (state, payload) => {
   const { buffer, data, status } = state
   const {
-    id: { operation, sequence_id },
+    event_id: eventId,
+    id,
     payload: { agent_id },
   } = payload
+  const { operation, sequence_id } = eventId || id
 
   if (status !== agentStatusEnum.SUCCEEDED) {
-    return { ...state, buffer: [...buffer, payload] }
+    const transformedPayload = {
+      ...payload,
+      event_id: eventId || id,
+    }
+
+    return { ...state, buffer: [...buffer, transformedPayload] }
   }
 
   return {

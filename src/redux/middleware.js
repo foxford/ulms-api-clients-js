@@ -29,9 +29,8 @@ import {
 const debug = Debug('presence-mw')
 
 const messageHandler = ({ dispatch }, message) => {
-  const {
-    id: { entity_type: entityType, operation },
-  } = message
+  const { event_id: eventId, id } = message
+  const { entity_type: entityType, operation } = eventId || id
 
   debug('event', message)
 
@@ -281,12 +280,15 @@ async function getPresenceAgentList(
   }
 
   debug('[agent] agentMap', agentMap)
-  debug(
-    '[agent] agentMap length after deduplication',
-    result.length,
-    '-->',
-    Object.keys(agentMap).length
-  )
+
+  if (Object.keys(agentMap).length !== result.length) {
+    debug(
+      '[agent] agentMap length after deduplication',
+      result.length,
+      '-->',
+      Object.keys(agentMap).length
+    )
+  }
 
   // find min sequence_id from agents
   const minSequenceId = Object.values(agentMap).reduce(
@@ -304,10 +306,10 @@ async function getPresenceAgentList(
   const buffer = selectAgentNotificationBuffer(getState())
 
   const sortedBuffer = [...buffer].sort(
-    (a, b) => a.id.sequence_id - b.id.sequence_id
+    (a, b) => a.event_id.sequence_id - b.event_id.sequence_id
   )
   const filteredBuffer = sortedBuffer.filter(
-    (_) => _.id.sequence_id > minSequenceId
+    (_) => _.event_id.sequence_id > minSequenceId
   )
 
   debug('[agent] buffer', buffer)
@@ -316,9 +318,10 @@ async function getPresenceAgentList(
 
   // applying notifications from buffer
   for (const notification of filteredBuffer) {
-    const { id, payload } = notification
-    const { operation, sequence_id } = id
-    const { agent_id } = payload
+    const {
+      event_id: { operation, sequence_id },
+      payload: { agent_id },
+    } = notification
 
     // add OR overwrite agent
     if (!agentMap[agent_id] || sequence_id > agentMap[agent_id].sequence_id) {

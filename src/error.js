@@ -44,24 +44,36 @@ export class PresenceError extends Error {
   static get recoverableTypes() {
     return {
       PING_TIMED_OUT: 'PING_TIMED_OUT', // client-side error
-      SLOW_SUBSCRIBER: 'SLOW_SUBSCRIBER',
-      TERMINATED: 'TERMINATED',
+
+      // slow_subscriber -> slow_consumer
+      SLOW_SUBSCRIBER: 'SLOW_SUBSCRIBER', // todo: remove it
+      SLOW_CONSUMER: 'SLOW_CONSUMER',
+
+      // terminated -> server_shutdown
+      TERMINATED: 'TERMINATED', // todo: remove it
+      SERVER_SHUTDOWN: 'SERVER_SHUTDOWN',
     }
   }
 
   static get unrecoverableTypes() {
     return {
       ACCESS_DENIED: 'ACCESS_DENIED',
-      AUTH_TIMED_OUT: 'AUTH_TIMED_OUT',
       INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
       NOT_CONNECTED: 'NOT_CONNECTED', // client-side error
-      PONG_TIMED_OUT: 'PONG_TIMED_OUT',
-      REPLACED: 'REPLACED',
+
+      // replaced -> session_replaced
+      REPLACED: 'REPLACED', // todo: remove it
+      SESSION_REPLACED: 'SESSION_REPLACED',
+
       SERIALIZATION_FAILED: 'SERIALIZATION_FAILED',
-      UNAUTHENTICATED: 'UNAUTHENTICATED',
       UNKNOWN_ERROR: 'UNKNOWN_ERROR', // client-side error
-      UNSUPPORTED_REQUEST: 'UNSUPPORTED_REQUEST',
       WS_ERROR: 'WS_ERROR', // client-side error
+
+      // currently unused and commented (todo: comment or remove)
+      CONNECT_TIMEOUT: 'CONNECT_TIMEOUT', // ✅
+      INVALID_CREDENTIALS: 'INVALID_CREDENTIALS', // ✅
+      INVALID_REQUEST: 'INVALID_REQUEST', // ✅
+      SESSION_TIMEOUT: 'SESSION_TIMEOUT', // ✅
     }
   }
 
@@ -85,15 +97,10 @@ export class PresenceError extends Error {
 
     const { message } = error
 
-    return message === PresenceError.unrecoverableTypes.REPLACED
-  }
-
-  static isTerminatedError(error) {
-    if (!(error instanceof PresenceError)) return false
-
-    const { message } = error
-
-    return message === PresenceError.recoverableTypes.TERMINATED
+    return (
+      message === PresenceError.unrecoverableTypes.REPLACED ||
+      message === PresenceError.unrecoverableTypes.SESSION_REPLACED
+    )
   }
 
   isRecoverable() {

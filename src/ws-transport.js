@@ -6,23 +6,23 @@ const debug = Debug('ws-transport')
 
 const generateRandomId = () => Math.random().toString(36).slice(2, 8)
 
+const KEEP_ALIVE_MESSAGE = '-'
 const PING_MESSAGE = '>'
 const PONG_MESSAGE = '<'
 const PING_TIMED_OUT_ERROR_PAYLOAD = {
   payload: {
-    status: 0,
+    is_transient: true,
     title: 'Ping timed out',
     type: 'ping_timed_out',
   },
-  type: 'recoverable_session_error',
+  type: 'error',
 }
 const WS_CLOSED_ERROR_PAYLOAD = {
   payload: {
-    status: 0,
     title: 'Connection closed',
     type: 'ws_error',
   },
-  type: 'unrecoverable_session_error',
+  type: 'error',
 }
 
 class WsTransport {
@@ -93,7 +93,10 @@ class WsTransport {
     this.socket.addEventListener('message', (messageEvent) => {
       debug(`[${this.id}] message event`, messageEvent.data)
 
-      if (messageEvent.data === PING_MESSAGE) {
+      if (
+        messageEvent.data === KEEP_ALIVE_MESSAGE ||
+        messageEvent.data === PING_MESSAGE
+      ) {
         this.socket.send(PONG_MESSAGE)
 
         if (this.pingInterval) {
