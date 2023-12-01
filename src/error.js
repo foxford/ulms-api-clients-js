@@ -43,7 +43,8 @@ export class PresenceError extends Error {
 
   static get recoverableTypes() {
     return {
-      PING_TIMED_OUT: 'PING_TIMED_OUT', // client-side error
+      KEEP_ALIVE_TIMED_OUT: 'KEEP_ALIVE_TIMED_OUT', // client-side error
+      PING_TIMED_OUT: 'PING_TIMED_OUT', // client-side error // todo: remove it
 
       // slow_subscriber -> slow_consumer
       SLOW_SUBSCRIBER: 'SLOW_SUBSCRIBER', // todo: remove it

@@ -10,7 +10,6 @@ const debug = Debug('presence-ws')
 
 const CONNECT_REQUEST_TYPE = 'connect_request'
 const CONNECT_RESPONSE_TYPE = 'connect_completed'
-const CONNECT_SUCCESS_RESPONSE_TYPE = 'connect_success'
 const ERROR_MESSAGE_TYPE = 'error'
 const EVENT_MESSAGE_TYPE = 'event'
 
@@ -34,16 +33,16 @@ class PresenceWS extends EventEmitter {
 
   async createTransport(options) {
     const { agentLabel, classroomId } = options
-    const token = await Promise.race([
+    const accessToken = await Promise.race([
       this.signal.promise,
       this.tokenProvider.getToken(),
     ])
 
     const connectRequestPayload = {
       payload: {
+        access_token: accessToken,
         agent_label: agentLabel,
         classroom_id: classroomId,
-        token,
       },
       type: CONNECT_REQUEST_TYPE,
     }
@@ -54,16 +53,12 @@ class PresenceWS extends EventEmitter {
 
       transport.setMessageHandler()
 
-      if (
-        type === CONNECT_RESPONSE_TYPE ||
-        type === CONNECT_SUCCESS_RESPONSE_TYPE
-      ) {
+      if (type === CONNECT_RESPONSE_TYPE) {
         if (payload) {
-          const { idle_timeout: idleTimeout, ping_timeout: pingTimeout } =
-            payload
+          const { idle_timeout: idleTimeout } = payload
 
-          if (pingTimeout || idleTimeout) {
-            transport.setPingInterval(pingTimeout || idleTimeout)
+          if (idleTimeout) {
+            transport.setIdleTimeout(idleTimeout)
           }
         }
 
@@ -154,13 +149,10 @@ class PresenceWS extends EventEmitter {
           this.recoverableErrorReceived.promise,
         ])
 
-        // todo: remove TERMINATED
         if (
           maybeDisconnectReason === undefined ||
           (maybeDisconnectReason &&
             maybeDisconnectReason.payload &&
-            maybeDisconnectReason.payload.type !==
-              PresenceError.recoverableTypes.TERMINATED &&
             maybeDisconnectReason.payload.type !==
               PresenceError.recoverableTypes.SERVER_SHUTDOWN)
         ) {
@@ -170,10 +162,7 @@ class PresenceWS extends EventEmitter {
         }
 
         // received recoverable_session_error
-        // todo: remove TERMINATED
-        debug(
-          '[flow] received recoverable_session_error TERMINATED | SERVER_SHUTDOWN'
-        )
+        debug('[flow] received recoverable_session_error SERVER_SHUTDOWN')
 
         previousTransport = this.transport
       }
@@ -220,20 +209,18 @@ class PresenceWS extends EventEmitter {
     if (type === EVENT_MESSAGE_TYPE) {
       // process service notification
       this.processEvent(EVENT_MESSAGE_TYPE, message)
-    } else if (type === ERROR_MESSAGE_TYPE || type !== undefined) {
+    } else if (type === ERROR_MESSAGE_TYPE) {
       const { is_transient: isTransient } = payload
       // process service system messages (error)
       this.lastProtocolError = PresenceError.fromType(
         payload.type.toUpperCase()
       )
 
-      // if (type === 'recoverable_session_error') {
-      if (isTransient || PresenceError.isRecoverableSessionError(message)) {
+      if (isTransient) {
         this.recoverableErrorReceived.resolve(this.lastProtocolError)
       }
     } else {
-      // process service notification
-      this.processEvent(EVENT_MESSAGE_TYPE, message)
+      debug('[handleMessage] unknown message type', type)
     }
   }
 
