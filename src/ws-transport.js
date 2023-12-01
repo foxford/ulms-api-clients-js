@@ -7,13 +7,11 @@ const debug = Debug('ws-transport')
 const generateRandomId = () => Math.random().toString(36).slice(2, 8)
 
 const KEEP_ALIVE_MESSAGE = '-'
-const PING_MESSAGE = '>'
-const PONG_MESSAGE = '<'
-const PING_TIMED_OUT_ERROR_PAYLOAD = {
+const KEEP_ALIVE_TIMED_OUT_ERROR_PAYLOAD = {
   payload: {
     is_transient: true,
-    title: 'Ping timed out',
-    type: 'ping_timed_out',
+    title: 'Keep alive timed out',
+    type: 'keep_alive_timed_out',
   },
   type: 'error',
 }
@@ -32,10 +30,10 @@ class WsTransport {
     this.disconnectedPromise = makeDeferred()
     this.forcedDisconnect = false
     this.id = generateRandomId()
+    this.idleTimeout = undefined // in ms
+    this.idleTimerId = undefined
     this.lastError = undefined
     this.messageHandler = undefined
-    this.pingInterval = undefined // in ms
-    this.pingTimerId = undefined
     this.socket = undefined
   }
 
@@ -93,24 +91,11 @@ class WsTransport {
     this.socket.addEventListener('message', (messageEvent) => {
       debug(`[${this.id}] message event`, messageEvent.data)
 
-      if (
-        messageEvent.data === KEEP_ALIVE_MESSAGE ||
-        messageEvent.data === PING_MESSAGE
-      ) {
-        this.socket.send(PONG_MESSAGE)
+      if (messageEvent.data === KEEP_ALIVE_MESSAGE) {
+        this.socket.send(KEEP_ALIVE_MESSAGE)
 
-        if (this.pingInterval) {
-          if (this.pingTimerId) {
-            clearTimeout(this.pingTimerId)
-          }
-
-          this.pingTimerId = setTimeout(() => {
-            if (this.pingTimerId) {
-              clearTimeout(this.pingTimerId)
-            }
-
-            this.close(PING_TIMED_OUT_ERROR_PAYLOAD)
-          }, this.pingInterval)
+        if (this.idleTimeout) {
+          this.setIdleTimer()
         }
 
         return
@@ -133,9 +118,7 @@ class WsTransport {
   close(reason) {
     if (!this.socket) return
 
-    if (this.pingTimerId) {
-      clearTimeout(this.pingTimerId)
-    }
+    this.clearIdleTimer()
 
     this.forcedDisconnect = true
 
@@ -161,8 +144,24 @@ class WsTransport {
     this.messageHandler = handler
   }
 
-  setPingInterval(value) {
-    this.pingInterval = value
+  setIdleTimeout(value) {
+    this.idleTimeout = value
+  }
+
+  clearIdleTimer() {
+    if (this.idleTimerId) {
+      clearTimeout(this.idleTimerId)
+    }
+  }
+
+  setIdleTimer() {
+    this.clearIdleTimer()
+
+    this.idleTimerId = setTimeout(() => {
+      this.clearIdleTimer()
+
+      this.close(KEEP_ALIVE_TIMED_OUT_ERROR_PAYLOAD)
+    }, this.idleTimeout)
   }
 }
 
