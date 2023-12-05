@@ -1,6 +1,6 @@
 {
   "name": "@ulms/api-clients",
-  "version": "6.9.0",
+  "version": "6.9.0-dev.0-ulms-2761",
   "description": "JavaScript API clients for ULMS platform",
   "keywords": [],
   "homepage": "https://github.com/foxford/ulms-api-clients-js#readme",

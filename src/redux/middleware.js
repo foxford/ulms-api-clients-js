@@ -133,7 +133,7 @@ async function startPresenceFlow(
         ? { message: error.message, name: error.name }
         : null
 
-      if (trackError) {
+      if (trackError && error) {
         trackError(error)
       }
 

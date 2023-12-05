@@ -65,6 +65,12 @@ class NatsManager {
         token,
       })
 
+      if (this.forcedStop) {
+        await this.closeConnection()
+
+        break
+      }
+
       await Promise.race([
         closed,
         this.nsm.waitOffline(),

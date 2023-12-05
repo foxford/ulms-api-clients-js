@@ -21,6 +21,7 @@ class NATSClient {
   constructor(endpoint, defaultOptions = {}) {
     this.defaultOptions = defaultOptions
     this.endpoint = endpoint
+    this.forcedStop = false
     this.handlers = {}
     this.natsConnection = undefined
     this.responders = {}
@@ -30,7 +31,7 @@ class NATSClient {
   }
 
   isClosed() {
-    if (!this.natsConnection) return true
+    if (!this.natsConnection) return false
 
     return this.natsConnection.isClosed()
   }
@@ -194,6 +195,14 @@ class NATSClient {
       console.log('[NATS] Error connecting to server:', error) // eslint-disable-line no-console
     }
 
+    // handle early disconnect
+    if (this.forcedStop) {
+      this.disconnect()
+
+      return
+    }
+
+    // eslint-disable-next-line consistent-return
     return done
   }
 
@@ -203,6 +212,8 @@ class NATSClient {
    * @return {Promise<void>}
    */
   async disconnect() {
+    this.forcedStop = true
+
     if (!this.natsConnection) return
 
     try {
