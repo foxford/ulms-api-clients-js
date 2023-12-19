@@ -27,6 +27,10 @@ class Event extends Service {
       ROOM_UPDATE: 'room.update',
     }
   }
+
+  constructor(mqttClient, agentId) {
+    super(mqttClient, agentId, 'event.svc.netology-group.services')
+  }
 }
 
 export default Event

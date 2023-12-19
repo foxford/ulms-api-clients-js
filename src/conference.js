@@ -45,6 +45,10 @@ class Conference extends Service {
       RTC_STREAM_UPDATE: 'rtc_stream.update',
     }
   }
+
+  constructor(mqttClient, agentId) {
+    super(mqttClient, agentId, 'conference.svc.netology-group.services')
+  }
 }
 
 export default Conference
