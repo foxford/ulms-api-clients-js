@@ -85,14 +85,11 @@ class Dispatcher extends BasicClient {
 
   /**
    * Fetch token data for NATS
-   * @param {string} audience
    * @param {string} classroomId
    * @returns {Promise}
    */
-  fetchTokenData(audience, classroomId) {
-    return this.post(
-      `${this.baseUrl}/audiences/${audience}/classrooms/${classroomId}/tokens`
-    )
+  fetchTokenData(classroomId) {
+    return this.post(`${this.baseUrl}/classrooms/${classroomId}/tokens`)
   }
 
   /**
