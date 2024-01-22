@@ -20,7 +20,7 @@ class NatsManager {
     }
   }
 
-  async retrieveNatsToken(audience, classId) {
+  async retrieveNatsToken(classId) {
     let response
 
     // eslint-disable-next-line no-constant-condition
@@ -28,7 +28,7 @@ class NatsManager {
       await this.nsm.waitOnline()
 
       try {
-        response = await this.gatekeeper.fetchTokenData(audience, classId)
+        response = await this.gatekeeper.fetchTokenData(classId)
       } catch (error) {
         console.log('[retrieveNatsToken] catch', error) // eslint-disable-line no-console
       }
@@ -47,13 +47,12 @@ class NatsManager {
     return response
   }
 
-  async start(audience, classId, name, accountLabel) {
+  async start(classId, name, accountLabel) {
     this.forcedStop = false
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const { expires_in: expiresIn, token } = await this.retrieveNatsToken(
-        audience,
         classId
       )
 
