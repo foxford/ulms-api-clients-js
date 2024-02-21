@@ -95,7 +95,7 @@ class HTTPConference extends BasicClient {
    * @returns {Promise}
    */
   readRoom(roomId) {
-    return this.get(this.url(`/rooms/${roomId}`))
+    return this.get(this.url(`/conference_rooms/${roomId}`))
   }
 
   /**
@@ -111,7 +111,7 @@ class HTTPConference extends BasicClient {
       time,
     }
 
-    return this.patch(this.url(`/rooms/${roomId}`), payload)
+    return this.patch(this.url(`/conference_rooms/${roomId}`), payload)
   }
 
   /**
@@ -120,7 +120,7 @@ class HTTPConference extends BasicClient {
    * @returns {Promise}
    */
   closeRoom(roomId) {
-    return this.post(this.url(`/rooms/${roomId}/close`))
+    return this.post(this.url(`/conference_rooms/${roomId}/close`))
   }
 
   /**
@@ -129,7 +129,7 @@ class HTTPConference extends BasicClient {
    * @returns {Promise}
    */
   enterRoom(roomId) {
-    return this.post(this.url(`/rooms/${roomId}/enter`))
+    return this.post(this.url(`/conference_rooms/${roomId}/enter`))
   }
 
   /**
@@ -139,7 +139,9 @@ class HTTPConference extends BasicClient {
    * @returns {Promise}
    */
   listAgent(roomId, filterParameters = {}) {
-    return this.get(this.url(`/rooms/${roomId}/agents`, filterParameters))
+    return this.get(
+      this.url(`/conference_rooms/${roomId}/agents`, filterParameters)
+    )
   }
 
   /**
@@ -148,7 +150,7 @@ class HTTPConference extends BasicClient {
    * @returns {Promise}
    */
   createRtc(roomId) {
-    return this.post(this.url(`/rooms/${roomId}/rtcs`))
+    return this.post(this.url(`/conference_rooms/${roomId}/rtcs`))
   }
 
   /**
@@ -167,7 +169,9 @@ class HTTPConference extends BasicClient {
    * @returns {Promise}
    */
   listRtc(roomId, filterParameters = {}) {
-    return this.get(this.url(`/rooms/${roomId}/rtcs`, filterParameters))
+    return this.get(
+      this.url(`/conference_rooms/${roomId}/rtcs`, filterParameters)
+    )
   }
 
   /**
@@ -193,7 +197,9 @@ class HTTPConference extends BasicClient {
    * @returns {Promise}
    */
   listRtcStream(roomId, filterParameters = {}) {
-    return this.get(this.url(`/rooms/${roomId}/streams`, filterParameters))
+    return this.get(
+      this.url(`/conference_rooms/${roomId}/streams`, filterParameters)
+    )
   }
 
   /**
@@ -257,7 +263,7 @@ class HTTPConference extends BasicClient {
    * @returns {Promise}
    */
   readAgentReaderConfig(roomId) {
-    return this.get(this.url(`/rooms/${roomId}/configs/reader`))
+    return this.get(this.url(`/conference_rooms/${roomId}/configs/reader`))
   }
 
   /**
@@ -266,7 +272,7 @@ class HTTPConference extends BasicClient {
    * @returns {Promise}
    */
   readAgentWriterConfig(roomId) {
-    return this.get(this.url(`/rooms/${roomId}/configs/writer`))
+    return this.get(this.url(`/conference_rooms/${roomId}/configs/writer`))
   }
 
   /**
@@ -276,7 +282,9 @@ class HTTPConference extends BasicClient {
    * @returns {Promise}
    */
   readGroups(roomId, filterParameters) {
-    return this.get(this.url(`/rooms/${roomId}/groups`, filterParameters))
+    return this.get(
+      this.url(`/conference_rooms/${roomId}/groups`, filterParameters)
+    )
   }
 
   /**
@@ -288,7 +296,10 @@ class HTTPConference extends BasicClient {
   updateAgentReaderConfig(roomId, configs) {
     const payload = { configs }
 
-    return this.post(this.url(`/rooms/${roomId}/configs/reader`), payload)
+    return this.post(
+      this.url(`/conference_rooms/${roomId}/configs/reader`),
+      payload
+    )
   }
 
   /**
@@ -300,7 +311,10 @@ class HTTPConference extends BasicClient {
   updateAgentWriterConfig(roomId, configs) {
     const payload = { configs }
 
-    return this.post(this.url(`/rooms/${roomId}/configs/writer`), payload)
+    return this.post(
+      this.url(`/conference_rooms/${roomId}/configs/writer`),
+      payload
+    )
   }
 
   /**
@@ -310,7 +324,7 @@ class HTTPConference extends BasicClient {
    * @returns {Promise}
    */
   updateGroups(roomId, payload) {
-    return this.post(this.url(`/rooms/${roomId}/groups`), payload)
+    return this.post(this.url(`/conference_rooms/${roomId}/groups`), payload)
   }
 }
 
