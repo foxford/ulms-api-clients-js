@@ -1,9 +1,6 @@
 import BasicClient from './basic-client'
 
-/**
- * @deprecated Use ULMS client instead of Dispatcher client
- */
-class Dispatcher extends BasicClient {
+class ULMS extends BasicClient {
   /**
    * Scope kind enum
    * @returns {{CHAT: string, MINIGROUP: string, P2P: string, WEBINAR: string}}
@@ -96,7 +93,7 @@ class Dispatcher extends BasicClient {
   }
 
   /**
-   * Read dispatcher scope
+   * Read ulms scope
    * @param {string} kind
    * @param {string} audience
    * @param {string} scope
@@ -157,7 +154,7 @@ class Dispatcher extends BasicClient {
   }
 
   /**
-   * Update dispatcher scope
+   * Update ulms scope
    * @param {string} kind
    * @param {string} audience
    * @param {string} scope
@@ -193,4 +190,4 @@ class Dispatcher extends BasicClient {
   }
 }
 
-export default Dispatcher
+export default ULMS
