@@ -24,6 +24,18 @@ const eventEndpoints = {
 
 class HTTPEvent extends BasicClient {
   /**
+   * Change type enum
+   * @returns {{ADDITION: string, MODIFICATION: string, REMOVAL: string}}
+   */
+  static get changeTypes() {
+    return {
+      ADDITION: 'addition',
+      MODIFICATION: 'modification',
+      REMOVAL: 'removal',
+    }
+  }
+
+  /**
    * Read room
    * @param id
    * @returns {Promise}

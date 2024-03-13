@@ -59,15 +59,14 @@ export const sleep = async (ms) =>
 export async function enterServiceRoom(
   client,
   httpClient,
+  eventName,
   roomId,
   id,
   label,
-  minDelay, // unused parameter
   trackEvent,
   serviceName
 ) {
   const backoff = new Backoff()
-  const EVENT_NAME = 'room.enter'
   const isTransportConnected = () => client.mqtt.connected
   let enterRoomSuccess = false
   let response
@@ -76,11 +75,11 @@ export async function enterServiceRoom(
     if (event.data.agent_id === id) {
       enterRoomSuccess = true
 
-      client.off(EVENT_NAME, handler)
+      client.off(eventName, handler)
     }
   }
 
-  client.on(EVENT_NAME, handler)
+  client.on(eventName, handler)
 
   try {
     // eslint-disable-next-line no-constant-condition
@@ -108,7 +107,7 @@ export async function enterServiceRoom(
       trackEvent('Debug', `${serviceName}.Subscription.Retry`)
     }
   } catch (error) {
-    client.off(EVENT_NAME, handler)
+    client.off(eventName, handler)
 
     backoff.reset()
 

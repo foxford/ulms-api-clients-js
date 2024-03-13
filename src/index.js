@@ -1,4 +1,5 @@
 export { default as Backoff } from './backoff'
+export { default as Broker } from './broker'
 export { default as Conference } from './conference'
 export { default as Dispatcher } from './dispatcher'
 export { default as Event } from './event'

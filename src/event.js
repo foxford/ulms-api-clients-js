@@ -1,5 +1,8 @@
 import Service from './service'
 
+/**
+ * @deprecated Use Broker class instead of Event class
+ */
 class Event extends Service {
   /**
    * Change type enum
@@ -15,13 +18,18 @@ class Event extends Service {
 
   /**
    * Events enum
-   * @returns {{AGENT_UPDATE: string, EVENT_CREATE: string, ROOM_CLOSE: string, ROOM_ENTER: string, ROOM_LEAVE: string, ROOM_UPDATE: string}}
+   * @returns {{
+   *  AGENT_UPDATE: string,
+   *  EVENT_CREATE: string,
+   *  ROOM_ENTER: string,
+   *  ROOM_LEAVE: string,
+   *  ROOM_UPDATE: string
+   * }}
    */
   static get events() {
     return {
       AGENT_UPDATE: 'agent.update',
-      EVENT_CREATE: 'event.create', // eslint-disable-line sonarjs/no-duplicate-string
-      ROOM_CLOSE: 'room.close',
+      EVENT_CREATE: 'event.create',
       ROOM_ENTER: 'room.enter',
       ROOM_LEAVE: 'room.leave',
       ROOM_UPDATE: 'room.update',
