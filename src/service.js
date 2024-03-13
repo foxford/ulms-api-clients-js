@@ -4,6 +4,9 @@ import EventEmitter from 'events'
 
 import Codec from './codec'
 
+/**
+ * @deprecated Use Broker class instead of Service base class
+ */
 class Service {
   constructor(mqttClient, agentId, appName) {
     this.agentId = agentId

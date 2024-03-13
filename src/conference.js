@@ -19,6 +19,9 @@ import Service from './service'
  * @property {number} video_remb
  */
 
+/**
+ * @deprecated Use Broker class instead of Conference class
+ */
 class Conference extends Service {
   /**
    * Conference events enum
@@ -28,7 +31,6 @@ class Conference extends Service {
    *  ROOM_CLOSE: string,
    *  ROOM_ENTER: string,
    *  ROOM_LEAVE: string,
-   *  ROOM_OPEN: string,
    *  RTC_STREAM_AGENT_SPEAKING: string
    *  RTC_STREAM_UPDATE: string
    * }}
@@ -36,11 +38,10 @@ class Conference extends Service {
   static get events() {
     return {
       AGENT_WRITER_CONFIG_UPDATE: 'agent_writer_config.update',
-      GROUP_UPDATE: 'group.update',
+      GROUP_UPDATE: 'video_group.update',
       ROOM_CLOSE: 'room.close',
       ROOM_ENTER: 'room.enter',
       ROOM_LEAVE: 'room.leave',
-      ROOM_OPEN: 'room.open',
       RTC_STREAM_AGENT_SPEAKING: 'rtc_stream.agent_speaking',
       RTC_STREAM_UPDATE: 'rtc_stream.update',
     }
