@@ -1,6 +1,6 @@
 {
   "name": "@ulms/api-clients",
-  "version": "7.2.0",
+  "version": "7.2.1",
   "description": "JavaScript API clients for ULMS platform",
   "keywords": [],
   "homepage": "https://github.com/foxford/ulms-api-clients-js#readme",
@@ -26,9 +26,10 @@
     "build": "npm run build:lib && npm run build:es",
     "build:es": "cross-env BABEL_ENV=es babel src --config-file ./.babelrc.json -d es --copy-files",
     "build:lib": "cross-env BABEL_ENV=lib babel src --config-file ./.babelrc.json -d lib --copy-files",
-    "prelint": "prettier --check .",
     "lint": "eslint ./src --cache",
     "prebuild": "rm -rf lib es",
+    "prelint": "prettier --check .",
+    "prepare": "husky install",
     "prepublishOnly": "npm test && npm run build",
     "test": "jest --coverage"
   },
@@ -59,6 +60,7 @@
     "eslint-plugin-promise": "6.0.0",
     "eslint-plugin-sonarjs": "0.11.0",
     "eslint-plugin-unicorn": "39.0.0",
+    "husky": "7.0.4",
     "jest": "26.6.3",
     "prettier": "2.5.1"
   }
