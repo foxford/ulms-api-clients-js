@@ -36,6 +36,8 @@ class ULMS extends BasicClient {
     return {
       IS_ADULT: 'is_adult',
       HAS_USER_ACCESS_TO_BOARD: 'has_user_access_to_board',
+      IS_TOXIC_COMMENT_CLASSIFIER_ENABLED:
+        'is_toxic_comment_classifier_enabled',
       EMOTIONS: 'emotions',
     }
   }
