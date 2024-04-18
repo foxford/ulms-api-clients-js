@@ -120,6 +120,10 @@ async function startPresenceFlow(
         })
       }
 
+      if (trackError && reason !== undefined) {
+        trackError(reason)
+      }
+
       debug('[flow] disconnected, reason:', reason)
       dispatch({
         type: PRESENCE_UPDATE,
