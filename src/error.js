@@ -34,25 +34,12 @@ export class PresenceError extends Error {
     this.name = 'PresenceError'
   }
 
-  static get kinds() {
-    return {
-      RECOVERABLE_SESSION_ERROR: 'recoverable_session_error',
-      UNRECOVERABLE_SESSION_ERROR: 'unrecoverable_session_error',
-    }
-  }
-
   static get recoverableTypes() {
     return {
       KEEP_ALIVE_TIMED_OUT: 'KEEP_ALIVE_TIMED_OUT', // client-side error
-      PING_TIMED_OUT: 'PING_TIMED_OUT', // client-side error // todo: remove it
-
-      // slow_subscriber -> slow_consumer
-      SLOW_SUBSCRIBER: 'SLOW_SUBSCRIBER', // todo: remove it
-      SLOW_CONSUMER: 'SLOW_CONSUMER',
-
-      // terminated -> server_shutdown
-      TERMINATED: 'TERMINATED', // todo: remove it
       SERVER_SHUTDOWN: 'SERVER_SHUTDOWN',
+      SLOW_CONSUMER: 'SLOW_CONSUMER',
+      WS_ERROR: 'WS_ERROR', // client-side error
     }
   }
 
@@ -62,13 +49,10 @@ export class PresenceError extends Error {
       INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
       NOT_CONNECTED: 'NOT_CONNECTED', // client-side error
 
-      // replaced -> session_replaced
-      REPLACED: 'REPLACED', // todo: remove it
       SESSION_REPLACED: 'SESSION_REPLACED',
 
       SERIALIZATION_FAILED: 'SERIALIZATION_FAILED',
       UNKNOWN_ERROR: 'UNKNOWN_ERROR', // client-side error
-      WS_ERROR: 'WS_ERROR', // client-side error
 
       // currently unused and commented (todo: comment or remove)
       CONNECT_TIMEOUT: 'CONNECT_TIMEOUT', // ✅
@@ -85,12 +69,6 @@ export class PresenceError extends Error {
       PresenceError.unrecoverableTypes.UNKNOWN_ERROR
 
     return new PresenceError(errorType)
-  }
-
-  static isRecoverableSessionError(error) {
-    const { type } = error
-
-    return type === PresenceError.kinds.RECOVERABLE_SESSION_ERROR
   }
 
   static isReplacedError(error) {

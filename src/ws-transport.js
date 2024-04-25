@@ -17,6 +17,7 @@ const KEEP_ALIVE_TIMED_OUT_ERROR_PAYLOAD = {
 }
 const WS_CLOSED_ERROR_PAYLOAD = {
   payload: {
+    is_transient: true,
     title: 'Connection closed',
     type: 'ws_error',
   },
