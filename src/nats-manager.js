@@ -52,9 +52,8 @@ class NatsManager {
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const { expires_in: expiresIn, token } = await this.retrieveNatsToken(
-        classId
-      )
+      const { expires_in: expiresIn, token } =
+        await this.retrieveNatsToken(classId)
 
       // setup new connection to NATS
       const closed = this.client.connect({

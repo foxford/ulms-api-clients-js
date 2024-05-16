@@ -1,7 +1,7 @@
-/* global window */
 // eslint-disable-next-line unicorn/prefer-node-protocol
 import EventEmitter from 'events'
 
+// eslint-disable-next-line unicorn/prefer-event-target
 class NetworkStatusMonitor extends EventEmitter {
   static events = {
     ONLINE: 'online',

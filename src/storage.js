@@ -63,22 +63,22 @@ class Storage {
     this.contentBucket = Storage.createBucketName(
       Storage.bucketKinds.CONTENT,
       this.appKind,
-      this.audience
+      this.audience,
     )
     this.eventsBucket = Storage.createBucketName(
       Storage.bucketKinds.EVENTS,
       this.appKind,
-      this.audience
+      this.audience,
     )
     this.hlsBucket = Storage.createBucketName(
       Storage.bucketKinds.HLS,
       this.appKind,
-      this.audience
+      this.audience,
     )
     this.originBucket = Storage.createBucketName(
       Storage.bucketKinds.ORIGIN,
       this.appKind,
-      this.audience
+      this.audience,
     )
   }
 
@@ -90,7 +90,7 @@ class Storage {
     return this.getObjectUrl(
       this.hlsBucket,
       set,
-      `long.v2.${this.backend}.master.m3u8`
+      `long.v2.${this.backend}.master.m3u8`,
     )
   }
 
@@ -98,7 +98,7 @@ class Storage {
     return this.getObjectUrl(
       this.eventsBucket,
       set,
-      reservedObjectNameEnum.EVENTS_DUMP
+      reservedObjectNameEnum.EVENTS_DUMP,
     )
   }
 
@@ -106,7 +106,7 @@ class Storage {
     return this.getObjectUrl(
       this.hlsBucket,
       set,
-      reservedObjectNameEnum.SUBTITLES
+      reservedObjectNameEnum.SUBTITLES,
     )
   }
 
@@ -136,7 +136,7 @@ class Storage {
   toShortObjectUrl(url) {
     const result = url.match(objectUrlRegularExpression)
 
-    return this.getShortObjectUrl(result[result.length - 1])
+    return this.getShortObjectUrl(result.at(-1))
   }
 
   async sign(parameters) {
@@ -166,7 +166,7 @@ class Storage {
   async uploadContent(file, set, config) {
     const uuid = uuidV4()
     const { name, type } = file
-    const extension = mime.getExtension(type) || name.split('.').slice(-1)[0]
+    const extension = mime.getExtension(type) || name.split('.').at(-1)
     const bucket = this.contentBucket
     const object = `${uuid}.${extension}`
     const headers = {

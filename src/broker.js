@@ -100,8 +100,9 @@ class Broker {
         }
 
         return payload
-      }
+      },
     )
+    // eslint-disable-next-line unicorn/prefer-event-target
     this.ee = new EventEmitter()
 
     this.bindListeners()
@@ -110,7 +111,7 @@ class Broker {
   bindListeners() {
     this.mqtt.on(
       this.mqtt.constructor.events.MESSAGE,
-      this.messageHandler.bind(this)
+      this.messageHandler.bind(this),
     )
   }
 
@@ -126,10 +127,12 @@ class Broker {
       if (eventNamesToTransform.has(label)) {
         const topicParams = MQTTPattern.exec(
           `apps/+appName/api/v1/rooms/+roomId/events`,
-          topic
+          topic,
         )
 
-        if (topicParams !== null) {
+        if (topicParams === null) {
+          console.warn('[topicParams] no parameters') // eslint-disable-line no-console
+        } else {
           const { appName } = topicParams
           const transformedLabel = appNameToEventNameMap[appName][label]
 
@@ -139,8 +142,6 @@ class Broker {
           }
 
           this.ee.emit(transformedLabel, event)
-        } else {
-          console.warn('[topicParams] no parameters') // eslint-disable-line no-console
         }
       } else {
         const event = {

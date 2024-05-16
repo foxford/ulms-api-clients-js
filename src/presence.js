@@ -19,7 +19,7 @@ class Presence extends BasicClient {
       this.url(`/classrooms/${classroomId}/agents`, {
         limit,
         sequence_id: sequenceId,
-      })
+      }),
     )
   }
 }

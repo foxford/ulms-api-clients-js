@@ -20,7 +20,7 @@ describe('Custom errors have right titles', () => {
   })
   it('MQTTClientError message is valid (from error)', () => {
     expect(MQTTClientError.fromError(new Error('Message')).message).toEqual(
-      'Message'
+      'Message',
     )
   })
 

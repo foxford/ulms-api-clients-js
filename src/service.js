@@ -26,8 +26,9 @@ class Service {
         }
 
         return payload
-      }
+      },
     )
+    // eslint-disable-next-line unicorn/prefer-event-target
     this.ee = new EventEmitter()
 
     this.attachRoutes()
@@ -36,7 +37,7 @@ class Service {
   attachRoutes() {
     this.mqtt.attachRoute(
       this.topicPatternNotifications,
-      this.subMessageHandler.bind(this)
+      this.subMessageHandler.bind(this),
     )
   }
 

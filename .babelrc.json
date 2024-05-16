@@ -9,7 +9,14 @@
           "@babel/preset-env",
           {
             "modules": false,
-            "targets": "last 2 versions"
+            "targets": {
+              "chrome": 87,
+              "edge": 91,
+              "firefox": 84,
+              "ios": 11,
+              "opera": 87,
+              "safari": 11
+            }
           }
         ]
       ],

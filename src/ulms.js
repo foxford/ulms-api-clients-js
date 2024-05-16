@@ -59,7 +59,7 @@ class ULMS extends BasicClient {
    */
   banUser({ accountId, ban, classId }) {
     return this.get(
-      `${this.baseUrl}/account/${accountId}/ban/${classId}` // get last ban operation id for user
+      `${this.baseUrl}/account/${accountId}/ban/${classId}`, // get last ban operation id for user
       // eslint-disable-next-line camelcase
     ).then(({ last_seen_op_id }) =>
       this.post(`${this.baseUrl}/account/${accountId}/ban`, {
@@ -67,7 +67,7 @@ class ULMS extends BasicClient {
         class_id: classId,
         // eslint-disable-next-line camelcase
         last_seen_op_id,
-      })
+      }),
     )
   }
 
@@ -80,7 +80,7 @@ class ULMS extends BasicClient {
    */
   commitEdition(audience, scope, editionId) {
     return this.post(
-      `${this.baseUrl}/audiences/${audience}/classes/${scope}/editions/${editionId}`
+      `${this.baseUrl}/audiences/${audience}/classes/${scope}/editions/${editionId}`,
     )
   }
 
@@ -103,7 +103,7 @@ class ULMS extends BasicClient {
    */
   readScope(kind, audience, scope, options) {
     return this.get(
-      this.url(`/audiences/${audience}/${kind}/${scope}`, options)
+      this.url(`/audiences/${audience}/${kind}/${scope}`, options),
     )
   }
 
@@ -116,7 +116,7 @@ class ULMS extends BasicClient {
    */
   readClassProperty(kind, classId, propertyId) {
     return this.get(
-      `${this.baseUrl}/${kind}/${classId}/properties/${propertyId}`
+      `${this.baseUrl}/${kind}/${classId}/properties/${propertyId}`,
     )
   }
 
@@ -131,7 +131,7 @@ class ULMS extends BasicClient {
   updateClassProperty(kind, classId, propertyId, data) {
     return this.put(
       `${this.baseUrl}/${kind}/${classId}/properties/${propertyId}`,
-      data
+      data,
     )
   }
 
@@ -165,7 +165,7 @@ class ULMS extends BasicClient {
   updateScope(kind, audience, scope, data) {
     return this.put(
       `${this.baseUrl}/audiences/${audience}/${kind}/${scope}`,
-      data
+      data,
     )
   }
 
@@ -184,7 +184,7 @@ class ULMS extends BasicClient {
     return this.post(
       `${this.baseUrl}/${kind}/${classId}/timestamps`,
       { position },
-      { signal }
+      { signal },
     ).finally(() => {
       clearTimeout(timeoutId)
     })

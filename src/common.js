@@ -12,8 +12,8 @@ export function rejectByTimeout(promise, timeout = 5000, context) {
         reject,
         timeout,
         new TimeoutError(
-          `${contextString}Service or another peer not responding more than ${timeout} ms`
-        )
+          `${contextString}Service or another peer not responding more than ${timeout} ms`,
+        ),
       )
     }),
   ])
@@ -64,7 +64,7 @@ export async function enterServiceRoom(
   id,
   label,
   trackEvent,
-  serviceName
+  serviceName,
 ) {
   const backoff = new Backoff()
   const isTransportConnected = () => client.mqtt.connected
