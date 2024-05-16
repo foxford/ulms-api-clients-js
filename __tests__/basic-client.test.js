@@ -63,7 +63,7 @@ describe('Basic client suite', () => {
     (endpoint, parameters, expectedParameters) => {
       const resultUrl = Client.url(`/${endpoint}`, parameters)
       expect(resultUrl).toBe(`${baseUrl}/${endpoint}${expectedParameters}`)
-    }
+    },
   )
 
   it('Headers should compare with labels', () => {
@@ -93,7 +93,7 @@ describe('Basic client suite', () => {
       expect(httpClient[method]).toBeCalledWith(baseUrl, {
         headers: headersWithoutLabels,
       })
-    }
+    },
   )
 
   it.each(methodsWithoutDataCases)(
@@ -105,7 +105,7 @@ describe('Basic client suite', () => {
       expect(httpClient[method]).toBeCalledWith(baseUrl, {
         headers: { ...headersWithoutLabels, ...ulmsLabels },
       })
-    }
+    },
   )
 
   it.each(methodsWithDataCases)(
@@ -115,7 +115,7 @@ describe('Basic client suite', () => {
       expect(httpClient[method]).toBeCalledWith(baseUrl, data, {
         headers: headersWithoutLabels,
       })
-    }
+    },
   )
 
   it.each(methodsWithDataCases)(
@@ -127,6 +127,6 @@ describe('Basic client suite', () => {
       expect(httpClient[method]).toBeCalledWith(baseUrl, data, {
         headers: { ...headersWithoutLabels, ...ulmsLabels },
       })
-    }
+    },
   )
 })

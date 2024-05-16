@@ -16,6 +16,7 @@ const EVENT_MESSAGE_TYPE = 'event'
 // todo: add client timeout for connection start
 // todo: - connect timeout - from start to open event
 // todo: - auth timeout - from request to response
+// eslint-disable-next-line unicorn/prefer-event-target
 class PresenceWS extends EventEmitter {
   constructor(url, tokenProvider) {
     super()
@@ -118,7 +119,7 @@ class PresenceWS extends EventEmitter {
 
                 // otherwise, throw error
                 throw result
-              }
+              },
             )
           : await p
         // connected transport
@@ -213,7 +214,7 @@ class PresenceWS extends EventEmitter {
       const { is_transient: isTransient } = payload
       // process service system messages (error)
       this.lastProtocolError = PresenceError.fromType(
-        payload.type.toUpperCase()
+        payload.type.toUpperCase(),
       )
 
       if (isTransient) {
@@ -244,7 +245,7 @@ class PresenceWS extends EventEmitter {
   disconnected() {
     if (!this.connected) {
       return Promise.reject(
-        PresenceError.fromType(PresenceError.unrecoverableTypes.NOT_CONNECTED)
+        PresenceError.fromType(PresenceError.unrecoverableTypes.NOT_CONNECTED),
       )
     }
 

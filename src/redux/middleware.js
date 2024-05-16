@@ -1,5 +1,4 @@
 /* eslint-disable camelcase, no-await-in-loop, no-restricted-syntax, sonarjs/cognitive-complexity, unicorn/no-array-reduce, unicorn/no-null */
-/* global window */
 import Debug from 'debug'
 
 import Backoff from '../backoff'
@@ -36,15 +35,17 @@ const messageHandler = ({ dispatch }, message) => {
 
   if (entityType === AGENT_ENTITY_TYPE) {
     switch (operation) {
-      case agentEntityOperationEnum.ENTERED:
+      case agentEntityOperationEnum.ENTERED: {
         dispatch({ type: AGENT_ENTERED, payload: message })
 
         break
+      }
 
-      case agentEntityOperationEnum.LEFT:
+      case agentEntityOperationEnum.LEFT: {
         dispatch({ type: AGENT_LEFT, payload: message })
 
         break
+      }
 
       default:
       // do nothing
@@ -58,7 +59,7 @@ async function startPresenceFlow(
   { dispatch },
   { presenceWs, trackError, trackEvent },
   classroomId,
-  agentLabel = 'http'
+  agentLabel = 'http',
 ) {
   debug('[flow] start')
 
@@ -180,7 +181,7 @@ async function startPresenceFlow(
 async function getPresenceAgentList(
   { dispatch, getState },
   { presence, trackError },
-  classroomId
+  classroomId,
 ) {
   const agentBackoff = new Backoff()
   const agentMap = {}
@@ -218,7 +219,7 @@ async function getPresenceAgentList(
         break
       }
 
-      lastSequenceId = response[response.length - 1].sequence_id
+      lastSequenceId = response.at(-1).sequence_id
 
       // reset 'retry' state
       retryCount = 0
@@ -290,7 +291,7 @@ async function getPresenceAgentList(
       '[agent] agentMap length after deduplication',
       result.length,
       '-->',
-      Object.keys(agentMap).length
+      Object.keys(agentMap).length,
     )
   }
 
@@ -300,9 +301,9 @@ async function getPresenceAgentList(
       accumulator === -1
         ? item.sequence_id
         : item.sequence_id < accumulator
-        ? item.sequence_id
-        : accumulator,
-    -1
+          ? item.sequence_id
+          : accumulator,
+    -1,
   )
 
   debug('[agent] minSequenceId', minSequenceId)
@@ -310,10 +311,10 @@ async function getPresenceAgentList(
   const buffer = selectAgentNotificationBuffer(getState())
 
   const sortedBuffer = [...buffer].sort(
-    (a, b) => a.event_id.sequence_id - b.event_id.sequence_id
+    (a, b) => a.event_id.sequence_id - b.event_id.sequence_id,
   )
   const filteredBuffer = sortedBuffer.filter(
-    (_) => _.event_id.sequence_id > minSequenceId
+    (_) => _.event_id.sequence_id > minSequenceId,
   )
 
   debug('[agent] buffer', buffer)
@@ -359,7 +360,7 @@ const createPresenceMiddleware =
         dispatch,
         getState,
       },
-      { presence, presenceWs, trackError, trackEvent }
+      { presence, presenceWs, trackError, trackEvent },
     )
     const boundedGetPresenceAgentList = getPresenceAgentList.bind(
       undefined,
@@ -367,7 +368,7 @@ const createPresenceMiddleware =
         dispatch,
         getState,
       },
-      { presence, presenceWs, trackError, trackEvent }
+      { presence, presenceWs, trackError, trackEvent },
     )
 
     presenceWs.on('event', boundedMessageHandler)
@@ -426,8 +427,9 @@ const createPresenceMiddleware =
           return
         }
 
-        default:
+        default: {
           next(action)
+        }
       }
     }
   }

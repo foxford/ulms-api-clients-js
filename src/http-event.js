@@ -76,7 +76,7 @@ class HTTPEvent extends BasicClient {
    */
   listAgent(roomId, filterParameters = {}) {
     return this.get(
-      this.url(eventEndpoints.agentsList(roomId), filterParameters)
+      this.url(eventEndpoints.agentsList(roomId), filterParameters),
     )
   }
 
@@ -153,7 +153,7 @@ class HTTPEvent extends BasicClient {
    */
   listEvent(roomId, filterParameters = {}) {
     return this.get(
-      this.url(eventEndpoints.eventsList(roomId), filterParameters)
+      this.url(eventEndpoints.eventsList(roomId), filterParameters),
     )
   }
 
@@ -180,7 +180,7 @@ class HTTPEvent extends BasicClient {
       this.url(eventEndpoints.roomUpdateWhiteboardAccess(roomId)),
       {
         whiteboard_access: payload,
-      }
+      },
     )
   }
 
@@ -223,7 +223,7 @@ class HTTPEvent extends BasicClient {
    */
   listEdition(roomId, filterParameters = {}) {
     return this.get(
-      this.url(eventEndpoints.editionsList(roomId), filterParameters)
+      this.url(eventEndpoints.editionsList(roomId), filterParameters),
     )
   }
 
@@ -260,7 +260,7 @@ class HTTPEvent extends BasicClient {
 
     return this.post(
       this.url(eventEndpoints.changesCreate(editionId)),
-      parameters
+      parameters,
     )
   }
 

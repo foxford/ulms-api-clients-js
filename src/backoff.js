@@ -35,7 +35,7 @@ class Backoff {
           ? randomAdditive
           : Math.min(
               MILLISECONDS_IN_SECOND * FACTOR ** this.counter + randomAdditive,
-              MAX_DELAY
+              MAX_DELAY,
             )
     }
 

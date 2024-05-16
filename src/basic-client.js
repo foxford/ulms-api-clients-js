@@ -4,7 +4,7 @@ const parseParameter = (key, value) => {
     return value.reduce(
       (accumulator, item) =>
         accumulator ? `${accumulator}&${key}[]=${item}` : `${key}[]=${item}`,
-      ''
+      '',
     )
   }
 
@@ -15,7 +15,7 @@ const parseParameter = (key, value) => {
         accumulator
           ? `${accumulator}&${key}[${attribute}]=${value[attribute]}`
           : `${key}[${attribute}]=${value[attribute]}`,
-      ''
+      '',
     )
   }
 

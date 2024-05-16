@@ -1,4 +1,3 @@
-/* global window */
 /* eslint-disable camelcase, promise/always-return */
 import { makeDeferred } from './common'
 import { TokenProviderError } from './error'
@@ -95,25 +94,25 @@ class TokenProvider {
       transformedError = new TokenProviderError(
         TokenProviderError.types.NETWORK_ERROR,
         error.message,
-        error
+        error,
       )
     } else if (error instanceof DOMException && error.name === 'AbortError') {
       transformedError = new TokenProviderError(
         TokenProviderError.types.CLIENT_TIMEOUT,
         'Request was aborted (client timeout)',
-        error
+        error,
       )
     } else if (error.error) {
       transformedError = new TokenProviderError(
         TokenProviderError.types.UNAUTHENTICATED,
         error.error,
-        error
+        error,
       )
     } else {
       transformedError = new TokenProviderError(
         TokenProviderError.types.UNKNOWN_ERROR,
         error.message,
-        error
+        error,
       )
     }
 

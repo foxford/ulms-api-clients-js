@@ -1,9 +1,9 @@
-/* global document */
 // eslint-disable-next-line unicorn/prefer-node-protocol
 import EventEmitter from 'events'
 
 import { makeDeferred } from './common'
 
+// eslint-disable-next-line unicorn/prefer-event-target
 class VisibilityStateMonitor extends EventEmitter {
   static events = {
     CHANGE: 'change',
@@ -40,7 +40,7 @@ class VisibilityStateMonitor extends EventEmitter {
   handleEvent = () => {
     this.emit(
       VisibilityStateMonitor.events.CHANGE,
-      VisibilityStateMonitor.state
+      VisibilityStateMonitor.state,
     )
 
     if (this.constructor.isHidden) {

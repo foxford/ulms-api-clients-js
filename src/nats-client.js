@@ -1,11 +1,5 @@
 /* eslint-disable unicorn/no-abusive-eslint-disable, unicorn/numeric-separators-style */
-/* global window */
-import {
-  JSONCodec,
-  NatsError,
-  connect,
-  jwtAuthenticator,
-} from 'nats.ws/lib/src/mod'
+import { JSONCodec, NatsError, connect, jwtAuthenticator } from 'nats.ws'
 
 const jsonCodec = JSONCodec()
 
@@ -147,7 +141,7 @@ class NATSClient {
                 sourceMessage.respond(jsonCodec.encode(response))
               }
             },
-          }
+          },
         )
       }
 
@@ -170,7 +164,7 @@ class NATSClient {
               'NATS.Disconnect',
               'v1',
               (t2 - t1).toFixed(0),
-              { reason: error || null } // eslint-disable-line unicorn/no-null
+              { reason: error || null }, // eslint-disable-line unicorn/no-null
             )
           }
         })
@@ -245,7 +239,7 @@ class NATSClient {
     const requestPromise = this.natsConnection.request(
       `agent.${receiver}.request.${classId}`,
       jsonCodec.encode({ type, data }),
-      { timeout }
+      { timeout },
     )
 
     if (this.trackEvent) {

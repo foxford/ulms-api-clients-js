@@ -140,7 +140,7 @@ class HTTPConference extends BasicClient {
    */
   listAgent(roomId, filterParameters = {}) {
     return this.get(
-      this.url(`/conference_rooms/${roomId}/agents`, filterParameters)
+      this.url(`/conference_rooms/${roomId}/agents`, filterParameters),
     )
   }
 
@@ -170,7 +170,7 @@ class HTTPConference extends BasicClient {
    */
   listRtc(roomId, filterParameters = {}) {
     return this.get(
-      this.url(`/conference_rooms/${roomId}/rtcs`, filterParameters)
+      this.url(`/conference_rooms/${roomId}/rtcs`, filterParameters),
     )
   }
 
@@ -198,7 +198,7 @@ class HTTPConference extends BasicClient {
    */
   listRtcStream(roomId, filterParameters = {}) {
     return this.get(
-      this.url(`/conference_rooms/${roomId}/streams`, filterParameters)
+      this.url(`/conference_rooms/${roomId}/streams`, filterParameters),
     )
   }
 
@@ -231,7 +231,7 @@ class HTTPConference extends BasicClient {
     rtcId,
     jsep,
     intent = HTTPConference.intents.INTENT_READ, // eslint-disable-line default-param-last
-    label
+    label,
   ) {
     const payload = {
       intent,
@@ -283,7 +283,7 @@ class HTTPConference extends BasicClient {
    */
   readGroups(roomId, filterParameters) {
     return this.get(
-      this.url(`/conference_rooms/${roomId}/groups`, filterParameters)
+      this.url(`/conference_rooms/${roomId}/groups`, filterParameters),
     )
   }
 
@@ -298,7 +298,7 @@ class HTTPConference extends BasicClient {
 
     return this.post(
       this.url(`/conference_rooms/${roomId}/configs/reader`),
-      payload
+      payload,
     )
   }
 
@@ -313,7 +313,7 @@ class HTTPConference extends BasicClient {
 
     return this.post(
       this.url(`/conference_rooms/${roomId}/configs/writer`),
-      payload
+      payload,
     )
   }
 
