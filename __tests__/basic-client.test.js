@@ -1,12 +1,15 @@
 import BasicClient from '../src/basic-client'
 
+const methodFunctionMock = jest.fn(() =>
+  Promise.resolve({ data: {}, status: 200 }),
+)
 const baseUrl = 'https://test.url'
 const httpClient = {
-  get: jest.fn(),
-  put: jest.fn(),
-  post: jest.fn(),
-  patch: jest.fn(),
-  delete: jest.fn(),
+  get: methodFunctionMock,
+  put: methodFunctionMock,
+  post: methodFunctionMock,
+  patch: methodFunctionMock,
+  delete: methodFunctionMock,
 }
 const tokenProvider = {
   getToken: jest.fn().mockImplementation(() => 'token'),

@@ -1,3 +1,7 @@
+/* eslint-disable promise/no-nesting */
+const responseTransformer = (_) => _.data
+
+// todo: extend from BasicClient
 class HttpProfileResource {
   constructor(host, endpoint, httpClient, tokenProvider) {
     this.baseUrl = `${host}/${endpoint}`
@@ -25,9 +29,11 @@ class HttpProfileResource {
     }
 
     return this.tokenProvider.getToken().then((token) =>
-      this.httpClient.get(`${this.baseUrl}/users/${id}${qs}`, {
-        headers: HttpProfileResource.headers({ token }),
-      }),
+      this.httpClient
+        .get(`${this.baseUrl}/users/${id}${qs}`, {
+          headers: HttpProfileResource.headers({ token }),
+        })
+        .then(responseTransformer),
     )
   }
 
@@ -35,9 +41,11 @@ class HttpProfileResource {
     const qs = `?ids=${ids.join(',')}&scope=${scope}`
 
     return this.tokenProvider.getToken().then((token) =>
-      this.httpClient.get(`${this.baseUrl}/users${qs}`, {
-        headers: HttpProfileResource.headers({ token }),
-      }),
+      this.httpClient
+        .get(`${this.baseUrl}/users${qs}`, {
+          headers: HttpProfileResource.headers({ token }),
+        })
+        .then(responseTransformer),
     )
   }
 
@@ -45,9 +53,11 @@ class HttpProfileResource {
     const qs = `?scope=${scope}`
 
     return this.tokenProvider.getToken().then((token) =>
-      this.httpClient.patch(`${this.baseUrl}/users/${id}${qs}`, data, {
-        headers: HttpProfileResource.headers({ token }),
-      }),
+      this.httpClient
+        .patch(`${this.baseUrl}/users/${id}${qs}`, data, {
+          headers: HttpProfileResource.headers({ token }),
+        })
+        .then(responseTransformer),
     )
   }
 }

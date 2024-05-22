@@ -1,6 +1,9 @@
 /* eslint-disable camelcase, promise/always-return */
 import { makeDeferred } from './common'
 import { TokenProviderError } from './error'
+import retry, { isErrorRetryable } from './retry'
+
+const onRetry = (error) => !isErrorRetryable(error)
 
 class TokenProvider {
   constructor(baseUrl, httpClient) {
@@ -37,7 +40,7 @@ class TokenProvider {
 
       this.fetchTokenData()
         .then((response) => {
-          this.updateTokenData(response)
+          this.updateTokenData(response.data)
           this.resolveAndReset()
         })
         .catch((error) => {
@@ -50,24 +53,19 @@ class TokenProvider {
     return Promise.resolve(this.tokenData.access_token)
   }
 
-  fetchTokenData() {
-    const controller = new AbortController()
-    const { signal } = controller
-    const timeoutId = setTimeout(() => controller.abort(), 10 * 1000)
+  async fetchTokenData() {
     const qs = this.context ? `?context=${this.context}` : ''
     const url = `${this.baseUrl}/api/user/ulms_token${qs}`
-
-    return this.httpClient
-      .post(url, undefined, {
+    const task = async () =>
+      this.httpClient.post(url, undefined, {
         credentials: 'include',
         headers: {
           'X-Referer': `${window.location.origin}${window.location.pathname}`,
         },
-        signal,
+        timeout: 10_000,
       })
-      .finally(() => {
-        clearTimeout(timeoutId)
-      })
+
+    return retry(task, onRetry)
   }
 
   rejectAndReset(error) {
@@ -102,10 +100,10 @@ class TokenProvider {
         'Request was aborted (client timeout)',
         error,
       )
-    } else if (error.error) {
+    } else if (error.data && error.data.error) {
       transformedError = new TokenProviderError(
         TokenProviderError.types.UNAUTHENTICATED,
-        error.error,
+        error.data.error,
         error,
       )
     } else {
