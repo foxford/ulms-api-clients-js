@@ -1,65 +1,92 @@
 /* eslint-disable class-methods-use-this */
 
+function createTimeoutSignal(timeout) {
+  const controller = new AbortController()
+  const { signal } = controller
+  const id = setTimeout(() => controller.abort(), timeout)
+  const cleanup = () => clearTimeout(id)
+
+  return { cleanup, signal }
+}
+
 class FetchHttpClient {
-  static handleResponse(response) {
-    if (!response.ok) {
-      return response
-        .json()
-        .catch(() => response.text())
-        .catch(() => ({
-          status: response.status,
-          statusText: response.statusText,
-        }))
-        .then((result) => {
-          throw result
-        })
+  static async handleResponse(response) {
+    const bodyAsText = await response.text()
+    let data
+
+    try {
+      data = JSON.parse(bodyAsText)
+    } catch {
+      data = { message: bodyAsText }
     }
 
-    return response
-      .json()
-      .catch(() => response.text())
-      .catch(() => ({
-        status: response.status,
-        statusText: response.statusText,
-      }))
+    const result = {
+      data,
+      status: response.status,
+    }
+
+    if (!response.ok) {
+      throw result
+    }
+
+    return result
+  }
+
+  request(url, config) {
+    const { timeout, ...requestConfig } = config
+    const requestOptions = {
+      ...requestConfig,
+    }
+    let onFinally
+
+    if (timeout !== undefined) {
+      const { cleanup, signal } = createTimeoutSignal(timeout)
+
+      requestOptions.signal = signal
+      onFinally = cleanup
+    }
+
+    return fetch(url, requestOptions)
+      .then(FetchHttpClient.handleResponse)
+      .finally(() => (onFinally ? onFinally() : undefined))
   }
 
   get(url, config) {
-    return fetch(url, {
+    return this.request(url, {
       ...config,
       method: 'GET',
-    }).then(FetchHttpClient.handleResponse)
+    })
   }
 
   put(url, data, config) {
-    return fetch(url, {
+    return this.request(url, {
       ...config,
       method: 'PUT',
       body: JSON.stringify(data),
-    }).then(FetchHttpClient.handleResponse)
+    })
   }
 
   post(url, data, config) {
-    return fetch(url, {
+    return this.request(url, {
       ...config,
       method: 'POST',
       body: JSON.stringify(data),
-    }).then(FetchHttpClient.handleResponse)
+    })
   }
 
   patch(url, data, config) {
-    return fetch(url, {
+    return this.request(url, {
       ...config,
       method: 'PATCH',
       body: JSON.stringify(data),
-    }).then(FetchHttpClient.handleResponse)
+    })
   }
 
   delete(url, config) {
-    return fetch(url, {
+    return this.request(url, {
       ...config,
       method: 'DELETE',
-    }).then(FetchHttpClient.handleResponse)
+    })
   }
 }
 

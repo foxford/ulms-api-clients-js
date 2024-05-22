@@ -1,3 +1,7 @@
+import retry, { isErrorRetryable } from './retry'
+
+const onRetry = (error) => !isErrorRetryable(error)
+
 const parseParameter = (key, value) => {
   if (Array.isArray(value)) {
     // eslint-disable-next-line unicorn/no-array-reduce
@@ -21,6 +25,8 @@ const parseParameter = (key, value) => {
 
   return `${key}=${value}`
 }
+
+const responseTransformer = (_) => _.data
 
 class BasicClient {
   constructor(baseUrl, httpClient, tokenProvider) {
@@ -86,6 +92,25 @@ class BasicClient {
   }
 
   async get(url, options = {}) {
+    const { retry: retryEnabled } = options
+
+    if (retryEnabled) {
+      const task = async () => {
+        const token = await this.tokenProvider.getToken()
+        const headers = {
+          ...options.headers,
+          ...BasicClient.headers(token, this.labels, this.customHeaders),
+        }
+        const requestOptions = { ...options, headers }
+
+        return this.httpClient
+          .get(url, requestOptions)
+          .then(responseTransformer)
+      }
+
+      return retry(task, onRetry)
+    }
+
     const token = await this.tokenProvider.getToken()
     const headers = {
       ...options.headers,
@@ -93,7 +118,7 @@ class BasicClient {
     }
     const requestOptions = { ...options, headers }
 
-    return this.httpClient.get(url, requestOptions)
+    return this.httpClient.get(url, requestOptions).then(responseTransformer)
   }
 
   async put(url, data, options = {}) {
@@ -104,7 +129,9 @@ class BasicClient {
     }
     const requestOptions = { ...options, headers }
 
-    return this.httpClient.put(url, data, requestOptions)
+    return this.httpClient
+      .put(url, data, requestOptions)
+      .then(responseTransformer)
   }
 
   async post(url, data, options = {}) {
@@ -122,7 +149,9 @@ class BasicClient {
       const expiresAtLocal = this.tokenProvider.tokenData
         ? this.tokenProvider.tokenData.expires_ts
         : undefined
-      const result = this.httpClient.post(url, data, requestOptions)
+      const result = this.httpClient
+        .post(url, data, requestOptions)
+        .then(responseTransformer)
 
       result.catch((error) => {
         const responseEnd = Date.now()
@@ -143,7 +172,9 @@ class BasicClient {
     }
     // [debug section] end
 
-    return this.httpClient.post(url, data, requestOptions)
+    return this.httpClient
+      .post(url, data, requestOptions)
+      .then(responseTransformer)
   }
 
   async patch(url, data, options = {}) {
@@ -154,7 +185,9 @@ class BasicClient {
     }
     const requestOptions = { ...options, headers }
 
-    return this.httpClient.patch(url, data, requestOptions)
+    return this.httpClient
+      .patch(url, data, requestOptions)
+      .then(responseTransformer)
   }
 
   async delete(url, options = {}) {
@@ -165,7 +198,7 @@ class BasicClient {
     }
     const requestOptions = { ...options, headers }
 
-    return this.httpClient.delete(url, requestOptions)
+    return this.httpClient.delete(url, requestOptions).then(responseTransformer)
   }
 }
 

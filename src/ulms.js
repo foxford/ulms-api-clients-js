@@ -104,6 +104,7 @@ class ULMS extends BasicClient {
   readScope(kind, audience, scope, options) {
     return this.get(
       this.url(`/audiences/${audience}/${kind}/${scope}`, options),
+      { timeout: 10_000, retry: true },
     )
   }
 
