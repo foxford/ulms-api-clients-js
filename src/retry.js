@@ -56,7 +56,6 @@ function isErrorRetryable(error) {
     error instanceof DOMException && error.name === 'AbortError'
   const isPassedByStatusCode = error.status
     ? error.status === 422 ||
-      error.status === 401 ||
       error.status === 424 ||
       error.status === 429 ||
       error.status >= 500
