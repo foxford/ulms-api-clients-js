@@ -242,7 +242,7 @@ class ReconnectingMQTTClient extends MQTTClient {
   }
 
   reconnect() {
-    if (this.tokenProviderPromise !== null) return
+    if (this.tokenProviderPromise !== undefined) return
 
     this.tokenProviderPromise = this.tokenProvider
       .getToken()
