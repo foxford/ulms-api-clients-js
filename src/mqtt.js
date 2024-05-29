@@ -14,6 +14,7 @@ const defaultOptions = {
   },
   protocolVersion: 5,
   reconnectPeriod: 0,
+  // timerVariant: 'native',
   username: '',
 }
 
@@ -83,7 +84,11 @@ class MQTTClient {
   }
 
   connect(options) {
-    this.client = mqtt.connect(this.url, options)
+    this.client = mqtt.connect(this.url, {
+      ...options,
+      // todo: remove it after fix (https://github.com/mqttjs/MQTT.js/issues/1873)
+      transformWsUrl: () => this.url,
+    })
 
     this.bindEventListeners()
   }
