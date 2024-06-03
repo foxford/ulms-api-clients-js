@@ -1,5 +1,8 @@
-// eslint-disable-next-line max-classes-per-file
-import mqtt from 'mqtt'
+/* eslint-disable max-classes-per-file */
+/* global mqtt */
+
+// using version from cdn
+// import mqtt from 'mqtt'
 import MQTTPattern from 'mqtt-pattern'
 
 import { mqttReasonCodeNameEnum } from './constants'
@@ -14,7 +17,6 @@ const defaultOptions = {
   },
   protocolVersion: 5,
   reconnectPeriod: 0,
-  // timerVariant: 'native',
   username: '',
 }
 
@@ -84,11 +86,7 @@ class MQTTClient {
   }
 
   connect(options) {
-    this.client = mqtt.connect(this.url, {
-      ...options,
-      // todo: remove it after fix (https://github.com/mqttjs/MQTT.js/issues/1873)
-      transformWsUrl: () => this.url,
-    })
+    this.client = mqtt.connect(this.url, options)
 
     this.bindEventListeners()
   }
@@ -230,12 +228,12 @@ class ReconnectingMQTTClient extends MQTTClient {
           reject(error)
         }
         const offHandlers = () => {
-          this.client.off(ReconnectingMQTTClient.events.CONNECT, connectHandler)
-          this.client.off(ReconnectingMQTTClient.events.ERROR, errorHandler)
+          super.off(ReconnectingMQTTClient.events.CONNECT, connectHandler)
+          super.off(ReconnectingMQTTClient.events.ERROR, errorHandler)
         }
 
-        this.client.on(ReconnectingMQTTClient.events.CONNECT, connectHandler)
-        this.client.on(ReconnectingMQTTClient.events.ERROR, errorHandler)
+        super.on(ReconnectingMQTTClient.events.CONNECT, connectHandler)
+        super.on(ReconnectingMQTTClient.events.ERROR, errorHandler)
       })
     })
   }
