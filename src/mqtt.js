@@ -129,6 +129,7 @@ class ReconnectingMQTTClient extends MQTTClient {
     this.reconnectLimit = reconnectLimit || 3
     this.tokenProvider = tokenProvider
     this.tokenProviderPromise = undefined
+    this.trackEvent = undefined
 
     this.handleCloseEvent = this.handleCloseEvent.bind(this)
     this.handleConnectEvent = this.handleConnectEvent.bind(this)
@@ -190,6 +191,14 @@ class ReconnectingMQTTClient extends MQTTClient {
       console.debug(
         `[mqtt] Command '${cmd}', reasonCode ${reasonCode} (${mqttReasonCodeNameEnum[reasonCode]})`,
       )
+
+      if (this.trackEvent) {
+        // eslint-disable-next-line unicorn/no-null
+        this.trackEvent('Debug', 'MQTT.Disconnect', 'v1', null, {
+          reason: mqttReasonCodeNameEnum[reasonCode],
+          reasonCode,
+        })
+      }
 
       // ignore 131 (MQTT broker limits)
       if (reasonCode === 131) {
@@ -261,6 +270,14 @@ class ReconnectingMQTTClient extends MQTTClient {
 
         this.disconnect()
       })
+  }
+
+  /**
+   * Set event tracker
+   * @param {function} trackEvent
+   */
+  setEventTracker(trackEvent) {
+    this.trackEvent = trackEvent
   }
 }
 
