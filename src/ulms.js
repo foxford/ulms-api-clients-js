@@ -85,6 +85,18 @@ class ULMS extends BasicClient {
   }
 
   /**
+   * Perform enter to classroom
+   * @param {string} classroomId
+   * @param {string} agentLabel
+   * @returns {Promise}
+   */
+  enterClassroom(classroomId, agentLabel) {
+    return this.post(`${this.baseUrl}/classrooms/${classroomId}/enter`, {
+      agent_label: agentLabel,
+    })
+  }
+
+  /**
    * Fetch token data for NATS
    * @param {string} classroomId
    * @returns {Promise}

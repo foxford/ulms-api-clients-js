@@ -125,11 +125,21 @@ class HTTPConference extends BasicClient {
 
   /**
    * Enter room
+   * @deprecated
    * @param roomId
    * @returns {Promise}
    */
   enterRoom(roomId) {
     return this.post(this.url(`/conference_rooms/${roomId}/enter`))
+  }
+
+  /**
+   * Subscribe to room events
+   * @param roomId
+   * @returns {Promise}
+   */
+  subscribeRoom(roomId) {
+    return this.post(this.url(`/conference_rooms/${roomId}/subscribe`))
   }
 
   /**

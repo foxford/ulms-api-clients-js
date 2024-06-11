@@ -12,11 +12,12 @@ const eventEndpoints = {
   editionsDelete: (id) => `/editions/${id}`,
   editionsList: (id) => `/event_rooms/${id}/editions`,
   eventsCreate: (id) => `/event_rooms/${id}/events`,
-  eventsRemove: (id) => `/event_rooms/${id}/events`,
   eventsList: (id) => `/event_rooms/${id}/events`,
+  eventsRemove: (id) => `/event_rooms/${id}/events`,
   roomEnter: (id) => `/event_rooms/${id}/enter`,
   roomRead: (id) => `/event_rooms/${id}`,
   roomState: (id) => `/event_rooms/${id}/state`,
+  roomSubscribe: (id) => `/event_rooms/${id}/subscribe`,
   roomUpdate: (id) => `/event_rooms/${id}`,
   roomUpdateLockedTypes: (id) => `/event_rooms/${id}/locked_types`,
   roomUpdateWhiteboardAccess: (id) => `/event_rooms/${id}/whiteboard_access`,
@@ -56,6 +57,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Enter room
+   * @deprecated
    * @param id
    * @param {String} agentLabel
    * @param {Boolean} broadcastSubscription
@@ -63,6 +65,20 @@ class HTTPEvent extends BasicClient {
    */
   enterRoom(id, agentLabel, broadcastSubscription = true) {
     return this.post(this.url(eventEndpoints.roomEnter(id)), {
+      agent_label: agentLabel,
+      broadcast_subscription: broadcastSubscription,
+    })
+  }
+
+  /**
+   * Subscribe to room events
+   * @param id
+   * @param {String} agentLabel
+   * @param {Boolean} broadcastSubscription
+   * @returns {Promise}
+   */
+  subscribeRoom(id, agentLabel, broadcastSubscription = true) {
+    return this.post(this.url(eventEndpoints.roomSubscribe(id)), {
       agent_label: agentLabel,
       broadcast_subscription: broadcastSubscription,
     })
