@@ -1,4 +1,5 @@
 import Backoff from './backoff'
+import Broker from './broker'
 import { TimeoutError } from './error'
 
 // eslint-disable-next-line default-param-last
@@ -59,7 +60,6 @@ export const sleep = async (ms) =>
 export async function enterServiceRoom(
   client,
   httpClient,
-  eventName,
   roomId,
   id,
   label,
@@ -68,18 +68,37 @@ export async function enterServiceRoom(
 ) {
   const backoff = new Backoff()
   const isTransportConnected = () => client.mqtt.connected
-  let enterRoomSuccess = false
+  let enterEventRoomSuccess = false
+  let enterConferenceRoomSuccess = false
   let response
 
-  const handler = (event) => {
+  const handlerEnterEventRoom = (event) => {
+    console.log('[handlerEnterEventRoom] handler', event)
     if (event.data.agent_id === id) {
-      enterRoomSuccess = true
+      console.log('[handlerEnterEventRoom] enterEventRoomSuccess = true')
+      enterEventRoomSuccess = true
 
-      client.off(eventName, handler)
+      client.off(Broker.events.EVENT_ROOM_ENTER, handlerEnterEventRoom)
     }
   }
 
-  client.on(eventName, handler)
+  const handlerEnterConferenceRoom = (event) => {
+    console.log('[handlerEnterConferenceRoom] handler', event)
+    if (event.data.agent_id === id) {
+      console.log(
+        '[handlerEnterConferenceRoom] enterConferenceRoomSuccess = true',
+      )
+      enterConferenceRoomSuccess = true
+
+      client.off(
+        Broker.events.CONFERENCE_ROOM_ENTER,
+        handlerEnterConferenceRoom,
+      )
+    }
+  }
+
+  client.on(Broker.events.EVENT_ROOM_ENTER, handlerEnterEventRoom)
+  client.on(Broker.events.CONFERENCE_ROOM_ENTER, handlerEnterConferenceRoom)
 
   try {
     // eslint-disable-next-line no-constant-condition
@@ -89,25 +108,26 @@ export async function enterServiceRoom(
       }
 
       // eslint-disable-next-line no-await-in-loop
-      response = await httpClient.enterRoom(roomId, label)
+      response = await httpClient.enterClassroom(roomId, label)
 
       if (!isTransportConnected()) {
         throw new Error('MQTT client disconnected')
       }
 
-      if (enterRoomSuccess) break
+      if (enterEventRoomSuccess && enterConferenceRoomSuccess) break
 
       // eslint-disable-next-line no-await-in-loop
       await sleep(backoff.value)
 
       backoff.next()
 
-      if (enterRoomSuccess) break
+      if (enterEventRoomSuccess && enterConferenceRoomSuccess) break
 
       trackEvent('Debug', `${serviceName}.Subscription.Retry`)
     }
   } catch (error) {
-    client.off(eventName, handler)
+    client.off(Broker.events.EVENT_ROOM_ENTER, handlerEnterEventRoom)
+    client.off(Broker.events.CONFERENCE_ROOM_ENTER, handlerEnterConferenceRoom)
 
     backoff.reset()
 
