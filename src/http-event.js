@@ -12,8 +12,8 @@ const eventEndpoints = {
   editionsDelete: (id) => `/editions/${id}`,
   editionsList: (id) => `/event_rooms/${id}/editions`,
   eventsCreate: (id) => `/event_rooms/${id}/events`,
-  eventsRemove: (id) => `/event_rooms/${id}/events`,
   eventsList: (id) => `/event_rooms/${id}/events`,
+  eventsRemove: (id) => `/event_rooms/${id}/events`,
   roomEnter: (id) => `/event_rooms/${id}/enter`,
   roomRead: (id) => `/event_rooms/${id}`,
   roomState: (id) => `/event_rooms/${id}/state`,
@@ -56,6 +56,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Enter room
+   * @deprecated
    * @param id
    * @param {String} agentLabel
    * @param {Boolean} broadcastSubscription
