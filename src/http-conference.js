@@ -134,15 +134,6 @@ class HTTPConference extends BasicClient {
   }
 
   /**
-   * Subscribe to room events
-   * @param roomId
-   * @returns {Promise}
-   */
-  subscribeRoom(roomId) {
-    return this.post(this.url(`/conference_rooms/${roomId}/subscribe`))
-  }
-
-  /**
    * List agent
    * @param roomId
    * @param {DefaultFilterParameters|Object} filterParameters
