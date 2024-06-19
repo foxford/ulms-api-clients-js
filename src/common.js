@@ -74,9 +74,8 @@ export async function enterServiceRoom(
   let response
 
   const handlerEnterEventRoom = (event) => {
-    console.log('[handlerEnterEventRoom] handler', event)
     if (event.data.agent_id === id) {
-      console.log('[handlerEnterEventRoom] enterEventRoomSuccess = true')
+      console.log('[handlerEnterEventRoom] enterEventRoomSuccess')
       enterEventRoomSuccess = true
 
       client.off(Broker.events.EVENT_ROOM_ENTER, handlerEnterEventRoom)
@@ -84,11 +83,8 @@ export async function enterServiceRoom(
   }
 
   const handlerEnterConferenceRoom = (event) => {
-    console.log('[handlerEnterConferenceRoom] handler', event)
     if (event.data.agent_id === id) {
-      console.log(
-        '[handlerEnterConferenceRoom] enterConferenceRoomSuccess = true',
-      )
+      console.log('[handlerEnterConferenceRoom] enterConferenceRoomSuccess')
       enterConferenceRoomSuccess = true
 
       client.off(
@@ -183,71 +179,4 @@ export const timeout = async (delay) => {
   }, 60 * 1e3) // 60 seconds
 
   return promise
-}
-
-export async function subscribeWithNotification(
-  client,
-  httpClient,
-  eventName,
-  roomId,
-  id,
-  label,
-  trackEvent,
-  serviceName,
-) {
-  const backoff = new Backoff()
-  const isTransportConnected = () => client.mqtt.connected
-  let subscribeRoomSuccess = false
-  let response
-
-  const handler = (event) => {
-    if (event.data.agent_id === id) {
-      console.log(
-        '[subscribeWithNotification] subscribeRoomSuccess = true',
-        eventName,
-      )
-      subscribeRoomSuccess = true
-
-      client.off(eventName, handler)
-    }
-  }
-
-  client.on(eventName, handler)
-
-  try {
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      if (!isTransportConnected()) {
-        throw new Error('MQTT client disconnected')
-      }
-
-      // eslint-disable-next-line no-await-in-loop
-      response = await httpClient.subscribeRoom(roomId, label)
-
-      if (!isTransportConnected()) {
-        throw new Error('MQTT client disconnected')
-      }
-
-      if (subscribeRoomSuccess) break
-
-      // eslint-disable-next-line no-await-in-loop
-      await sleep(backoff.value)
-
-      backoff.next()
-
-      if (subscribeRoomSuccess) break
-
-      trackEvent('Debug', `${serviceName}.Subscription.Retry`)
-    }
-  } catch (error) {
-    client.off(eventName, handler)
-
-    backoff.reset()
-
-    throw error
-  }
-
-  backoff.reset()
-
-  return response
 }
