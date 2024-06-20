@@ -111,6 +111,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Create event
+   * @deprecated
    * @param {uuid} roomId
    * @param {String} type
    * @param {Object|String|Number} data
@@ -131,6 +132,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Sets the flag "removed" for the event
+   * @deprecated
    * @param {uuid} roomId
    * @param {String} type
    * @param {Object|String|Number} data
