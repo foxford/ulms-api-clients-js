@@ -85,6 +85,43 @@ class ULMS extends BasicClient {
   }
 
   /**
+   * Create event
+   * @param {uuid} roomId
+   * @param {String} type
+   * @param {Object|String|Number} data
+   * @param {Object} eventParameters event parameters: attribute, is_claim, is_persistent, label, set, removed
+   * for more information see: https://github.com/foxford/event/blob/master/docs/src/api/event/create.md
+   *
+   * @returns {Promise}
+   */
+  createEvent(roomId, type, data, eventParameters = {}) {
+    const parameters = {
+      ...eventParameters,
+      data,
+      type,
+    }
+
+    return this.post(`${this.baseUrl}/event_rooms/${roomId}/events`, parameters)
+  }
+
+  /**
+   * Sets the flag "removed" for the event
+   * @param {uuid} roomId
+   * @param {String} type
+   * @param {Object|String|Number} data
+   * @param {Object} eventParameters event parameters: attribute, is_claim, is_persistent, label, set, removed
+   * for more information see: https://github.com/foxford/event/blob/master/docs/src/api/event/create.md
+   *
+   * @returns {Promise}
+   */
+  createRemovalEvent(roomId, type, data, eventParameters = {}) {
+    return this.createEvent(roomId, type, data, {
+      ...eventParameters,
+      removed: true,
+    })
+  }
+
+  /**
    * Perform enter to classroom
    * @param {string} classroomId
    * @param {string} agentLabel
