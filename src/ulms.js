@@ -143,6 +143,25 @@ class ULMS extends BasicClient {
   }
 
   /**
+   * List events
+   * @param {uuid} roomId
+   * @param {Object} filterParameters
+   * @returns {Promise}
+   */
+  listEvent(roomId, filterParameters = {}) {
+    return this.get(this.url(`/event_rooms/${roomId}/events`, filterParameters))
+  }
+
+  /**
+   * Read room
+   * @param roomId
+   * @returns {Promise}
+   */
+  readRoom(roomId) {
+    return this.get(`${this.baseUrl}/event_rooms/${roomId}`)
+  }
+
+  /**
    * Read ulms scope
    * @param {string} kind
    * @param {string} audience
@@ -155,6 +174,28 @@ class ULMS extends BasicClient {
       this.url(`/audiences/${audience}/${kind}/${scope}`, options),
       { timeout: 10_000, retry: true },
     )
+  }
+
+  /**
+   * Read state
+   * @param {uuid} roomId
+   * @param {String[]} sets
+   * @param {Object} filterParameters
+   * @returns {Promise}
+   */
+  readState(roomId, sets, filterParameters = {}) {
+    // eslint-disable-next-line camelcase
+    const { attribute, limit, occurred_at, original_occurred_at } =
+      filterParameters
+    const parameters = {
+      attribute,
+      limit,
+      occurred_at, // eslint-disable-line camelcase
+      original_occurred_at, // eslint-disable-line camelcase
+      sets,
+    }
+
+    return this.get(this.url(`/event_rooms/${roomId}/state`, parameters))
   }
 
   /**
