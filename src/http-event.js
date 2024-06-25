@@ -37,6 +37,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Read room
+   * @deprecated
    * @param id
    * @returns {Promise}
    */
@@ -150,6 +151,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * List events
+   * @deprecated
    * @param {uuid} roomId
    * @param {Object} filterParameters
    * @returns {Promise}
@@ -189,6 +191,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Read state
+   * @deprecated
    * @param {uuid} roomId
    * @param {String[]} sets
    * @param {Object} filterParameters
