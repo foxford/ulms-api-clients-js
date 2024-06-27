@@ -116,6 +116,7 @@ class HTTPConference extends BasicClient {
 
   /**
    * Close room
+   * @deprecated
    * @param roomId
    * @returns {Promise}
    */
