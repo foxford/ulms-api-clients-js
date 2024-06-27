@@ -72,6 +72,15 @@ class ULMS extends BasicClient {
   }
 
   /**
+   * Close room
+   * @param classroomId
+   * @returns {Promise}
+   */
+  closeRoom(classroomId) {
+    return this.post(this.url(`/classrooms/${classroomId}/close`))
+  }
+
+  /**
    * Commit edition by scope
    * @param {string} audience
    * @param {string} scope
@@ -246,6 +255,18 @@ class ULMS extends BasicClient {
   }
 
   /**
+   * Update locked types in room
+   * @param {uuid} roomId
+   * @param {Object} lockedTypes
+   * @returns {Promise}
+   */
+  updateLockedTypes(roomId, lockedTypes) {
+    return this.post(this.url(`/event_rooms/${roomId}/locked_types`), {
+      locked_types: lockedTypes,
+    })
+  }
+
+  /**
    * Update ulms scope
    * @param {string} kind
    * @param {string} audience
@@ -278,6 +299,18 @@ class ULMS extends BasicClient {
       { signal },
     ).finally(() => {
       clearTimeout(timeoutId)
+    })
+  }
+
+  /**
+   * Use to update whiteboard access in a room
+   * @param {uuid} roomId
+   * @param {{ [account_id]: Boolean }} payload
+   * @returns {Promise}
+   */
+  updateWhiteboardAccess(roomId, payload) {
+    return this.post(this.url(`/event_rooms/${roomId}/whiteboard_access`), {
+      whiteboard_access: payload,
     })
   }
 }

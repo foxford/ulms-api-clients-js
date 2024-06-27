@@ -164,6 +164,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Update locked types in room
+   * @deprecated
    * @param {uuid} roomId
    * @param {Object} lockedTypes
    * @returns {Promise}
@@ -176,6 +177,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Use to update whiteboard access in a room
+   * @deprecated
    * @param {uuid} roomId
    * @param {{ [account_id]: Boolean }} payload
    * @returns {Promise}
