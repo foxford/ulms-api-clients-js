@@ -1,8 +1,6 @@
 /* eslint-disable max-classes-per-file */
-/* global mqtt */
 
-// using version from cdn
-// import mqtt from 'mqtt'
+import mqtt from 'mqtt'
 import MQTTPattern from 'mqtt-pattern'
 
 import { mqttReasonCodeNameEnum } from './constants'
