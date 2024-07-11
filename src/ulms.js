@@ -90,11 +90,11 @@ class ULMS extends BasicClient {
   }
 
   /**
-   * Close room
+   * Close classroom
    * @param classroomId
    * @returns {Promise}
    */
-  closeRoom(classroomId) {
+  closeClassroom(classroomId) {
     return this.post(this.url(`/classrooms/${classroomId}/close`))
   }
 
@@ -272,11 +272,11 @@ class ULMS extends BasicClient {
   }
 
   /**
-   * Read room
+   * Read event room
    * @param roomId
    * @returns {Promise}
    */
-  readRoom(roomId) {
+  readEventRoom(roomId) {
     return this.get(this.url(eventEndpoints.roomRead(roomId)))
   }
 
