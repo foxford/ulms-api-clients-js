@@ -1,7 +1,6 @@
 /* eslint-disable unicorn/prevent-abbreviations */
 // eslint-disable-next-line unicorn/prefer-node-protocol
 import EventEmitter from 'events'
-import MQTTPattern from 'mqtt-pattern'
 
 import Codec from './codec'
 
@@ -38,30 +37,6 @@ const entityEventsEnum = {
   RTC_STREAM_AGENT_SPEAKING: 'rtc_stream.agent_speaking',
   RTC_STREAM_UPDATE: 'rtc_stream.update',
 }
-
-const ROOM_CLOSE_EVENT = 'room.close'
-const ROOM_ENTER_EVENT = 'room.enter'
-const ROOM_LEAVE_EVENT = 'room.leave'
-const ROOM_UPDATE_EVENT = 'room.update'
-
-const appNameToEventNameMap = {
-  'conference.svc.netology-group.services': {
-    'room.close': entityEventsEnum.CONFERENCE_ROOM_CLOSE,
-    'room.enter': entityEventsEnum.CONFERENCE_ROOM_ENTER,
-    'room.leave': entityEventsEnum.CONFERENCE_ROOM_LEAVE,
-  },
-  'event.svc.netology-group.services': {
-    'room.enter': entityEventsEnum.EVENT_ROOM_ENTER,
-    'room.leave': entityEventsEnum.EVENT_ROOM_LEAVE,
-    'room.update': entityEventsEnum.EVENT_ROOM_UPDATE,
-  },
-}
-const eventNamesToTransform = new Set([
-  ROOM_CLOSE_EVENT,
-  ROOM_ENTER_EVENT,
-  ROOM_LEAVE_EVENT,
-  ROOM_UPDATE_EVENT,
-])
 
 class Broker {
   /**
@@ -124,36 +99,12 @@ class Broker {
     } = packet
 
     if (type === 'event' && payload !== undefined) {
-      if (eventNamesToTransform.has(label)) {
-        const topicParams = MQTTPattern.exec(
-          `apps/+appName/api/v1/rooms/+roomId/events`,
-          topic,
-        )
-
-        if (topicParams === null) {
-          console.warn('[topicParams] no parameters') // eslint-disable-line no-console
-        } else {
-          const { appName } = topicParams
-          const transformedLabel = appNameToEventNameMap[appName][label]
-
-          const event = {
-            type: transformedLabel,
-            data: payload,
-          }
-
-          this.ee.emit(transformedLabel, event)
-        }
-      } else {
-        const event = {
-          type: label,
-          data: payload,
-        }
-
-        this.ee.emit(label, event)
+      const event = {
+        type: label,
+        data: payload,
       }
-    } else {
-      // do nothing
-      console.log('[messageHandler] ignore message', type) // eslint-disable-line no-console
+
+      this.ee.emit(label, event)
     }
   }
 
