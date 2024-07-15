@@ -279,6 +279,7 @@ class HTTPConference extends BasicClient {
 
   /**
    * Read Groups
+   * @deprecated
    * @param roomId
    * @param {GroupsFilterParameters|Object} filterParameters
    * @returns {Promise}
@@ -321,6 +322,7 @@ class HTTPConference extends BasicClient {
 
   /**
    * Update Groups
+   * @deprecated
    * @param roomId
    * @param {GroupConfig[]} payload
    * @returns {Promise}
