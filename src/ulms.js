@@ -1,5 +1,23 @@
 import BasicClient from './basic-client'
 
+const eventEndpoints = {
+  agentsList: (id) => `/event_rooms/${id}/agents`,
+  agentsUpdate: (id) => `/event_rooms/${id}/agents`,
+  banList: (id) => `/event_rooms/${id}/bans`,
+  changesCreate: (id) => `/editions/${id}/changes`,
+  changesDelete: (id) => `/changes/${id}`,
+  changesList: (id) => `/editions/${id}/changes`,
+  editionsCreate: (id) => `/event_rooms/${id}/editions`,
+  editionsDelete: (id) => `/editions/${id}`,
+  editionsList: (id) => `/event_rooms/${id}/editions`,
+  eventsCreate: (id) => `/event_rooms/${id}/events`,
+  eventsList: (id) => `/event_rooms/${id}/events`,
+  roomRead: (id) => `/event_rooms/${id}`,
+  roomState: (id) => `/event_rooms/${id}/state`,
+  roomUpdateLockedTypes: (id) => `/event_rooms/${id}/locked_types`,
+  roomUpdateWhiteboardAccess: (id) => `/event_rooms/${id}/whiteboard_access`,
+}
+
 class ULMS extends BasicClient {
   /**
    * Scope kind enum
@@ -72,11 +90,11 @@ class ULMS extends BasicClient {
   }
 
   /**
-   * Close room
+   * Close classroom
    * @param classroomId
    * @returns {Promise}
    */
-  closeRoom(classroomId) {
+  closeClassroom(classroomId) {
     return this.post(this.url(`/classrooms/${classroomId}/close`))
   }
 
@@ -91,6 +109,15 @@ class ULMS extends BasicClient {
     return this.post(
       `${this.baseUrl}/audiences/${audience}/classes/${scope}/editions/${editionId}`,
     )
+  }
+
+  /**
+   * Create edition
+   * @param {uuid} roomId
+   * @returns {Promise}
+   */
+  createEdition(roomId) {
+    return this.post(this.url(eventEndpoints.editionsCreate(roomId)))
   }
 
   /**
@@ -110,7 +137,26 @@ class ULMS extends BasicClient {
       type,
     }
 
-    return this.post(`${this.baseUrl}/event_rooms/${roomId}/events`, parameters)
+    return this.post(this.url(eventEndpoints.eventsCreate(roomId)), parameters)
+  }
+
+  /**
+   * Create change
+   * @param editionId
+   * @param type
+   * @param event
+   * @returns {Promise}
+   */
+  createChange(editionId, type, event) {
+    const parameters = {
+      event,
+      type,
+    }
+
+    return this.post(
+      this.url(eventEndpoints.changesCreate(editionId)),
+      parameters,
+    )
   }
 
   /**
@@ -128,6 +174,24 @@ class ULMS extends BasicClient {
       ...eventParameters,
       removed: true,
     })
+  }
+
+  /**
+   * Delete edition
+   * @param id
+   * @returns {Promise}
+   */
+  deleteEdition(id) {
+    return this.delete(this.url(eventEndpoints.editionsDelete(id)))
+  }
+
+  /**
+   * Delete change
+   * @param id
+   * @returns {Promise}
+   */
+  deleteChange(id) {
+    return this.delete(this.url(eventEndpoints.changesDelete(id)))
   }
 
   /**
@@ -152,22 +216,68 @@ class ULMS extends BasicClient {
   }
 
   /**
+   * List agents in room
+   * @param {uuid} roomId
+   * @param {Object} filterParameters
+   * @returns {Promise}
+   */
+  listAgent(roomId, filterParameters = {}) {
+    return this.get(
+      this.url(eventEndpoints.agentsList(roomId), filterParameters),
+    )
+  }
+
+  /**
+   * List bans in room
+   * @param {uuid} roomId
+   * @param {Object} filterParameters
+   * @returns {Promise}
+   */
+  listBans(roomId, filterParameters = {}) {
+    return this.get(this.url(eventEndpoints.banList(roomId), filterParameters))
+  }
+
+  /**
+   * List changes
+   * @param id
+   * @param {Object} filterParameters
+   * @returns {Promise}
+   */
+  listChange(id, filterParameters = {}) {
+    return this.get(this.url(eventEndpoints.changesList(id), filterParameters))
+  }
+
+  /**
+   * List editions
+   * @param {uuid} roomId
+   * @param {Object} filterParameters
+   * @returns {Promise}
+   */
+  listEdition(roomId, filterParameters = {}) {
+    return this.get(
+      this.url(eventEndpoints.editionsList(roomId), filterParameters),
+    )
+  }
+
+  /**
    * List events
    * @param {uuid} roomId
    * @param {Object} filterParameters
    * @returns {Promise}
    */
   listEvent(roomId, filterParameters = {}) {
-    return this.get(this.url(`/event_rooms/${roomId}/events`, filterParameters))
+    return this.get(
+      this.url(eventEndpoints.eventsList(roomId), filterParameters),
+    )
   }
 
   /**
-   * Read room
+   * Read event room
    * @param roomId
    * @returns {Promise}
    */
-  readRoom(roomId) {
-    return this.get(`${this.baseUrl}/event_rooms/${roomId}`)
+  readEventRoom(roomId) {
+    return this.get(this.url(eventEndpoints.roomRead(roomId)))
   }
 
   /**
@@ -204,7 +314,7 @@ class ULMS extends BasicClient {
       sets,
     }
 
-    return this.get(this.url(`/event_rooms/${roomId}/state`, parameters))
+    return this.get(this.url(eventEndpoints.roomState(roomId), parameters))
   }
 
   /**
@@ -218,6 +328,24 @@ class ULMS extends BasicClient {
     return this.get(
       `${this.baseUrl}/${kind}/${classId}/properties/${propertyId}`,
     )
+  }
+
+  /**
+   * Update agent in room (currently only ban or un-ban)
+   * @param {uuid} roomId
+   * @param accountId
+   * @param {Boolean} value
+   * @param {String} reason
+   * @returns {Promise}
+   */
+  updateAgent(roomId, accountId, value, reason) {
+    const parameters = {
+      account_id: accountId,
+      reason,
+      value,
+    }
+
+    return this.patch(this.url(eventEndpoints.agentsUpdate(roomId)), parameters)
   }
 
   /**
@@ -261,7 +389,7 @@ class ULMS extends BasicClient {
    * @returns {Promise}
    */
   updateLockedTypes(roomId, lockedTypes) {
-    return this.post(this.url(`/event_rooms/${roomId}/locked_types`), {
+    return this.post(this.url(eventEndpoints.roomUpdateLockedTypes(roomId)), {
       locked_types: lockedTypes,
     })
   }
@@ -309,9 +437,12 @@ class ULMS extends BasicClient {
    * @returns {Promise}
    */
   updateWhiteboardAccess(roomId, payload) {
-    return this.post(this.url(`/event_rooms/${roomId}/whiteboard_access`), {
-      whiteboard_access: payload,
-    })
+    return this.post(
+      this.url(eventEndpoints.roomUpdateWhiteboardAccess(roomId)),
+      {
+        whiteboard_access: payload,
+      },
+    )
   }
 }
 

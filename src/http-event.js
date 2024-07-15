@@ -72,6 +72,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * List agents in room
+   * @deprecated
    * @param {uuid} roomId
    * @param {Object} filterParameters
    * @returns {Promise}
@@ -84,6 +85,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Update agent in room (currently only ban or un-ban)
+   * @deprecated
    * @param {uuid} roomId
    * @param accountId
    * @param {Boolean} value
@@ -102,6 +104,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * List bans in room
+   * @deprecated
    * @param {uuid} roomId
    * @param {Object} filterParameters
    * @returns {Promise}
@@ -216,6 +219,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Create edition
+   * @deprecated
    * @param {uuid} roomId
    * @returns {Promise}
    */
@@ -225,6 +229,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * List editions
+   * @deprecated
    * @param {uuid} roomId
    * @param {Object} filterParameters
    * @returns {Promise}
@@ -237,6 +242,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Delete edition
+   * @deprecated
    * @param id
    * @returns {Promise}
    */
@@ -246,6 +252,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Commit edition
+   * @deprecated
    * @param id
    * @returns {Promise}
    */
@@ -255,6 +262,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Create change
+   * @deprecated
    * @param editionId
    * @param type
    * @param event
@@ -274,6 +282,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * List changes
+   * @deprecated
    * @param id
    * @param {Object} filterParameters
    * @returns {Promise}
@@ -284,6 +293,7 @@ class HTTPEvent extends BasicClient {
 
   /**
    * Delete change
+   * @deprecated
    * @param id
    * @returns {Promise}
    */
