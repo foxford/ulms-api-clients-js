@@ -76,17 +76,10 @@ class ULMS extends BasicClient {
    * @returns {Promise}
    */
   banUser({ accountId, ban, classId }) {
-    return this.get(
-      `${this.baseUrl}/account/${accountId}/ban/${classId}`, // get last ban operation id for user
-      // eslint-disable-next-line camelcase
-    ).then(({ last_seen_op_id }) =>
-      this.post(`${this.baseUrl}/account/${accountId}/ban`, {
-        ban,
-        class_id: classId,
-        // eslint-disable-next-line camelcase
-        last_seen_op_id,
-      }),
-    )
+    this.post(`${this.baseUrl}/account/${accountId}/ban`, {
+      ban,
+      class_id: classId,
+    })
   }
 
   /**
@@ -373,6 +366,18 @@ class ULMS extends BasicClient {
   }
 
   /**
+   * Read Groups
+   * @param roomId
+   * @param {GroupsFilterParameters|Object} filterParameters
+   * @returns {Promise}
+   */
+  readGroups(roomId, filterParameters) {
+    return this.get(
+      this.url(`/conference_rooms/${roomId}/groups`, filterParameters),
+    )
+  }
+
+  /**
    * Update account property
    * @param {string} propertyId
    * @param {object} data
@@ -380,6 +385,16 @@ class ULMS extends BasicClient {
    */
   updateAccountProperty(propertyId, data) {
     return this.put(`${this.baseUrl}/account/properties/${propertyId}`, data)
+  }
+
+  /**
+   * Update Groups
+   * @param roomId
+   * @param {GroupConfig[]} payload
+   * @returns {Promise}
+   */
+  updateGroups(roomId, payload) {
+    return this.post(this.url(`/conference_rooms/${roomId}/groups`), payload)
   }
 
   /**
