@@ -18,6 +18,57 @@ const eventEndpoints = {
   roomUpdateWhiteboardAccess: (id) => `/event_rooms/${id}/whiteboard_access`,
 }
 
+/**
+ * Agent reader configuration
+ * @name AgentReaderConfig
+ * @type {object}
+ * @property {string} agent_id
+ * @property {boolean} receive_audio
+ * @property {boolean} receive_video
+ */
+
+/**
+ * Agent writer configuration
+ * @name AgentWriterConfig
+ * @type {object}
+ * @property {string} agent_id
+ * @property {boolean} send_audio
+ * @property {boolean} send_video
+ * @property {number} video_remb
+ */
+
+/**
+ * Default parameters to filter listing requests
+ * @name DefaultFilterParameters
+ * @type {object}
+ * @property {number} limit
+ * @property {number} offset
+ */
+
+/**
+ * Group configuration
+ * @name GroupConfig
+ * @type {object}
+ * @property {number} number
+ * @property {string[]} agents
+ */
+
+/**
+ * Filter parameters for groups read requests
+ * @name GroupsFilterParameters
+ * @type {object}
+ * @property {number} within_group
+ */
+
+/**
+ * Extended parameters to filter listing requests of rtc streams
+ * @name RtcStreamFilterParameters
+ * @type {object}
+ * @extends DefaultFilterParameters
+ * @property {string} rtc_id
+ * @property {[number | null, number | null]} time
+ */
+
 class ULMS extends BasicClient {
   /**
    * Scope kind enum
@@ -29,6 +80,17 @@ class ULMS extends BasicClient {
       MINIGROUP: 'minigroups',
       P2P: 'p2p',
       WEBINAR: 'webinars',
+    }
+  }
+
+  /**
+   * Conference intents enum
+   * @returns {{INTENT_READ: string, INTENT_WRITE: string}}
+   */
+  static get intents() {
+    return {
+      INTENT_READ: 'read',
+      INTENT_WRITE: 'write',
     }
   }
 
@@ -170,6 +232,53 @@ class ULMS extends BasicClient {
   }
 
   /**
+   * Create RTC
+   * @param roomId
+   * @returns {Promise}
+   */
+  createRtc(roomId) {
+    return this.post(this.url(`/conference_rooms/${roomId}/rtcs`))
+  }
+
+  /**
+   * Create signal
+   * @param {String} rtcId
+   * @param {Object|Object[]} jsep
+   * @param {String} intent
+   * @param {String} label
+   * @returns {Promise}
+   */
+  createSignal(
+    rtcId,
+    jsep,
+    intent = ULMS.intents.INTENT_READ, // eslint-disable-line default-param-last
+    label,
+  ) {
+    const payload = {
+      intent,
+      jsep,
+      label,
+    }
+
+    return this.post(this.url(`/conference_rtcs/${rtcId}/signal`), payload)
+  }
+
+  /**
+   * Create trickle signal
+   * @param {String} handleId
+   * @param {Object|Object[]} candidates
+   * @returns {Promise}
+   */
+  createTrickleSignal(handleId, candidates) {
+    const payload = {
+      candidates,
+      handle_id: handleId,
+    }
+
+    return this.post(this.url('/conference_streams/trickle'), payload)
+  }
+
+  /**
    * Delete edition
    * @param id
    * @returns {Promise}
@@ -209,7 +318,7 @@ class ULMS extends BasicClient {
   }
 
   /**
-   * List agents in room
+   * List agents in event room
    * @param {uuid} roomId
    * @param {Object} filterParameters
    * @returns {Promise}
@@ -217,6 +326,18 @@ class ULMS extends BasicClient {
   listAgent(roomId, filterParameters = {}) {
     return this.get(
       this.url(eventEndpoints.agentsList(roomId), filterParameters),
+    )
+  }
+
+  /**
+   * List agents in conference room
+   * @param {uuid} roomId
+   * @param {Object} filterParameters
+   * @returns {Promise}
+   */
+  listAgentConferenceRoom(roomId, filterParameters = {}) {
+    return this.get(
+      this.url(`/conference_rooms/${roomId}/agents`, filterParameters),
     )
   }
 
@@ -262,6 +383,57 @@ class ULMS extends BasicClient {
     return this.get(
       this.url(eventEndpoints.eventsList(roomId), filterParameters),
     )
+  }
+
+  /**
+   * List RTC
+   * @param roomId
+   * @param {DefaultFilterParameters|Object} filterParameters
+   * @returns {Promise}
+   */
+  listRtc(roomId, filterParameters = {}) {
+    return this.get(
+      this.url(`/conference_rooms/${roomId}/rtcs`, filterParameters),
+    )
+  }
+
+  /**
+   * List RTC stream
+   * @param roomId
+   * @param {RtcStreamFilterParameters|Object} filterParameters
+   * @returns {Promise}
+   */
+  listRtcStream(roomId, filterParameters = {}) {
+    return this.get(
+      this.url(`/conference_rooms/${roomId}/streams`, filterParameters),
+    )
+  }
+
+  /**
+   * Read AgentReaderConfig
+   * @param roomId
+   * @returns {Promise}
+   */
+  readAgentReaderConfig(roomId) {
+    return this.get(this.url(`/conference_rooms/${roomId}/configs/reader`))
+  }
+
+  /**
+   * Read AgentWriterConfig
+   * @param roomId
+   * @returns {Promise}
+   */
+  readAgentWriterConfig(roomId) {
+    return this.get(this.url(`/conference_rooms/${roomId}/configs/writer`))
+  }
+
+  /**
+   * Read conference room
+   * @param roomId
+   * @returns {Promise}
+   */
+  readConferenceRoom(roomId) {
+    return this.get(this.url(`/conference_rooms/${roomId}`))
   }
 
   /**
@@ -339,6 +511,36 @@ class ULMS extends BasicClient {
     }
 
     return this.patch(this.url(eventEndpoints.agentsUpdate(roomId)), parameters)
+  }
+
+  /**
+   * Update AgentReaderConfig
+   * @param roomId
+   * @param {AgentReaderConfig[]} configs
+   * @returns {Promise}
+   */
+  updateAgentReaderConfig(roomId, configs) {
+    const payload = { configs }
+
+    return this.post(
+      this.url(`/conference_rooms/${roomId}/configs/reader`),
+      payload,
+    )
+  }
+
+  /**
+   * Update AgentWriterConfig
+   * @param roomId
+   * @param {AgentWriterConfig[]} configs
+   * @returns {Promise}
+   */
+  updateAgentWriterConfig(roomId, configs) {
+    const payload = { configs }
+
+    return this.post(
+      this.url(`/conference_rooms/${roomId}/configs/writer`),
+      payload,
+    )
   }
 
   /**
