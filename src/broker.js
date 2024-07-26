@@ -26,6 +26,10 @@ import Codec from './codec'
 const entityEventsEnum = {
   AGENT_UPDATE: 'agent.update',
   AGENT_WRITER_CONFIG_UPDATE: 'agent_writer_config.update',
+  CLASSROOM_CLOSE: 'classroom.close',
+  CLASSROOM_ENTER: 'classroom.enter',
+  CLASSROOM_LEAVE: 'classroom.leave',
+  CLASSROOM_UPDATE: 'classroom.update',
   CONFERENCE_ROOM_CLOSE: 'conference_room.close',
   CONFERENCE_ROOM_ENTER: 'conference_room.enter',
   CONFERENCE_ROOM_LEAVE: 'conference_room.leave',
@@ -44,6 +48,10 @@ class Broker {
    * @returns {{
    *  AGENT_UPDATE: string,
    *  AGENT_WRITER_CONFIG_UPDATE: string,
+   *  CLASSROOM_CLOSE: string,
+   *  CLASSROOM_ENTER: string,
+   *  CLASSROOM_LEAVE: string,
+   *  CLASSROOM_UPDATE: string,
    *  CONFERENCE_ROOM_CLOSE: string,
    *  CONFERENCE_ROOM_ENTER: string,
    *  CONFERENCE_ROOM_LEAVE: string,

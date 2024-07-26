@@ -71,6 +71,7 @@ export async function enterServiceRoom(
   const isTransportConnected = () => client.mqtt.connected
   let enterEventRoomSuccess = false
   let enterConferenceRoomSuccess = false
+  let enterClassroomSuccess = false
   let response
 
   const handlerEnterEventRoom = (event) => {
@@ -94,8 +95,18 @@ export async function enterServiceRoom(
     }
   }
 
+  const handlerEnterClassroom = (event) => {
+    if (event.data.agent_id === id) {
+      console.log('[handlerEnterClassroom] enterClassroomSuccess')
+      enterClassroomSuccess = true
+
+      client.off(Broker.events.CLASSROOM_ENTER, handlerEnterClassroom)
+    }
+  }
+
   client.on(Broker.events.EVENT_ROOM_ENTER, handlerEnterEventRoom)
   client.on(Broker.events.CONFERENCE_ROOM_ENTER, handlerEnterConferenceRoom)
+  client.on(Broker.events.CLASSROOM_ENTER, handlerEnterClassroom)
 
   try {
     // eslint-disable-next-line no-constant-condition
@@ -111,20 +122,29 @@ export async function enterServiceRoom(
         throw new Error('MQTT client disconnected')
       }
 
-      if (enterEventRoomSuccess && enterConferenceRoomSuccess) break
+      if (
+        enterClassroomSuccess ||
+        (enterEventRoomSuccess && enterConferenceRoomSuccess)
+      )
+        break
 
       // eslint-disable-next-line no-await-in-loop
       await sleep(backoff.value)
 
       backoff.next()
 
-      if (enterEventRoomSuccess && enterConferenceRoomSuccess) break
+      if (
+        enterClassroomSuccess ||
+        (enterEventRoomSuccess && enterConferenceRoomSuccess)
+      )
+        break
 
       trackEvent('Debug', `${serviceName}.Subscription.Retry`)
     }
   } catch (error) {
     client.off(Broker.events.EVENT_ROOM_ENTER, handlerEnterEventRoom)
     client.off(Broker.events.CONFERENCE_ROOM_ENTER, handlerEnterConferenceRoom)
+    client.off(Broker.events.CLASSROOM_ENTER, handlerEnterClassroom)
 
     backoff.reset()
 
