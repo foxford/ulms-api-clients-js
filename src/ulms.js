@@ -70,6 +70,12 @@ const eventEndpoints = {
  */
 
 class ULMS extends BasicClient {
+  agentLabel
+
+  setAgentLabel(label) {
+    this.agentLabel = label
+  }
+
   /**
    * Scope kind enum
    * @returns {{CHAT: string, MINIGROUP: string, P2P: string, WEBINAR: string}}
@@ -187,6 +193,7 @@ class ULMS extends BasicClient {
    */
   createEvent(roomId, type, data, eventParameters = {}) {
     const parameters = {
+      agent_label: this.agentLabel,
       ...eventParameters,
       data,
       type,
@@ -237,7 +244,9 @@ class ULMS extends BasicClient {
    * @returns {Promise}
    */
   createRtc(roomId) {
-    return this.post(this.url(`/conference_rooms/${roomId}/rtcs`))
+    return this.post(this.url(`/conference_rooms/${roomId}/rtcs`), {
+      agent_label: this.agentLabel,
+    })
   }
 
   /**
@@ -255,6 +264,7 @@ class ULMS extends BasicClient {
     label,
   ) {
     const payload = {
+      agent_label: this.agentLabel,
       intent,
       jsep,
       label,
@@ -271,6 +281,7 @@ class ULMS extends BasicClient {
    */
   createTrickleSignal(handleId, candidates) {
     const payload = {
+      agent_label: this.agentLabel,
       candidates,
       handle_id: handleId,
     }
@@ -415,7 +426,11 @@ class ULMS extends BasicClient {
    * @returns {Promise}
    */
   readAgentReaderConfig(roomId) {
-    return this.get(this.url(`/conference_rooms/${roomId}/configs/reader`))
+    return this.get(
+      this.url(`/conference_rooms/${roomId}/configs/reader`, {
+        agent_label: this.agentLabel,
+      }),
+    )
   }
 
   /**
@@ -424,7 +439,11 @@ class ULMS extends BasicClient {
    * @returns {Promise}
    */
   readAgentWriterConfig(roomId) {
-    return this.get(this.url(`/conference_rooms/${roomId}/configs/writer`))
+    return this.get(
+      this.url(`/conference_rooms/${roomId}/configs/writer`, {
+        agent_label: this.agentLabel,
+      }),
+    )
   }
 
   /**
@@ -520,7 +539,10 @@ class ULMS extends BasicClient {
    * @returns {Promise}
    */
   updateAgentReaderConfig(roomId, configs) {
-    const payload = { configs }
+    const payload = {
+      agent_label: this.agentLabel,
+      configs,
+    }
 
     return this.post(
       this.url(`/conference_rooms/${roomId}/configs/reader`),
@@ -535,7 +557,10 @@ class ULMS extends BasicClient {
    * @returns {Promise}
    */
   updateAgentWriterConfig(roomId, configs) {
-    const payload = { configs }
+    const payload = {
+      agent_label: this.agentLabel,
+      configs,
+    }
 
     return this.post(
       this.url(`/conference_rooms/${roomId}/configs/writer`),
@@ -574,9 +599,12 @@ class ULMS extends BasicClient {
    * @returns {Promise}
    */
   readGroups(roomId, filterParameters) {
-    return this.get(
-      this.url(`/conference_rooms/${roomId}/groups`, filterParameters),
-    )
+    const parameters = {
+      agent_label: this.agentLabel,
+      ...filterParameters,
+    }
+
+    return this.get(this.url(`/conference_rooms/${roomId}/groups`, parameters))
   }
 
   /**
@@ -592,11 +620,16 @@ class ULMS extends BasicClient {
   /**
    * Update Groups
    * @param roomId
-   * @param {GroupConfig[]} payload
+   * @param {GroupConfig[]} groups
    * @returns {Promise}
    */
-  updateGroups(roomId, payload) {
-    return this.post(this.url(`/conference_rooms/${roomId}/groups`), payload)
+  updateGroups(roomId, groups) {
+    const parameters = {
+      agent_label: this.agentLabel,
+      groups,
+    }
+
+    return this.post(this.url(`/conference_rooms/${roomId}/groups`), parameters)
   }
 
   /**
