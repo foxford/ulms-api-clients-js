@@ -32,44 +32,49 @@ class FVS extends BasicClient {
   }
 
   /**
-   * Get issue types in Minigroup
+   * Get issue categories for Minigroup
    * @returns {Promise}
    */
-  getIssueTypes() {
-    return this.get(`${this.baseUrl}/ulms-issues/types`)
+  getMinigroupIssueCategories() {
+    return this.get(
+      `${this.baseUrl}/api/livestreaming/ulms/miniGroup/issueCategories`,
+    )
   }
 
   /**
    * Create issue in Minigroup
-   * @param {string} scope
+   * @param {string} externalId
    * @param {number} typeId
    * @param {string} description
    * @returns {Promise}
    */
-  createIssue(scope, typeId, description) {
+  createMinigroupIssue(externalId, typeId, description) {
     const payload = {
       description,
-      scope,
+      external_id: externalId,
       typeId,
     }
 
-    return this.post(`${this.baseUrl}/ulms-issues/issues`, payload)
+    return this.post(
+      `${this.baseUrl}/api/livestreaming/ulms/miniGroup/issues`,
+      payload,
+    )
   }
 
   /**
-   * Get issue categories in Webinar
+   * Get issue categories for Webinar
    * @returns {Promise}
    */
-  getIssueCategories() {
+  getWebinarIssueCategories() {
     return this.get(`${this.baseUrl}/api/livestreaming/ulms/issueCategories`)
   }
 
   /**
    * @typedef {Object} WebinarIssue
    * @property {string} description
+   * @property {string} external_id
    * @property {boolean} isCutVideo
    * @property {boolean} isNeedHelp
-   * @property {string} scope
    * @property {number} subcategoryId
    * /
 
