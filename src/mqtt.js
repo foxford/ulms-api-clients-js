@@ -6,6 +6,8 @@
 import MQTTPattern from 'mqtt-pattern'
 
 import { mqttReasonCodeNameEnum } from './constants'
+import retry from './retry'
+import loadScript from './script-loader'
 
 const defaultOptions = {
   keepalive: 10,
@@ -33,6 +35,14 @@ class MQTTClient {
       PACKETSEND: 'packetsend',
       PACKETRECEIVE: 'packetreceive',
     }
+  }
+
+  static async loadDependencies() {
+    const isBigIntSupported = typeof BigInt !== 'undefined'
+    const mqttVersion = isBigIntSupported ? '5.9.1' : '3.0.0'
+    const source = `https://ulms-static.foxford.ngcdn.ru/prod/js/mqtt@${mqttVersion}/dist/mqtt.min.js`
+
+    return retry(() => loadScript(source))
   }
 
   constructor(url) {
