@@ -1,12 +1,12 @@
 import {
   MQTTClientError,
   MQTTRPCServiceError,
-  PresenceError,
+  PresenceWsError,
   TimeoutError,
 } from '../src/error'
 
 const clientError = new MQTTClientError('Message')
-const presenceError = new PresenceError('Message')
+const presenceWsError = new PresenceWsError('Message')
 const serviceError = new MQTTRPCServiceError('Message')
 const timeoutError = new TimeoutError('Message')
 
@@ -26,13 +26,13 @@ describe('Custom errors have right titles', () => {
 
   // PresenceError
   it('PresenceError message is valid (`fromType` method)', () => {
-    expect(PresenceError.fromType('test').message).toEqual('UNKNOWN_ERROR')
+    expect(PresenceWsError.fromType('test').message).toEqual('UNKNOWN_ERROR')
   })
   it('PresenceError name is valid', () => {
-    expect(presenceError.name).toEqual('PresenceError')
+    expect(presenceWsError.name).toEqual('PresenceWsError')
   })
   it('PresenceError message is valid (default)', () => {
-    expect(presenceError.message).toEqual('Message')
+    expect(presenceWsError.message).toEqual('Message')
   })
 
   // MQTTRPCServiceError

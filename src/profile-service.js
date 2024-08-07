@@ -39,7 +39,7 @@ class ProfileService {
 
       this.queue.add(() =>
         this.client
-          .listProfiles(ids, scope)
+          .listProfile(ids, scope)
           .then((response) => {
             for (const profile of response) {
               const { id } = profile
@@ -76,11 +76,11 @@ class ProfileService {
   }
 
   forceReadProfile(id, scope) {
-    return this.client.getProfile(id, scope, true)
+    return this.client.readProfile(id, scope, true)
   }
 
   readMeProfile(scope) {
-    return this.client.getProfile('me', scope)
+    return this.client.readProfile('me', scope)
   }
 
   readProfile(id, scope) {

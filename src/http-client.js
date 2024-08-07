@@ -1,4 +1,5 @@
 /* eslint-disable class-methods-use-this */
+import { NetworkError } from './error'
 
 function createTimeoutSignal(timeout) {
   const controller = new AbortController()
@@ -10,28 +11,6 @@ function createTimeoutSignal(timeout) {
 }
 
 class FetchHttpClient {
-  static async handleResponse(response) {
-    const bodyAsText = await response.text()
-    let data
-
-    try {
-      data = JSON.parse(bodyAsText)
-    } catch {
-      data = { message: bodyAsText }
-    }
-
-    const result = {
-      data,
-      status: response.status,
-    }
-
-    if (!response.ok) {
-      throw result
-    }
-
-    return result
-  }
-
   request(url, config) {
     const { timeout, ...requestConfig } = config
     const requestOptions = {
@@ -46,9 +25,16 @@ class FetchHttpClient {
       onFinally = cleanup
     }
 
-    return fetch(url, requestOptions)
-      .then(FetchHttpClient.handleResponse)
-      .finally(() => (onFinally ? onFinally() : undefined))
+    const fetchPromise = fetch(url, requestOptions).catch((error) => {
+      throw new NetworkError('', { cause: error })
+    })
+
+    if (onFinally) {
+      // eslint-disable-next-line promise/catch-or-return
+      fetchPromise.finally(() => onFinally())
+    }
+
+    return fetchPromise
   }
 
   get(url, config) {

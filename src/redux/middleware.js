@@ -3,7 +3,7 @@ import Debug from 'debug'
 
 import Backoff from '../backoff'
 import { sleep } from '../common'
-import { PresenceError } from '../error'
+import { PresenceWsError } from '../error'
 
 import {
   AGENT_ENTERED,
@@ -160,7 +160,7 @@ async function startPresenceFlow(
       reason = error
     }
 
-    if (reason instanceof PresenceError && reason.isRecoverable()) {
+    if (reason instanceof PresenceWsError && reason.isRecoverable()) {
       retryCount += 1
     } else {
       break
@@ -232,8 +232,8 @@ async function getPresenceAgentList(
         trackError(error)
       }
 
-      const { status } = error
-      const isErrorUnrecoverable = !!status
+      const { isTransient } = error
+      const isErrorUnrecoverable = !isTransient
       const retryLimitExceeded = retryCount === RETRY_LIMIT
 
       // error is unrecoverable OR retry limit reached

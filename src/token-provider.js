@@ -5,11 +5,34 @@ import retry, { isErrorRetryable } from './retry'
 
 const onRetry = (error) => !isErrorRetryable(error)
 
+async function handleResponse(response) {
+  let data
+
+  try {
+    data = await response.json()
+  } catch (error) {
+    console.log('[TP:handleResponse] body parsing catch', error)
+    // todo: change error type (UnexpectedError)
+    throw error
+  }
+
+  if (!response.ok) {
+    // eslint-disable-next-line no-throw-literal
+    throw {
+      data,
+      status: response.status,
+    }
+  }
+
+  return data
+}
+
 class TokenProvider {
   constructor(baseUrl, httpClient) {
     this.baseUrl = baseUrl
     this.context = undefined
     this.errorHandler = undefined
+    this.handleResponse = handleResponse
     this.httpClient = httpClient
     this.tokenData = undefined
     this.tokenP = undefined
@@ -39,8 +62,9 @@ class TokenProvider {
       this.tokenRequestStart = Date.now()
 
       this.fetchTokenData()
+        .then(this.handleResponse)
         .then((response) => {
-          this.updateTokenData(response.data)
+          this.updateTokenData(response)
           this.resolveAndReset()
         })
         .catch((error) => {

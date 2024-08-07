@@ -46,10 +46,12 @@ async function retry(task, onRetry, retryLimit = RETRY_LIMIT) {
 function isErrorRetryable(error) {
   /*
   Повторная попытка разрешена для следующих ошибок:
+  - [+] ошибка из апи, которая позволяет выполнить повторную попытку отправки запроса
   - [+] клиентская сетевая ошибка ("Failed to fetch *")
-  - [+] таймаут запроса
+  - [+] клиентский таймаут запроса
   - [+] HTTP ответ со статус-кодом: 422, 424, 429 или 5xx
    */
+  const isTransientApiError = error.isTransient
   const isNetworkError =
     error instanceof TypeError && error.message.startsWith('Failed to fetch')
   const isTimeoutError =
@@ -61,7 +63,12 @@ function isErrorRetryable(error) {
       error.status >= 500
     : false
 
-  return isNetworkError || isTimeoutError || isPassedByStatusCode
+  return (
+    isTransientApiError ||
+    isNetworkError ||
+    isTimeoutError ||
+    isPassedByStatusCode
+  )
 }
 
 export default retry
