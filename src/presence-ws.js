@@ -3,7 +3,7 @@ import Debug from 'debug'
 import EventEmitter from 'events' // eslint-disable-line unicorn/prefer-node-protocol
 
 import { makeDeferred } from './common'
-import { PresenceError } from './error'
+import { PresenceWsError } from './error'
 import WsTransport from './ws-transport'
 
 const debug = Debug('presence-ws')
@@ -112,7 +112,7 @@ class PresenceWS extends EventEmitter {
                 // if previousTransport closed with replaced error, ignore and return
                 if (
                   previousTransport &&
-                  PresenceError.isReplacedError(this.lastProtocolError)
+                  PresenceWsError.isReplacedError(this.lastProtocolError)
                 ) {
                   return p
                 }
@@ -155,7 +155,7 @@ class PresenceWS extends EventEmitter {
           (maybeDisconnectReason &&
             maybeDisconnectReason.payload &&
             maybeDisconnectReason.payload.type !==
-              PresenceError.recoverableTypes.SERVER_SHUTDOWN)
+              PresenceWsError.recoverableTypes.SERVER_SHUTDOWN)
         ) {
           debug('[flow] transport disconnected, throw')
 
@@ -174,7 +174,7 @@ class PresenceWS extends EventEmitter {
       const reason = error
         ? (error.payload && error.payload.type) ||
           error.type === ERROR_MESSAGE_TYPE
-          ? PresenceError.fromType(error.payload.type.toUpperCase())
+          ? PresenceWsError.fromType(error.payload.type.toUpperCase())
           : error
         : undefined
 
@@ -213,7 +213,7 @@ class PresenceWS extends EventEmitter {
     } else if (type === ERROR_MESSAGE_TYPE) {
       const { is_transient: isTransient } = payload
       // process service system messages (error)
-      this.lastProtocolError = PresenceError.fromType(
+      this.lastProtocolError = PresenceWsError.fromType(
         payload.type.toUpperCase(),
       )
 
@@ -245,7 +245,9 @@ class PresenceWS extends EventEmitter {
   disconnected() {
     if (!this.connected) {
       return Promise.reject(
-        PresenceError.fromType(PresenceError.unrecoverableTypes.NOT_CONNECTED),
+        PresenceWsError.fromType(
+          PresenceWsError.unrecoverableTypes.NOT_CONNECTED,
+        ),
       )
     }
 
