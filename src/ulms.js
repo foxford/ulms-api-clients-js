@@ -107,7 +107,7 @@ class ULMS extends BasicClient {
   }
 
   /**
-   * Scope kind enum
+   * Classroom kind enum
    * @returns {{CHAT: string, MINIGROUP: string, P2P: string, WEBINAR: string}}
    */
   static get kind() {
@@ -131,10 +131,10 @@ class ULMS extends BasicClient {
   }
 
   /**
-   * Scope status enum
+   * Classroom status enum
    * @returns {{REAL_TIME: string, CLOSED: string, FINISHED: string, ADJUSTED: string, TRANSCODED: string}}
    */
-  static get scopeStatus() {
+  static get classroomStatus() {
     return {
       REAL_TIME: 'real-time',
       CLOSED: 'closed',
@@ -190,15 +190,14 @@ class ULMS extends BasicClient {
   }
 
   /**
-   * Commit edition by scope
-   * @param {string} audience
-   * @param {string} scope
+   * Commit edition by classroomId
+   * @param {string} classroomId
    * @param {string} editionId
    * @returns {Promise}
    */
-  commitEdition(audience, scope, editionId) {
+  commitEdition(classroomId, editionId) {
     return this.post(
-      `${this.baseUrl}/audiences/${audience}/classes/${scope}/editions/${editionId}`,
+      `${this.baseUrl}/classrooms/${classroomId}/editions/${editionId}`,
     )
   }
 
@@ -488,18 +487,17 @@ class ULMS extends BasicClient {
   }
 
   /**
-   * Read ulms scope
+   * Read ulms classroom
    * @param {string} kind
-   * @param {string} audience
-   * @param {string} scope
+   * @param {string} classroomId
    * @param {object} options
    * @returns {Promise}
    */
-  readScope(kind, audience, scope, options) {
-    return this.get(
-      this.url(`/audiences/${audience}/${kind}/${scope}`, options),
-      { timeout: 10_000, retry: true },
-    )
+  readClassroom(kind, classroomId, options) {
+    return this.get(this.url(`/${kind}/${classroomId}`, options), {
+      timeout: 10_000,
+      retry: true,
+    })
   }
 
   /**
@@ -668,18 +666,14 @@ class ULMS extends BasicClient {
   }
 
   /**
-   * Update ulms scope
+   * Update ulms classroom
    * @param {string} kind
-   * @param {string} audience
-   * @param {string} scope
+   * @param {string} classroomId
    * @param {object} data
    * @returns {Promise}
    */
-  updateScope(kind, audience, scope, data) {
-    return this.put(
-      `${this.baseUrl}/audiences/${audience}/${kind}/${scope}`,
-      data,
-    )
+  updateClassroom(kind, classroomId, data) {
+    return this.put(`${this.baseUrl}/${kind}/${classroomId}`, data)
   }
 
   /**
