@@ -11,12 +11,13 @@ function createTimeoutSignal(timeout) {
 }
 
 class FetchHttpClient {
-  request(url, config) {
+  async request(url, config) {
     const { timeout, ...requestConfig } = config
     const requestOptions = {
       ...requestConfig,
     }
     let onFinally
+    let response
 
     if (timeout !== undefined) {
       const { cleanup, signal } = createTimeoutSignal(timeout)
@@ -25,16 +26,17 @@ class FetchHttpClient {
       onFinally = cleanup
     }
 
-    const fetchPromise = fetch(url, requestOptions).catch((error) => {
-      throw new NetworkError('', { cause: error })
-    })
-
-    if (onFinally) {
-      // eslint-disable-next-line promise/catch-or-return
-      fetchPromise.finally(() => onFinally())
+    try {
+      response = fetch(url, requestOptions)
+    } catch (error) {
+      throw new NetworkError('network_error', { cause: error })
+    } finally {
+      if (onFinally) {
+        onFinally()
+      }
     }
 
-    return fetchPromise
+    return response
   }
 
   get(url, config) {
