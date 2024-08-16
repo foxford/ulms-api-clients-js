@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-/* global mqtt */
+/* global bowser, mqtt */
 
 // using version from cdn
 // import mqtt from 'mqtt'
@@ -39,7 +39,13 @@ class MQTTClient {
 
   static async loadDependencies() {
     const isBigIntSupported = typeof BigInt !== 'undefined'
-    const mqttVersion = isBigIntSupported ? '5.9.1' : '3.0.0'
+    const isOldBrowserVersion = bowser
+      .getParser(window.navigator.userAgent)
+      .satisfies({
+        safari: '<15',
+      })
+    const mqttVersion =
+      isBigIntSupported && !isOldBrowserVersion ? '5.9.1' : '3.0.0'
     const source = `https://ulms-static.foxford.ngcdn.ru/prod/js/mqtt@${mqttVersion}/dist/mqtt.min.js`
 
     return retry(() => loadScript(source))
