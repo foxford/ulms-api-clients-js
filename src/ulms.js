@@ -163,7 +163,6 @@ class ULMS extends BasicClient {
    */
   static get accountKeys() {
     return {
-      LAST_SEEN_MESSAGE_ID_BY_ROOMS: 'last_seen_message_id_by_rooms',
       ONBOARDING: 'onboarding',
     }
   }
