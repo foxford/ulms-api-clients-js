@@ -159,10 +159,11 @@ class ULMS extends BasicClient {
 
   /**
    * Account properties enum
-   * @returns {{ONBOARDING: string}}
+   * @returns {{LAST_SEEN_MESSAGE_ID_BY_ROOMS: string, ONBOARDING: string}}
    */
   static get accountKeys() {
     return {
+      LAST_SEEN_MESSAGE_ID_BY_ROOMS: 'last_seen_message_id_by_rooms', // todo: deprecated key
       ONBOARDING: 'onboarding',
     }
   }
