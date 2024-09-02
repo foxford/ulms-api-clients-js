@@ -1,7 +1,12 @@
 /* eslint-disable class-methods-use-this */
+import { mergeSignals } from './common'
 import { NetworkError } from './error'
 
 function createTimeoutSignal(timeout) {
+  if (AbortSignal && AbortSignal.timeout) {
+    return { signal: AbortSignal.timeout(timeout) }
+  }
+
   const controller = new AbortController()
   const { signal } = controller
   const id = setTimeout(() => controller.abort(), timeout)
@@ -12,22 +17,32 @@ function createTimeoutSignal(timeout) {
 
 class FetchHttpClient {
   async request(url, config) {
-    const { timeout, ...requestConfig } = config
+    const { signal: appSignal, timeout, ...requestConfig } = config
     const requestOptions = {
       ...requestConfig,
     }
+    const signals = []
     let onFinally
     let response
 
-    if (timeout !== undefined) {
-      const { cleanup, signal } = createTimeoutSignal(timeout)
+    if (appSignal) {
+      signals.push(appSignal)
+    }
 
-      requestOptions.signal = signal
+    if (timeout !== undefined) {
+      const { cleanup, signal: timeoutSignal } = createTimeoutSignal(timeout)
+
+      signals.push(timeoutSignal)
+
       onFinally = cleanup
     }
 
+    if (signals.length > 0) {
+      requestOptions.signal = mergeSignals(signals)
+    }
+
     try {
-      response = fetch(url, requestOptions)
+      response = await fetch(url, requestOptions)
     } catch (error) {
       throw new NetworkError('network_error', { cause: error })
     } finally {

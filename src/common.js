@@ -165,3 +165,29 @@ export const timeout = async (delay) => {
 
   return promise
 }
+
+export function mergeSignals(signals) {
+  if (AbortSignal && AbortSignal.any) {
+    return AbortSignal.any(signals)
+  }
+
+  const controller = new AbortController()
+
+  for (const signal of signals) {
+    if (signal.aborted) {
+      controller.abort(signal.reason)
+
+      return controller.signal
+    }
+
+    signal.addEventListener(
+      'abort',
+      () => {
+        controller.abort(signal.reason)
+      },
+      { once: true },
+    )
+  }
+
+  return controller.signal
+}
