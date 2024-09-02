@@ -93,6 +93,12 @@ async function handleResponse(response) {
   return data
 }
 
+const DEFAULT_REQUEST_TIMEOUT_MS = 10_000
+const requestOptionsWithRetryAndTimeout = {
+  retry: true,
+  timeout: DEFAULT_REQUEST_TIMEOUT_MS,
+}
+
 class ULMS extends BasicClient {
   agentLabel
 
@@ -282,6 +288,7 @@ class ULMS extends BasicClient {
    * @param {Object|Object[]} jsep
    * @param {String} intent
    * @param {String} label
+   * @param {Object} requestOptions
    * @returns {Promise}
    */
   createSignal(
@@ -289,6 +296,7 @@ class ULMS extends BasicClient {
     jsep,
     intent = ULMS.intents.INTENT_READ, // eslint-disable-line default-param-last
     label,
+    requestOptions = {},
   ) {
     const payload = {
       agent_label: this.agentLabel,
@@ -296,24 +304,33 @@ class ULMS extends BasicClient {
       jsep,
       label,
     }
+    const { signal } = requestOptions
 
-    return this.post(this.url(`/conference_rtcs/${rtcId}/signal`), payload)
+    return this.post(this.url(`/conference_rtcs/${rtcId}/signal`), payload, {
+      ...requestOptionsWithRetryAndTimeout,
+      signal,
+    })
   }
 
   /**
    * Create trickle signal
    * @param {String} handleId
    * @param {Object|Object[]} candidates
+   * @param {Object} requestOptions
    * @returns {Promise}
    */
-  createTrickleSignal(handleId, candidates) {
+  createTrickleSignal(handleId, candidates, requestOptions = {}) {
     const payload = {
       agent_label: this.agentLabel,
       candidates,
       handle_id: handleId,
     }
+    const { signal } = requestOptions
 
-    return this.post(this.url('/conference_streams/trickle'), payload)
+    return this.post(this.url('/conference_streams/trickle'), payload, {
+      ...requestOptionsWithRetryAndTimeout,
+      signal,
+    })
   }
 
   /**
@@ -498,7 +515,7 @@ class ULMS extends BasicClient {
   readScope(kind, audience, scope, options) {
     return this.get(
       this.url(`/audiences/${audience}/${kind}/${scope}`, options),
-      { timeout: 10_000, retry: true },
+      requestOptionsWithRetryAndTimeout,
     )
   }
 
@@ -690,17 +707,11 @@ class ULMS extends BasicClient {
    * @returns {Promise}
    */
   updatePosition(kind, classId, position) {
-    const controller = new AbortController()
-    const { signal } = controller
-    const timeoutId = setTimeout(() => controller.abort(), 10 * 1000)
-
     return this.post(
       `${this.baseUrl}/${kind}/${classId}/timestamps`,
       { position },
-      { signal },
-    ).finally(() => {
-      clearTimeout(timeoutId)
-    })
+      requestOptionsWithRetryAndTimeout,
+    )
   }
 
   /**
