@@ -31,7 +31,7 @@ class ProfileService {
 
     for (const keyChunk of keyChunks) {
       const [, scope] = keyChunk[0].split(':')
-      const ids = keyChunk.map((_) => _.split(':')[0])
+      const ids = keyChunk.map((_) => _.split(':')[0]).sort()
 
       for (const key of keyChunk) {
         this.profileMap[key].state = 'pending'
