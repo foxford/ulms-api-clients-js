@@ -1,6 +1,6 @@
 {
   "name": "@ulms/api-clients",
-  "version": "7.18.0",
+  "version": "7.19.0",
   "description": "JavaScript API clients for ULMS platform",
   "keywords": [],
   "homepage": "https://github.com/foxford/ulms-api-clients-js#readme",
@@ -41,7 +41,6 @@
     "lodash": "4.17.21",
     "mime": "2.6.0",
     "mqtt": "3.0.0",
-    "mqtt-pattern": "1.2.0",
     "nats.ws": "1.7.2",
     "p-queue": "8.0.1",
     "uuid": "8.3.2"
