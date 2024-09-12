@@ -3,8 +3,9 @@
 
 // using version from cdn
 // import mqtt from 'mqtt'
-import MQTTPattern from 'mqtt-pattern'
 
+import Backoff from './backoff'
+import { sleep } from './common'
 import { mqttReasonCodeNameEnum } from './constants'
 import retry from './retry'
 import loadScript from './script-loader'
@@ -53,10 +54,7 @@ class MQTTClient {
 
   constructor(url) {
     this.client = undefined
-    this.patterns = {}
     this.url = url
-
-    this.handleMessageEvent = this.handleMessageEvent.bind(this)
   }
 
   get connected() {
@@ -75,36 +73,8 @@ class MQTTClient {
     return this.client.reconnecting
   }
 
-  bindEventListeners() {
-    this.client.on(MQTTClient.events.MESSAGE, this.handleMessageEvent)
-  }
-
-  handleMessageEvent(topic, message, packet) {
-    const patterns = Object.keys(this.patterns)
-
-    for (const pattern of patterns) {
-      const topicParameters = MQTTPattern.exec(pattern, topic)
-
-      if (topicParameters !== null) {
-        this.patterns[pattern](topicParameters, topic, message, packet)
-      }
-    }
-  }
-
-  attachRoute(topicPattern, handler) {
-    this.patterns[topicPattern] = handler
-  }
-
-  detachRoute(topicPattern) {
-    if (this.patterns[topicPattern]) {
-      delete this.patterns[topicPattern]
-    }
-  }
-
   connect(options) {
     this.client = mqtt.connect(this.url, options)
-
-    this.bindEventListeners()
   }
 
   disconnect(...arguments_) {
@@ -140,6 +110,7 @@ class ReconnectingMQTTClient extends MQTTClient {
   constructor(url, tokenProvider, reconnectLimit) {
     super(url)
 
+    this.backoff = new Backoff()
     this.forcedClose = false
     this.reconnectCount = 0
     this.reconnectLimit = reconnectLimit || 3
@@ -154,8 +125,6 @@ class ReconnectingMQTTClient extends MQTTClient {
   }
 
   bindEventListeners() {
-    super.bindEventListeners()
-
     this.client.on(ReconnectingMQTTClient.events.CLOSE, this.handleCloseEvent)
     this.client.on(
       ReconnectingMQTTClient.events.CONNECT,
@@ -193,6 +162,8 @@ class ReconnectingMQTTClient extends MQTTClient {
 
     this.forcedClose = false
     this.reconnectCount = 0
+
+    this.backoff.reset()
   }
 
   handlePacketReceiveEvent(packet) {
@@ -241,6 +212,8 @@ class ReconnectingMQTTClient extends MQTTClient {
     return this.tokenProvider.getToken().then((password) => {
       super.connect({ ...options, password })
 
+      this.bindEventListeners()
+
       return new Promise((resolve, reject) => {
         const connectHandler = () => {
           // eslint-disable-next-line no-use-before-define
@@ -265,12 +238,23 @@ class ReconnectingMQTTClient extends MQTTClient {
 
   disconnect() {
     this.forcedClose = true
+    this.reconnectCount = 0
+
+    this.backoff.reset()
 
     super.disconnect(true)
   }
 
-  reconnect() {
+  async reconnect() {
     if (this.tokenProviderPromise !== undefined) return
+
+    this.forcedClose = false
+
+    if (this.reconnectCount !== 0) {
+      await sleep(this.backoff.value)
+
+      this.backoff.next()
+    }
 
     this.tokenProviderPromise = this.tokenProvider
       .getToken()
