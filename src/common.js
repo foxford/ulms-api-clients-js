@@ -191,3 +191,47 @@ export function mergeSignals(signals) {
 
   return controller.signal
 }
+
+// eslint-disable-next-line unicorn/prevent-abbreviations
+export function listStateSet(client, roomId, set, params = {}) {
+  let result = []
+
+  function loop(room, parameters, callback) {
+    return rejectByTimeout(client.readState(room, [set], parameters))
+      .then((response) => {
+        if (response[set]?.length > 0) {
+          result = [...result, ...response[set]]
+
+          if (response.has_next) {
+            loop(
+              room,
+              {
+                ...parameters,
+                original_occurred_at:
+                  // eslint-disable-next-line unicorn/prefer-at
+                  response[set][response[set].length - 1].original_occurred_at,
+              },
+              callback,
+            )
+          } else {
+            callback() // eslint-disable-line promise/no-callback-in-promise
+          }
+        } else {
+          callback() // eslint-disable-line promise/no-callback-in-promise
+        }
+      })
+      .catch((error) => callback(error)) // eslint-disable-line promise/no-callback-in-promise
+  }
+
+  return new Promise((resolve, reject) => {
+    loop(roomId, params, (error) => {
+      if (error) {
+        reject(error)
+
+        return
+      }
+
+      resolve(result)
+    })
+  })
+}
