@@ -82,6 +82,10 @@ class NatsManager {
         // waiting 2 seconds between reconnections
         await sleep(2e3)
       }
+
+      if (this.forcedStop) {
+        break
+      }
     }
   }
 
