@@ -1,12 +1,13 @@
 /* eslint-disable no-await-in-loop */
 import Backoff from './backoff'
-import { sleep, timeout } from './common'
+import { generateRandomId, sleep, timeout } from './common'
 
 class NatsManager {
   constructor(client, gatekeeper, nsm, vsm) {
     this.client = client
     this.gatekeeper = gatekeeper
     this.gatekeeperBackoff = new Backoff()
+    this.id = undefined // local connection identifier (prevent simultaneous connections)
     this.nsm = nsm // NetworkStatusMonitor instance
     this.vsm = vsm // VisibilityStateMonitor instance
 
@@ -48,6 +49,9 @@ class NatsManager {
   }
 
   async start(classId, name, accountLabel) {
+    const rid = generateRandomId()
+
+    this.id = rid
     this.forcedStop = false
 
     // eslint-disable-next-line no-constant-condition
@@ -84,6 +88,11 @@ class NatsManager {
       }
 
       if (this.forcedStop) {
+        break
+      }
+
+      // prevent multiple connections
+      if (this.id !== rid) {
         break
       }
     }

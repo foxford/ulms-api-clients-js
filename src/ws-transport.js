@@ -1,10 +1,8 @@
 import Debug from 'debug'
 
-import { makeDeferred } from './common'
+import { generateRandomId, makeDeferred } from './common'
 
 const debug = Debug('ws-transport')
-
-const generateRandomId = () => Math.random().toString(36).slice(2, 8)
 
 const KEEP_ALIVE_MESSAGE = '-'
 const KEEP_ALIVE_TIMED_OUT_ERROR_PAYLOAD = {
