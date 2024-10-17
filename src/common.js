@@ -53,6 +53,10 @@ export function enterRoom(client, roomId, agentId, timeout = 5000) {
   })
 }
 
+export function generateRandomId() {
+  return Math.random().toString(36).slice(2, 8)
+}
+
 export const sleep = async (ms) =>
   new Promise((resolve) => {
     setTimeout(resolve, ms)
