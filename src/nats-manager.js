@@ -49,6 +49,11 @@ class NatsManager {
   }
 
   async start(classId, name, accountLabel) {
+    if (this.id) {
+      // has previous connection, close it
+      await this.stop()
+    }
+
     const rid = generateRandomId()
 
     this.id = rid
